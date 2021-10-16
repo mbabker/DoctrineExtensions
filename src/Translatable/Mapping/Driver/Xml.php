@@ -6,10 +6,9 @@ use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Translatable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Translatable
- * extension.
+ * XML mapping driver for the Translatable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
@@ -22,9 +21,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
         $xmlDoctrine = $xml;
 
@@ -32,9 +29,6 @@ class Xml extends BaseXml
 
         if (('entity' == $xmlDoctrine->getName() || 'mapped-superclass' == $xmlDoctrine->getName())) {
             if ($xml->count() && isset($xml->translation)) {
-                /**
-                 * @var \SimpleXmlElement
-                 */
                 $data = $xml->translation;
                 if ($this->_isAttributeSet($data, 'locale')) {
                     $config['locale'] = $this->_getAttribute($data, 'locale');
@@ -98,7 +92,6 @@ class Xml extends BaseXml
         $mapping = $mapping->children(self::GEDMO_NAMESPACE_URI);
         if ($mapping->count() > 0 && isset($mapping->translatable)) {
             $config['fields'][] = $fieldName;
-            /** @var \SimpleXmlElement $data */
             $data = $mapping->translatable;
             if ($this->_isAttributeSet($data, 'fallback')) {
                 $config['fallback'][$fieldName] = 'true' == $this->_getAttribute($data, 'fallback') ? true : false;

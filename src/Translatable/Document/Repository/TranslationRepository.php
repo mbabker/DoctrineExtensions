@@ -8,11 +8,12 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use Gedmo\Tool\Wrapper\MongoDocumentWrapper;
+use Gedmo\Translatable\Document\MappedSuperclass\AbstractPersonalTranslation;
 use Gedmo\Translatable\Mapping\Event\Adapter\ODM as TranslatableAdapterODM;
 use Gedmo\Translatable\TranslatableListener;
 
 /**
- * The TranslationRepository has some useful functions
+ * The TranslationRepository provides some useful functions
  * to interact with translations.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -21,8 +22,7 @@ use Gedmo\Translatable\TranslatableListener;
 class TranslationRepository extends DocumentRepository
 {
     /**
-     * Current TranslatableListener instance used
-     * in EntityManager
+     * Current TranslatableListener instance used in the document manager
      *
      * @var TranslatableListener
      */
@@ -30,25 +30,28 @@ class TranslationRepository extends DocumentRepository
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Gedmo\Exception\UnexpectedValueException if an unsupported object type is provided
      */
     public function __construct(DocumentManager $dm, UnitOfWork $uow, ClassMetadata $class)
     {
-        if ($class->getReflectionClass()->isSubclassOf('Gedmo\Translatable\Document\MappedSuperclass\AbstractPersonalTranslation')) {
+        if ($class->getReflectionClass()->isSubclassOf(AbstractPersonalTranslation::class)) {
             throw new \Gedmo\Exception\UnexpectedValueException('This repository is useless for personal translations');
         }
         parent::__construct($dm, $uow, $class);
     }
 
     /**
-     * Makes additional translation of $document $field into $locale
-     * using $value
+     * Makes an additional translation of a field from a document in the given locale
      *
      * @param object $document
      * @param string $field
      * @param string $locale
      * @param mixed  $value
      *
-     * @return static
+     * @return $this
+     *
+     * @throws \Gedmo\Exception\InvalidArgumentException if the field cannot be translated
      */
     public function translate($document, $field, $locale, $value)
     {
@@ -98,12 +101,11 @@ class TranslationRepository extends DocumentRepository
     }
 
     /**
-     * Loads all translations with all translatable
-     * fields from the given entity
+     * Loads all translations with all translatable fields for the given document
      *
      * @param object $document
      *
-     * @return array list of translations in locale groups
+     * @return array<string, array<string, mixed>>
      */
     public function findTranslations($document)
     {
@@ -151,16 +153,16 @@ class TranslationRepository extends DocumentRepository
     }
 
     /**
-     * Find the object $class by the translated field.
+     * Find an object for the provided class by the translated field.
      * Result is the first occurrence of translated field.
-     * Query can be slow, since there are no indexes on such
-     * columns
      *
-     * @param string $field
-     * @param string $value
-     * @param string $class
+     * Query can be slow since there are no indexes on such columns.
      *
-     * @return object - instance of $class or null if not found
+     * @param string       $field
+     * @param string       $value
+     * @param class-string $class
+     *
+     * @return object|null
      */
     public function findObjectByTranslatedField($field, $value, $class)
     {
@@ -188,12 +190,11 @@ class TranslationRepository extends DocumentRepository
     }
 
     /**
-     * Loads all translations with all translatable
-     * fields by a given document primary key
+     * Loads all translations with all translatable fields by a given document's primary key
      *
-     * @param mixed $id - primary key value of document
+     * @param mixed $id Primary key of the document
      *
-     * @return array
+     * @return array<string, array<string, mixed>>
      */
     public function findTranslationsByObjectId($id)
     {
@@ -224,9 +225,9 @@ class TranslationRepository extends DocumentRepository
     /**
      * Get the currently used TranslatableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return TranslatableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     private function getTranslatableListener()
     {

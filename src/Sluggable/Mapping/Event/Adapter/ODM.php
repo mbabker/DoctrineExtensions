@@ -10,8 +10,8 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 use MongoDB\BSON\Regex;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for sluggable behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the Sluggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -54,10 +54,10 @@ final class ODM extends BaseAdapterODM implements SluggableAdapter
     }
 
     /**
-     * This query can cause some data integrity failures since it does not
-     * execute automatically
-     *
      * {@inheritdoc}
+     *
+     * Note, this query can cause some data integrity failures since it does not
+     * execute automatically.
      */
     public function replaceRelative($object, array $config, $target, $replacement)
     {
@@ -90,10 +90,10 @@ final class ODM extends BaseAdapterODM implements SluggableAdapter
     }
 
     /**
-     * This query can cause some data integrity failures since it does not
-     * execute atomically
-     *
      * {@inheritdoc}
+     *
+     * Note, this query can cause some data integrity failures since it does not
+     * execute automatically.
      */
     public function replaceInverseRelative($object, array $config, $target, $replacement)
     {

@@ -5,7 +5,7 @@ namespace Gedmo\Translatable\Document\MappedSuperclass;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoODM;
 
 /**
- * Gedmo\Translatable\Document\AbstractPersonalTranslation
+ * Base Document object for personal translations for the MongoDB ODM.
  *
  * @MongoODM\MappedSuperclass
  */
@@ -26,8 +26,8 @@ abstract class AbstractPersonalTranslation
     protected $locale;
 
     /**
-     * Related document with ManyToOne relation
-     * must be mapped by user
+     * Related document with a ManyToOne relation,
+     * must be mapped by the user.
      *
      * @var object
      */
@@ -48,9 +48,9 @@ abstract class AbstractPersonalTranslation
     protected $content;
 
     /**
-     * Get id
+     * Get the document ID.
      *
-     * @return int $id
+     * @return int
      */
     public function getId()
     {
@@ -58,11 +58,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set locale
+     * Set the translation locale
      *
      * @param string $locale
      *
-     * @return static
+     * @return $this
      */
     public function setLocale($locale)
     {
@@ -72,7 +72,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get locale
+     * Get the translation locale
      *
      * @return string
      */
@@ -82,11 +82,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set field
+     * Set the translated field
      *
      * @param string $field
      *
-     * @return static
+     * @return $this
      */
     public function setField($field)
     {
@@ -96,7 +96,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get field
+     * Get the translated field
      *
      * @return string
      */
@@ -106,11 +106,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set object related
+     * Set the related object
      *
      * @param object $object
      *
-     * @return static
+     * @return $this
      */
     public function setObject($object)
     {
@@ -120,9 +120,9 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get object related
+     * Get the related object
      *
-     * @return string
+     * @return object
      */
     public function getObject()
     {
@@ -130,11 +130,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set content
+     * Set the translation content
      *
      * @param string $content
      *
-     * @return static
+     * @return $this
      */
     public function setContent($content)
     {
@@ -144,7 +144,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get content
+     * Get the translation content
      *
      * @return string
      */

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Blameable Trait, usable with PHP >= 5.4
+ * Trait integrating common Blameable properties for objects with ORM annotations.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,6 +15,7 @@ trait BlameableEntity
 {
     /**
      * @var string
+     *
      * @Gedmo\Blameable(on="create")
      * @ORM\Column(nullable=true)
      */
@@ -23,6 +24,7 @@ trait BlameableEntity
 
     /**
      * @var string
+     *
      * @Gedmo\Blameable(on="update")
      * @ORM\Column(nullable=true)
      */
@@ -30,7 +32,7 @@ trait BlameableEntity
     protected $updatedBy;
 
     /**
-     * Sets createdBy.
+     * Sets the created by information.
      *
      * @param string $createdBy
      *
@@ -44,7 +46,7 @@ trait BlameableEntity
     }
 
     /**
-     * Returns createdBy.
+     * Returns the created by information.
      *
      * @return string
      */
@@ -54,7 +56,7 @@ trait BlameableEntity
     }
 
     /**
-     * Sets updatedBy.
+     * Sets the updated by information.
      *
      * @param string $updatedBy
      *
@@ -68,7 +70,7 @@ trait BlameableEntity
     }
 
     /**
-     * Returns updatedBy.
+     * Returns the updated by information.
      *
      * @return string
      */

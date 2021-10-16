@@ -11,7 +11,7 @@ use Gedmo\Mapping\MappedEventSubscriber;
 use Gedmo\Sortable\Mapping\Event\SortableAdapter;
 
 /**
- * The SortableListener maintains a sort index on your entities
+ * The Sortable listener maintains a sort index on your objects
  * to enable arbitrary sorting.
  *
  * This behavior can impact the performance of your application
@@ -27,9 +27,9 @@ class SortableListener extends MappedEventSubscriber
     private $maxPositions = [];
 
     /**
-     * Specifies the list of events to listen
+     * Specifies the list of events to listen on.
      *
-     * @return array
+     * @return string[]
      */
     public function getSubscribedEvents()
     {
@@ -45,7 +45,9 @@ class SortableListener extends MappedEventSubscriber
     }
 
     /**
-     * Maps additional metadata
+     * Maps additional metadata for the object.
+     *
+     * @return void
      */
     public function loadClassMetadata(EventArgs $args)
     {
@@ -57,8 +59,9 @@ class SortableListener extends MappedEventSubscriber
      * Collect position updates on objects being updated during flush
      * if they require changing.
      *
-     * Persisting of positions is done later during prePersist, preUpdate and postRemove
-     * events, otherwise the queries won't be executed within the transaction.
+     * Persisting of positions is done later during the prePersist,
+     * preUpdate, and postRemove events, otherwise the queries won't be
+     * executed within the transaction.
      *
      * The synchronization of the objects in memory is done in postFlush. This
      * ensures that the positions have been successfully persisted to database.
@@ -207,7 +210,7 @@ class SortableListener extends MappedEventSubscriber
     }
 
     /**
-     * Computes node positions and updates the sort field in memory and in the db
+     * Computes node positions and updates the sort field in memory and in the database.
      *
      * @param ClassMetadata $meta
      * @param object        $object
@@ -345,7 +348,7 @@ class SortableListener extends MappedEventSubscriber
     }
 
     /**
-     * Computes node positions and updates the sort field in memory and in the db
+     * Computes node positions and updates the sort field in memory and in the database.
      *
      * @param ClassMetadata $meta
      * @param object        $object
@@ -505,6 +508,13 @@ class SortableListener extends MappedEventSubscriber
         return md5($data);
     }
 
+    /**
+     * @param ClassMetadata $meta
+     * @param array         $config
+     * @param object        $object
+     *
+     * @return mixed
+     */
     protected function getMaxPosition(SortableAdapter $ea, $meta, $config, $object, array $groups = [])
     {
         $em = $ea->getObjectManager();

@@ -2,14 +2,14 @@
 
 namespace Gedmo\Sortable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Sortable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Sortable
- * extension.
+ * XML mapping driver for the Sortable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Sortable extension.
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,9 +17,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * List of types which are valid for position field
+     * List of types which are valid for a position field.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'int',
@@ -33,9 +33,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
 
         if (isset($xml->field)) {
@@ -71,8 +69,8 @@ class Xml extends BaseXml
     }
 
     /**
-     * @param \SimpleXMLElement[] $mapping
-     * @param string              $fieldAttr
+     * @param \SimpleXMLElement $mapping
+     * @param string            $fieldAttr
      */
     private function readSortableGroups($mapping, array &$config, $fieldAttr = 'field')
     {
@@ -90,10 +88,10 @@ class Xml extends BaseXml
     }
 
     /**
-     * Checks if $field type is valid as Sortable Position field
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

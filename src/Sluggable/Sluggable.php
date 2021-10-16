@@ -3,9 +3,8 @@
 namespace Gedmo\Sluggable;
 
 /**
- * This interface is not necessary but can be implemented for
- * Entities which in some cases needs to be identified as
- * Sluggable
+ * Optional interface which can be used to identify
+ * Sluggable objects.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

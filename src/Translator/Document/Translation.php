@@ -8,7 +8,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\MappedSuperclass;
 use Gedmo\Translator\Translation as BaseTranslation;
 
 /**
- * Document translation class.
+ * Document object for translations for the MongoDB ODM.
  *
  * @author  Konstantin Kudryashov <ever.zet@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -44,9 +44,9 @@ abstract class Translation extends BaseTranslation
     protected $value;
 
     /**
-     * Get id
+     * Get the document ID.
      *
-     * @return int $id
+     * @return int
      */
     public function getId()
     {

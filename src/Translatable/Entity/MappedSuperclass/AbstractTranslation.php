@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation
+ * Base Entity object for translations for the ORM.
  *
  * @ORM\MappedSuperclass
  */
@@ -66,9 +66,9 @@ abstract class AbstractTranslation
     protected $content;
 
     /**
-     * Get id
+     * Get the entity ID.
      *
-     * @return int $id
+     * @return int
      */
     public function getId()
     {
@@ -76,11 +76,11 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Set locale
+     * Set the translation locale
      *
      * @param string $locale
      *
-     * @return static
+     * @return $this
      */
     public function setLocale($locale)
     {
@@ -90,7 +90,7 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Get locale
+     * Get the translation locale
      *
      * @return string
      */
@@ -100,11 +100,11 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Set field
+     * Set the translated field
      *
      * @param string $field
      *
-     * @return static
+     * @return $this
      */
     public function setField($field)
     {
@@ -114,7 +114,7 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Get field
+     * Get the translated field
      *
      * @return string
      */
@@ -124,11 +124,11 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Set object class
+     * Set the translated object class name
      *
-     * @param string $objectClass
+     * @param class-string $objectClass
      *
-     * @return static
+     * @return $this
      */
     public function setObjectClass($objectClass)
     {
@@ -138,9 +138,9 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Get objectClass
+     * Get the translated object class name
      *
-     * @return string
+     * @return class-string
      */
     public function getObjectClass()
     {
@@ -148,11 +148,11 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Set foreignKey
+     * Set the foreign key identifier for the related object
      *
      * @param string $foreignKey
      *
-     * @return static
+     * @return $this
      */
     public function setForeignKey($foreignKey)
     {
@@ -162,7 +162,7 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Get foreignKey
+     * Get the foreign key identifier for the related object
      *
      * @return string
      */
@@ -172,11 +172,11 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Set content
+     * Set the translation content
      *
      * @param string $content
      *
-     * @return static
+     * @return $this
      */
     public function setContent($content)
     {
@@ -186,7 +186,7 @@ abstract class AbstractTranslation
     }
 
     /**
-     * Get content
+     * Get the translation content
      *
      * @return string
      */

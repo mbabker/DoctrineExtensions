@@ -3,7 +3,7 @@
 namespace Gedmo\IpTraceable\Traits;
 
 /**
- * IpTraceable Trait, usable with PHP >= 5.4
+ * Trait integrating common IpTraceable properties for objects.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -21,7 +21,7 @@ trait IpTraceable
     protected $updatedFromIp;
 
     /**
-     * Sets createdFromIp.
+     * Sets the created from IP.
      *
      * @param string $createdFromIp
      *
@@ -35,7 +35,7 @@ trait IpTraceable
     }
 
     /**
-     * Returns createdFromIp.
+     * Returns the created from IP.
      *
      * @return string
      */
@@ -45,7 +45,7 @@ trait IpTraceable
     }
 
     /**
-     * Sets updatedFromIp.
+     * Sets the updated from IP.
      *
      * @param string $updatedFromIp
      *
@@ -59,7 +59,7 @@ trait IpTraceable
     }
 
     /**
-     * Returns updatedFromIp.
+     * Returns the updated from IP.
      *
      * @return string
      */

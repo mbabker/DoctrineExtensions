@@ -7,6 +7,10 @@ use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
+ * YAML mapping driver for the References behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the References extension.
+ *
  * @author Gonzalo Vilaseca <gonzalo.vilaseca@reiss.com>
  */
 class Yaml extends File implements Driver
@@ -18,6 +22,11 @@ class Yaml extends File implements Driver
      */
     protected $_extension = '.dcm.yml';
 
+    /**
+     * List of valid reference types.
+     *
+     * @var string[]
+     */
     private $validReferences = [
         'referenceOne' => [],
         'referenceMany' => [],
@@ -66,6 +75,6 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse($file);
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 }

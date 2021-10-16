@@ -4,13 +4,14 @@ namespace Gedmo\Loggable\Mapping\Driver;
 
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Loggable;
+use Gedmo\Mapping\Annotation\Versioned;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Loggable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Loggable
- * extension.
+ * Annotation mapping driver for the Loggable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Loggable extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -19,14 +20,14 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to define that this object is loggable
+     * Annotation class for the Loggable extension.
      */
-    public const LOGGABLE = 'Gedmo\\Mapping\\Annotation\\Loggable';
+    public const LOGGABLE = Loggable::class;
 
     /**
-     * Annotation to define that this property is versioned
+     * Annotation class defining a versioned field.
      */
-    public const VERSIONED = 'Gedmo\\Mapping\\Annotation\\Versioned';
+    public const VERSIONED = Versioned::class;
 
     /**
      * {@inheritdoc}
@@ -48,6 +49,8 @@ class Annotation extends AbstractAnnotationDriver
     {
         $class = $this->getMetaReflectionClass($meta);
         // class annotations
+
+        /** @var Loggable $annot */
         if ($annot = $this->reader->getClassAnnotation($class, self::LOGGABLE)) {
             $config['loggable'] = true;
             if ($annot->logEntryClass) {
@@ -74,7 +77,7 @@ class Annotation extends AbstractAnnotationDriver
                     $this->inspectEmbeddedForVersioned($field, $config, $meta);
                     continue;
                 }
-                // fields cannot be overrided and throws mapping exception
+                // fields cannot be overridden and throws mapping exception
                 if (!(isset($config['versioned']) && in_array($field, $config['versioned']))) {
                     $config['versioned'][] = $field;
                 }
@@ -85,13 +88,15 @@ class Annotation extends AbstractAnnotationDriver
             if (is_array($meta->identifier) && count($meta->identifier) > 1) {
                 throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
             }
-            if ($this->isClassAnnotationInValid($meta, $config)) {
+            if ($this->isClassAnnotationInvalid($meta, $config)) {
                 throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
             }
         }
     }
 
     /**
+     * Checks if the mapping is valid for the given field.
+     *
      * @param string $field
      *
      * @return bool
@@ -102,19 +107,21 @@ class Annotation extends AbstractAnnotationDriver
     }
 
     /**
+     * Checks if the annotation configuration is invalid.
+     *
      * @return bool
      */
-    protected function isClassAnnotationInValid(ClassMetadata $meta, array &$config)
+    protected function isClassAnnotationInvalid(ClassMetadata $meta, array &$config)
     {
         return isset($config['versioned']) && !isset($config['loggable']) && (!isset($meta->isEmbeddedClass) || !$meta->isEmbeddedClass);
     }
 
     /**
-     * Searches properties of embedded object for versioned fields
+     * Searches properties of an embedded object for versioned fields
      *
      * @param string $field
      */
-    private function inspectEmbeddedForVersioned($field, array &$config, \Doctrine\ORM\Mapping\ClassMetadata $meta)
+    private function inspectEmbeddedForVersioned($field, array &$config, ClassMetadata $meta)
     {
         $сlass = new \ReflectionClass($meta->embeddedClasses[$field]['class']);
 

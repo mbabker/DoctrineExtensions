@@ -7,10 +7,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 use Gedmo\SoftDeleteable\Mapping\Validator;
 
 /**
- * This is a xml mapping driver for SoftDeleteable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for SoftDeleteable
- * extension.
+ * XML mapping driver for the Blameable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Blameable extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -24,9 +23,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
         $xmlDoctrine = $xml;
         $xml = $xml->children(self::GEDMO_NAMESPACE_URI);

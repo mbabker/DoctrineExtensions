@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 use Gedmo\Translator\Translation as BaseTranslation;
 
 /**
- * Entity translation class.
+ * Entity object for translations for the ORM.
  *
  * @author  Konstantin Kudryashov <ever.zet@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -57,9 +57,9 @@ abstract class Translation extends BaseTranslation
     protected $value;
 
     /**
-     * Get id
+     * Get the entity ID.
      *
-     * @return int $id
+     * @return int
      */
     public function getId()
     {

@@ -2,16 +2,15 @@
 
 namespace Gedmo\Mapping\Driver;
 
-use Doctrine\ORM\Mapping\Driver\AbstractFileDriver;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\Driver\FileDriver;
 use Doctrine\Persistence\Mapping\Driver\FileLocator;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Gedmo\Mapping\Driver;
 
 /**
- * The mapping FileDriver abstract class, defines the
- * metadata extraction function common among
- * all drivers used on these extensions by file based
- * drivers.
+ * This is an abstract class to implement common functionality
+ * for extension filesystem based mapping drivers.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -31,7 +30,9 @@ abstract class File implements Driver
     protected $_extension;
 
     /**
-     * original driver if it is available
+     * Original mapping driver, if available.
+     *
+     * @var MappingDriver|null
      */
     protected $_originalDriver = null;
 
@@ -43,7 +44,7 @@ abstract class File implements Driver
     /**
      * Set the paths for file lookup
      *
-     * @param array $paths
+     * @param string[] $paths
      *
      * @return void
      */
@@ -66,16 +67,16 @@ abstract class File implements Driver
 
     /**
      * Loads a mapping file with the given name and returns a map
-     * from class/entity names to their corresponding elements.
+     * of class/entity names to their corresponding elements.
      *
-     * @param string $file the mapping file to load
+     * @param string $file The mapping file to load
      *
      * @return array
      */
     abstract protected function _loadMappingFile($file);
 
     /**
-     * Tries to get a mapping for a given class
+     * Tries to get the mapping for a given class
      *
      * @param string $className
      *
@@ -86,7 +87,7 @@ abstract class File implements Driver
         //try loading mapping from original driver first
         $mapping = null;
         if (!is_null($this->_originalDriver)) {
-            if ($this->_originalDriver instanceof FileDriver || $this->_originalDriver instanceof AbstractFileDriver) {
+            if ($this->_originalDriver instanceof FileDriver) {
                 $mapping = $this->_originalDriver->getElement($className);
             }
         }
@@ -103,7 +104,7 @@ abstract class File implements Driver
     /**
      * Passes in the mapping read by original driver
      *
-     * @param object $driver
+     * @param MappingDriver $driver
      *
      * @return void
      */
@@ -113,12 +114,12 @@ abstract class File implements Driver
     }
 
     /**
-     * Try to find out related class name out of mapping
+     * Try to find the related class name from the mapping data.
      *
-     * @param $metadata - the mapped class metadata
-     * @param $name - the related object class name
+     * @param ClassMetadata $metadata The mapped class metadata
+     * @param string        $name     The related object class name
      *
-     * @return string - related class name or empty string if does not exist
+     * @return string The related class name or an empty string if it does not exist
      */
     protected function getRelatedClassName($metadata, $name)
     {

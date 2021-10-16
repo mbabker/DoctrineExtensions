@@ -2,14 +2,14 @@
 
 namespace Gedmo\Loggable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Loggable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Loggable
- * extension.
+ * XML mapping driver for the Loggable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Loggable extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -23,9 +23,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
         $xmlDoctrine = $xml;
 
@@ -33,9 +31,6 @@ class Xml extends BaseXml
 
         if ('entity' == $xmlDoctrine->getName() || 'document' == $xmlDoctrine->getName() || 'mapped-superclass' == $xmlDoctrine->getName()) {
             if (isset($xml->loggable)) {
-                /**
-                 * @var \SimpleXMLElement;
-                 */
                 $data = $xml->loggable;
                 $config['loggable'] = true;
                 if ($this->_isAttributeSet($data, 'log-entry-class')) {
@@ -75,17 +70,16 @@ class Xml extends BaseXml
     }
 
     /**
-     * Searches mappings on element for versioned fields
+     * Searches mappings on an element for versioned fields.
      *
-     * @param object $meta
+     * @param ClassMetadata $meta
      */
     private function inspectElementForVersioned(\SimpleXMLElement $element, array &$config, $meta)
     {
         foreach ($element as $mapping) {
             $mappingDoctrine = $mapping;
-            /**
-             * @var \SimpleXmlElement
-             */
+
+            /** @var \SimpleXMLElement $mapping */
             $mapping = $mapping->children(self::GEDMO_NAMESPACE_URI);
 
             $isAssoc = $this->_isAttributeSet($mappingDoctrine, 'field');

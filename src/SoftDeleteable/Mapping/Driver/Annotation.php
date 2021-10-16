@@ -3,14 +3,14 @@
 namespace Gedmo\SoftDeleteable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\SoftDeleteable;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 use Gedmo\SoftDeleteable\Mapping\Validator;
 
 /**
- * This is an annotation mapping driver for SoftDeleteable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for SoftDeleteable
- * extension.
+ * Annotation mapping driver for the SoftDeleteable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the SoftDeleteable extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -19,9 +19,9 @@ use Gedmo\SoftDeleteable\Mapping\Validator;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to define that this object is loggable
+     * Annotation class for the SoftDeleteable extension.
      */
-    public const SOFT_DELETEABLE = 'Gedmo\\Mapping\\Annotation\\SoftDeleteable';
+    public const SOFT_DELETEABLE = SoftDeleteable::class;
 
     /**
      * {@inheritdoc}
@@ -29,7 +29,8 @@ class Annotation extends AbstractAnnotationDriver
     public function readExtendedMetadata($meta, array &$config)
     {
         $class = $this->getMetaReflectionClass($meta);
-        // class annotations
+
+        /** @var SoftDeleteable|null $annot */
         if (null !== $class && $annot = $this->reader->getClassAnnotation($class, self::SOFT_DELETEABLE)) {
             $config['softDeleteable'] = true;
 

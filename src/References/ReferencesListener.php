@@ -8,7 +8,8 @@ use Doctrine\Persistence\ObjectManager;
 use Gedmo\Mapping\MappedEventSubscriber;
 
 /**
- * Listener for loading and persisting cross database references.
+ * The References listener handles loading and persisting
+ * cross-database references.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -17,8 +18,18 @@ use Gedmo\Mapping\MappedEventSubscriber;
  */
 class ReferencesListener extends MappedEventSubscriber
 {
+    /**
+     * The managers available to this listener.
+     *
+     * @var array<string, ObjectManager>
+     */
     private $managers;
 
+    /**
+     * Instantiates the listener.
+     *
+     * @param array<string, ObjectManager> $managers
+     */
     public function __construct(array $managers = [])
     {
         parent::__construct();
@@ -117,12 +128,20 @@ class ReferencesListener extends MappedEventSubscriber
         ];
     }
 
+    /**
+     * Registers a manager to the listener.
+     *
+     * @param string        $type
+     * @param ObjectManager $manager
+     */
     public function registerManager($type, $manager)
     {
         $this->managers[$type] = $manager;
     }
 
     /**
+     * Retrieves the manager set for the given type.
+     *
      * @param string $type
      *
      * @return ObjectManager

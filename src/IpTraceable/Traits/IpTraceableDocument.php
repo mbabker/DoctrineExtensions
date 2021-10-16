@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * IpTraceable Trait, usable with PHP >= 5.4
+ * Trait integrating common IpTraceable properties for objects with MongoDB ODM annotations.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,6 +15,7 @@ trait IpTraceableDocument
 {
     /**
      * @var string
+     *
      * @Gedmo\IpTraceable(on="create")
      * @ODM\Field(type="string")
      */
@@ -22,13 +23,14 @@ trait IpTraceableDocument
 
     /**
      * @var string
+     *
      * @Gedmo\IpTraceable(on="update")
      * @ODM\Field(type="string")
      */
     protected $updatedFromIp;
 
     /**
-     * Sets createdFromIp.
+     * Sets the created from IP.
      *
      * @param string $createdFromIp
      *
@@ -42,7 +44,7 @@ trait IpTraceableDocument
     }
 
     /**
-     * Returns createdFromIp.
+     * Returns the created from IP.
      *
      * @return string
      */
@@ -52,7 +54,7 @@ trait IpTraceableDocument
     }
 
     /**
-     * Sets updatedFromIp.
+     * Sets the updated from IP.
      *
      * @param string $updatedFromIp
      *
@@ -66,7 +68,7 @@ trait IpTraceableDocument
     }
 
     /**
-     * Returns updatedFromIp.
+     * Returns the updated from IP.
      *
      * @return string
      */

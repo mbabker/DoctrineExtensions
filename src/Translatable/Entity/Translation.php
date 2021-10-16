@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 use Gedmo\Translatable\Entity\Repository\TranslationRepository;
 
 /**
- * Gedmo\Translatable\Entity\Translation
+ * Entity object for translations for the ORM.
  *
  * @Table(
  *         name="ext_translations",

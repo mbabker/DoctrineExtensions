@@ -7,8 +7,8 @@ use Gedmo\AbstractTrackingListener;
 use Gedmo\Timestampable\Mapping\Event\TimestampableAdapter;
 
 /**
- * The Timestampable listener handles the update of
- * dates on creation and update.
+ * The Blameable listener sets created and updated
+ * timestamps on objects.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

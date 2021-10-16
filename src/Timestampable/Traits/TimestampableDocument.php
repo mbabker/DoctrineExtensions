@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Timestampable Trait, usable with PHP >= 5.4
+ * Trait integrating common Timestampable properties for objects with MongoDB ODM annotations.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,6 +15,7 @@ trait TimestampableDocument
 {
     /**
      * @var \DateTime
+     *
      * @Gedmo\Timestampable(on="create")
      * @ODM\Field(type="date")
      */
@@ -22,13 +23,14 @@ trait TimestampableDocument
 
     /**
      * @var \DateTime
+     *
      * @Gedmo\Timestampable(on="update")
      * @ODM\Field(type="date")
      */
     protected $updatedAt;
 
     /**
-     * Sets createdAt.
+     * Sets the created at time.
      *
      * @return $this
      */
@@ -40,7 +42,7 @@ trait TimestampableDocument
     }
 
     /**
-     * Returns createdAt.
+     * Returns the created at time.
      *
      * @return \DateTime
      */
@@ -50,7 +52,7 @@ trait TimestampableDocument
     }
 
     /**
-     * Sets updatedAt.
+     * Sets the updated at time.
      *
      * @return $this
      */
@@ -62,9 +64,9 @@ trait TimestampableDocument
     }
 
     /**
-     * Returns updatedAt.
+     * Returns the updated at time.
      *
-     * @return \Datetime
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {

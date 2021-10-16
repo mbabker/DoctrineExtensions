@@ -8,10 +8,9 @@ use Gedmo\Mapping\Driver\File;
 use Gedmo\SoftDeleteable\Mapping\Validator;
 
 /**
- * This is a yaml mapping driver for Timestampable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Timestampable
- * extension.
+ * YAML mapping driver for the Blameable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Blameable extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -72,6 +71,6 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 }

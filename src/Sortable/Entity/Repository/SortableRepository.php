@@ -5,6 +5,8 @@ namespace Gedmo\Sortable\Entity\Repository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Gedmo\Sortable\SortableListener;
 
 /**
@@ -16,13 +18,20 @@ use Gedmo\Sortable\SortableListener;
 class SortableRepository extends EntityRepository
 {
     /**
-     * Sortable listener on event manager
+     * Sortable listener from the event manager
      *
      * @var SortableListener
      */
     protected $listener = null;
 
+    /**
+     * @var array|null
+     */
     protected $config = null;
+
+    /**
+     * @var ClassMetadata|null
+     */
     protected $meta = null;
 
     public function __construct(EntityManagerInterface $em, ClassMetadata $class)
@@ -50,11 +59,17 @@ class SortableRepository extends EntityRepository
         $this->config = $this->listener->getConfiguration($this->_em, $this->meta->name);
     }
 
+    /**
+     * @return Query
+     */
     public function getBySortableGroupsQuery(array $groupValues = [])
     {
         return $this->getBySortableGroupsQueryBuilder($groupValues)->getQuery();
     }
 
+    /**
+     * @return QueryBuilder
+     */
     public function getBySortableGroupsQueryBuilder(array $groupValues = [])
     {
         $groups = isset($this->config['groups']) ? array_combine(array_values($this->config['groups']), array_keys($this->config['groups'])) : [];

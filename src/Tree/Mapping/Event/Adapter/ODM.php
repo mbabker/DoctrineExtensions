@@ -6,8 +6,8 @@ use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\Tree\Mapping\Event\TreeAdapter;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for Tree behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the Tree extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

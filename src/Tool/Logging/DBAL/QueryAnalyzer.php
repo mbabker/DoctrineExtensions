@@ -36,22 +36,19 @@ class QueryAnalyzer implements SQLLogger
     /**
      * List of queries executed
      *
-     * @var array
+     * @var string[]
      */
     private $queries = [];
 
     /**
-     * Query execution times indexed
-     * in same order as queries
+     * Query execution times indexed in the same order as the queries
      *
-     * @var array
+     * @var int[]
      */
     private $queryExecutionTimes = [];
 
     /**
-     * Initialize log listener with database
-     * platform, which is needed for parameter
-     * conversion
+     * Initialize the analyzer
      */
     public function __construct(AbstractPlatform $platform)
     {
@@ -80,7 +77,7 @@ class QueryAnalyzer implements SQLLogger
     /**
      * Clean all collected data
      *
-     * @return QueryAnalyzer
+     * @return $this
      */
     public function cleanUp()
     {
@@ -94,7 +91,7 @@ class QueryAnalyzer implements SQLLogger
     /**
      * Dump the statistics of executed queries
      *
-     * @param bool $dumpOnlySql
+     * @param bool $dumpOnlySql Flag indicating only SQL statements should be dumped
      *
      * @return string
      */
@@ -117,7 +114,7 @@ class QueryAnalyzer implements SQLLogger
     }
 
     /**
-     * Index of the slowest query executed
+     * Find the index of the slowest query executed
      *
      * @return int
      */
@@ -136,7 +133,7 @@ class QueryAnalyzer implements SQLLogger
     }
 
     /**
-     * Get total execution time of queries
+     * Get the total execution time of all queries
      *
      * @return int
      */
@@ -148,7 +145,7 @@ class QueryAnalyzer implements SQLLogger
     /**
      * Get all queries
      *
-     * @return array
+     * @return string[]
      */
     public function getExecutedQueries()
     {
@@ -156,7 +153,7 @@ class QueryAnalyzer implements SQLLogger
     }
 
     /**
-     * Get number of executed queries
+     * Get the number of executed queries
      *
      * @return int
      */
@@ -168,7 +165,7 @@ class QueryAnalyzer implements SQLLogger
     /**
      * Get all query execution times
      *
-     * @return array
+     * @return int[]
      */
     public function getExecutionTimes()
     {
@@ -176,7 +173,7 @@ class QueryAnalyzer implements SQLLogger
     }
 
     /**
-     * Create the SQL with mapped parameters
+     * Create the SQL statement with mapped parameters
      *
      * @param string     $sql
      * @param array|null $params

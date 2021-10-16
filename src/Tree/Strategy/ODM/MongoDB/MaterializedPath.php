@@ -10,7 +10,7 @@ use MongoDB\BSON\Regex;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * This strategy makes tree using materialized path strategy
+ * This strategy manages a tree using a materialized path strategy
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>

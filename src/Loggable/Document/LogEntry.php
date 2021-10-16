@@ -5,7 +5,7 @@ namespace Gedmo\Loggable\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoODM;
 
 /**
- * Gedmo\Loggable\Document\LogEntry
+ * Document object for log entries for the MongoDB ODM.
  *
  * @MongoODM\Document(
  *     repositoryClass="Gedmo\Loggable\Document\Repository\LogEntryRepository",
@@ -19,7 +19,4 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoODM;
  */
 class LogEntry extends MappedSuperclass\AbstractLogEntry
 {
-    /*
-     * All required columns are mapped through inherited superclass
-     */
 }

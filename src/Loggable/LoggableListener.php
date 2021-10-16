@@ -8,7 +8,8 @@ use Gedmo\Mapping\MappedEventSubscriber;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
- * Loggable listener
+ * The Loggable listener handles logging actions
+ * on loggable objects.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -43,24 +44,24 @@ class LoggableListener extends MappedEventSubscriber
      * key generated yet - MySQL case. These entries
      * will be updated with new keys on postPersist event
      *
-     * @var array
+     * @var array<string, object>
      */
     protected $pendingLogEntryInserts = [];
 
     /**
-     * For log of changed relations we use
-     * its identifiers to avoid storing serialized Proxies.
+     * For log of changed relations we use its identifiers to avoid
+     * storing serialized Proxies.
      * These are pending relations in case it does not
      * have an identifier yet
      *
-     * @var array
+     * @var array<string, array<array{log: object, field: string}>
      */
     protected $pendingRelatedObjects = [];
 
     /**
      * Set username for identification
      *
-     * @param mixed $username
+     * @param string|object $username A string or an object with either a `getUserIdentifier()` or `getUsername()` method.
      *
      * @throws \Gedmo\Exception\InvalidArgumentException Invalid username
      */
@@ -98,9 +99,7 @@ class LoggableListener extends MappedEventSubscriber
      */
     protected function getLogEntryClass(LoggableAdapter $ea, $class)
     {
-        return isset(self::$configurations[$this->name][$class]['logEntryClass']) ?
-            self::$configurations[$this->name][$class]['logEntryClass'] :
-            $ea->getDefaultLogEntryClass();
+        return self::$configurations[$this->name][$class]['logEntryClass'] ?? $ea->getDefaultLogEntryClass();
     }
 
     /**
@@ -115,8 +114,7 @@ class LoggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Checks for inserted object to update its logEntry
-     * foreign key
+     * Checks for an inserted object to update its logEntry foreign key.
      *
      * @return void
      */
@@ -162,8 +160,7 @@ class LoggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Handle any custom LogEntry functionality that needs to be performed
-     * before persisting it
+     * Handle any custom functionality that needs to be performed before persisting the log entry.
      *
      * @param object $logEntry The LogEntry being persisted
      * @param object $object   The object being Logged
@@ -173,8 +170,7 @@ class LoggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Looks for loggable objects being inserted or updated
-     * for further processing
+     * Looks for loggable objects being inserted or updated for further processing.
      *
      * @return void
      */
@@ -204,7 +200,7 @@ class LoggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Returns an objects changeset data
+     * Retrieves an object's changeset data.
      *
      * @param LoggableAdapter $ea
      * @param object          $object
@@ -248,12 +244,12 @@ class LoggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Create a new Log instance
+     * Create a new LogEntry instance
      *
      * @param string $action
      * @param object $object
      *
-     * @return \Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry|null
+     * @return \Gedmo\Loggable\Document\MappedSuperclass\AbstractLogEntry|\Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry|null
      */
     protected function createLogEntry($action, $object, LoggableAdapter $ea)
     {
@@ -269,7 +265,7 @@ class LoggableListener extends MappedEventSubscriber
         if ($config = $this->getConfiguration($om, $meta->name)) {
             $logEntryClass = $this->getLogEntryClass($ea, $meta->name);
             $logEntryMeta = $om->getClassMetadata($logEntryClass);
-            /** @var \Gedmo\Loggable\Entity\LogEntry $logEntry */
+            /** @var \Gedmo\Loggable\Document\MappedSuperclass\AbstractLogEntry|\Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry $logEntry */
             $logEntry = $logEntryMeta->newInstance();
 
             $logEntry->setAction($action);

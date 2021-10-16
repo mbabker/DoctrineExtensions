@@ -12,7 +12,7 @@ use Gedmo\Tree\TreeListener;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * This strategy makes tree using materialized path strategy
+ * Base class to manage a tree using a materialized path strategy
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -28,7 +28,7 @@ abstract class AbstractMaterializedPath implements Strategy
     /**
      * TreeListener
      *
-     * @var AbstractTreeListener
+     * @var TreeListener
      */
     protected $listener = null;
 

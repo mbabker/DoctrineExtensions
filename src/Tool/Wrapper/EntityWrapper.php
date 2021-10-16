@@ -2,12 +2,11 @@
 
 namespace Gedmo\Tool\Wrapper;
 
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Proxy\Proxy;
 
 /**
- * Wraps entity or proxy for more convenient
- * manipulation
+ * Wraps a managed entity from the ORM for more convenient manipulation.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -22,14 +21,14 @@ class EntityWrapper extends AbstractWrapper
     private $identifier;
 
     /**
-     * True if entity or proxy is loaded
+     * Internal flag to track if the wrapper is initialized.
      *
      * @var bool
      */
     private $initialized = false;
 
     /**
-     * Wrap entity
+     * Wraps an entity.
      *
      * @param object $entity
      */
@@ -113,8 +112,7 @@ class EntityWrapper extends AbstractWrapper
     }
 
     /**
-     * Initialize the entity if it is proxy
-     * required when is detached or not initialized
+     * Initializes the entity if it is a proxy
      */
     protected function initialize()
     {

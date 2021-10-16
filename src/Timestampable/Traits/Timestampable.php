@@ -3,7 +3,7 @@
 namespace Gedmo\Timestampable\Traits;
 
 /**
- * Timestampable Trait, usable with PHP >= 5.4
+ * Trait integrating common Timestampable properties for objects.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -21,7 +21,7 @@ trait Timestampable
     protected $updatedAt;
 
     /**
-     * Sets createdAt.
+     * Sets the created at time.
      *
      * @return $this
      */
@@ -33,7 +33,7 @@ trait Timestampable
     }
 
     /**
-     * Returns createdAt.
+     * Returns the created at time.
      *
      * @return \DateTime
      */
@@ -43,7 +43,7 @@ trait Timestampable
     }
 
     /**
-     * Sets updatedAt.
+     * Sets the updated at time.
      *
      * @return $this
      */
@@ -55,7 +55,7 @@ trait Timestampable
     }
 
     /**
-     * Returns updatedAt.
+     * Returns the updated at time.
      *
      * @return \DateTime
      */

@@ -9,7 +9,8 @@ use Gedmo\Mapping\MappedEventSubscriber;
 use Gedmo\ReferenceIntegrity\Mapping\Validator;
 
 /**
- * The ReferenceIntegrity listener handles the reference integrity on related documents
+ * The ReferenceIntegrity listener handles the reference
+ * integrity on related objects.
  *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -28,7 +29,7 @@ class ReferenceIntegrityListener extends MappedEventSubscriber
     }
 
     /**
-     * Maps additional metadata for the Document
+     * Maps additional metadata for the object.
      *
      * @return void
      */
@@ -39,8 +40,8 @@ class ReferenceIntegrityListener extends MappedEventSubscriber
     }
 
     /**
-     * Looks for referenced objects being removed
-     * to nullify the relation or throw an exception
+     * Looks for referenced objects being removed to nullify
+     * the relation or throw an exception.
      *
      * @return void
      */

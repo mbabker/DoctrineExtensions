@@ -7,10 +7,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 use Gedmo\Tree\Mapping\Validator;
 
 /**
- * This is a xml mapping driver for Tree
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Tree
- * extension.
+ * XML mapping driver for the Tree behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Tree extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -22,7 +21,7 @@ class Xml extends BaseXml
     /**
      * List of tree strategies available
      *
-     * @var array
+     * @var string[]
      */
     private $strategies = [
         'nested',
@@ -35,9 +34,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
         $xmlDoctrine = $xml;
         $xml = $xml->children(self::GEDMO_NAMESPACE_URI);
@@ -155,9 +152,6 @@ class Xml extends BaseXml
         if ('mapped-superclass' == $xmlDoctrine->getName()) {
             if (isset($xmlDoctrine->{'many-to-one'})) {
                 foreach ($xmlDoctrine->{'many-to-one'} as $manyToOneMapping) {
-                    /**
-                     * @var \SimpleXMLElement
-                     */
                     $manyToOneMappingDoctrine = $manyToOneMapping;
                     $manyToOneMapping = $manyToOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($manyToOneMapping->{'tree-parent'})) {
@@ -179,9 +173,6 @@ class Xml extends BaseXml
                 }
             } elseif (isset($xmlDoctrine->{'reference-one'})) {
                 foreach ($xmlDoctrine->{'reference-one'} as $referenceOneMapping) {
-                    /**
-                     * @var \SimpleXMLElement
-                     */
                     $referenceOneMappingDoctrine = $referenceOneMapping;
                     $referenceOneMapping = $referenceOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($referenceOneMapping->{'tree-parent'})) {
@@ -203,9 +194,6 @@ class Xml extends BaseXml
         } elseif ('entity' == $xmlDoctrine->getName()) {
             if (isset($xmlDoctrine->{'many-to-one'})) {
                 foreach ($xmlDoctrine->{'many-to-one'} as $manyToOneMapping) {
-                    /**
-                     * @var \SimpleXMLElement
-                     */
                     $manyToOneMappingDoctrine = $manyToOneMapping;
                     $manyToOneMapping = $manyToOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($manyToOneMapping->{'tree-parent'})) {
@@ -229,9 +217,6 @@ class Xml extends BaseXml
         } elseif ('document' == $xmlDoctrine->getName()) {
             if (isset($xmlDoctrine->{'reference-one'})) {
                 foreach ($xmlDoctrine->{'reference-one'} as $referenceOneMapping) {
-                    /**
-                     * @var \SimpleXMLElement
-                     */
                     $referenceOneMappingDoctrine = $referenceOneMapping;
                     $referenceOneMapping = $referenceOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($referenceOneMapping->{'tree-parent'})) {

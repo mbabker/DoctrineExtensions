@@ -3,13 +3,14 @@
 namespace Gedmo\Sortable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\SortableGroup;
+use Gedmo\Mapping\Annotation\SortablePosition;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Sortable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Sortable
- * extension.
+ * Annotation mapping driver for the Sortable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Sortable extension.
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,19 +18,19 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to mark field as one which will store node position
+     * Annotation to mark a field as one which will store the node position.
      */
-    public const POSITION = 'Gedmo\\Mapping\\Annotation\\SortablePosition';
+    public const POSITION = SortablePosition::class;
 
     /**
-     * Annotation to mark field as sorting group
+     * Annotation to mark a field as being part of a sorting group.
      */
-    public const GROUP = 'Gedmo\\Mapping\\Annotation\\SortableGroup';
+    public const GROUP = SortableGroup::class;
 
     /**
-     * List of types which are valid for position fields
+     * List of types which are valid for a position field.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         'int',

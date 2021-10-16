@@ -2,13 +2,14 @@
 
 namespace Gedmo\IpTraceable;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\AbstractTrackingListener;
 use Gedmo\Exception\InvalidArgumentException;
 use Gedmo\Mapping\Event\AdapterInterface;
 
 /**
- * The IpTraceable listener handles the update of
- * IPs on creation and update.
+ * The IpTraceable listener sets IP information
+ * on objects when created and updated.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -21,9 +22,9 @@ class IpTraceableListener extends AbstractTrackingListener
     protected $ip;
 
     /**
-     * Get the ipValue value to set on a ip field
+     * Get the IP address to set on a field.
      *
-     * @param object           $meta
+     * @param ClassMetadata    $meta
      * @param string           $field
      * @param AdapterInterface $eventAdapter
      *
@@ -35,7 +36,7 @@ class IpTraceableListener extends AbstractTrackingListener
     }
 
     /**
-     * Set a ip value to return
+     * Set the IP address to use with this listener.
      *
      * @param string $ip
      *

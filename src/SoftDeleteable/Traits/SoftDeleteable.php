@@ -5,8 +5,7 @@ namespace Gedmo\SoftDeleteable\Traits;
 use DateTime;
 
 /**
- * A generic trait to use on your self-deletable entities.
- * There is no mapping information defined in this trait.
+ * Trait integrating common SoftDeleteable properties for objects.
  *
  * @author Wesley van Opdorp <wesley.van.opdorp@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -31,8 +30,9 @@ trait SoftDeleteable
     }
 
     /**
-     * Get the deleted at timestamp value. Will return null if
-     * the entity has not been soft deleted.
+     * Get the deleted at timestamp value.
+     *
+     * Will return null if the entity has not been soft-deleted.
      *
      * @return DateTime|null
      */
@@ -42,7 +42,7 @@ trait SoftDeleteable
     }
 
     /**
-     * Check if the entity has been soft deleted.
+     * Check if the entity has been soft-deleted.
      *
      * @return bool
      */

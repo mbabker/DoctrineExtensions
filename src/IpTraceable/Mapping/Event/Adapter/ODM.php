@@ -6,8 +6,8 @@ use Gedmo\IpTraceable\Mapping\Event\IpTraceableAdapter;
 use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for IpTraceable behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the IpTraceable extension.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

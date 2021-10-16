@@ -3,13 +3,13 @@
 namespace Gedmo\IpTraceable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\IpTraceable;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for IpTraceable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for IpTraceable
- * extension.
+ * Annotation mapping driver for the IpTraceable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the IpTraceable extension.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,14 +17,14 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation field is ipTraceable
+     * Annotation class for the IpTraceable extension.
      */
-    public const IP_TRACEABLE = 'Gedmo\\Mapping\\Annotation\\IpTraceable';
+    public const IP_TRACEABLE = IpTraceable::class;
 
     /**
-     * List of types which are valid for IP
+     * List of types which are valid for IP tracing.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         'string',
@@ -44,6 +44,8 @@ class Annotation extends AbstractAnnotationDriver
             ) {
                 continue;
             }
+
+            /** @var IpTraceable|null $ipTraceable */
             if ($ipTraceable = $this->reader->getPropertyAnnotation($property, self::IP_TRACEABLE)) {
                 $field = $property->getName();
 

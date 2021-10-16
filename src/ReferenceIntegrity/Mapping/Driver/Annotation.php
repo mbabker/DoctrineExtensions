@@ -3,14 +3,14 @@
 namespace Gedmo\ReferenceIntegrity\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\ReferenceIntegrity;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 use Gedmo\ReferenceIntegrity\Mapping\Validator;
 
 /**
- * This is an annotation mapping driver for ReferenceIntegrity
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for ReferenceIntegrity
- * extension.
+ * Annotation mapping driver for the ReferenceIntegrity behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the ReferenceIntegrity extension.
  *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -18,12 +18,12 @@ use Gedmo\ReferenceIntegrity\Mapping\Validator;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to identify the fields which manages the reference integrity
+     * Annotation class for the ReferenceIntegrity extension.
      */
-    public const REFERENCE_INTEGRITY = 'Gedmo\\Mapping\\Annotation\\ReferenceIntegrity';
+    public const REFERENCE_INTEGRITY = ReferenceIntegrity::class;
 
     /**
-     * ReferenceIntegrityAction extension annotation
+     * Annotation class for the ReferenceIntegrity action class.
      */
     public const ACTION = 'Gedmo\\Mapping\\Annotation\\ReferenceIntegrityAction';
 

@@ -6,8 +6,8 @@ use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\SoftDeleteable\Mapping\Event\SoftDeleteableAdapter;
 
 /**
- * Doctrine event adapter for ORM adapted
- * for SoftDeleteable behavior.
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the SoftDeleteable extension.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

@@ -2,13 +2,13 @@
 
 namespace Gedmo\Tree\Entity\Repository;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Gedmo\Tool\Wrapper\EntityWrapper;
 use Gedmo\Tree\Strategy;
 
 /**
- * The MaterializedPathRepository has some useful functions
- * to interact with MaterializedPath tree. Repository uses
- * the strategy used by listener
+ * Entity repository for ORM materialized tree repositories.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -17,11 +17,11 @@ use Gedmo\Tree\Strategy;
 class MaterializedPathRepository extends AbstractTreeRepository
 {
     /**
-     * Get tree query builder
+     * Create a query builder to get the list of children for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getTreeQueryBuilder($rootNode = null)
     {
@@ -29,11 +29,11 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get tree query
+     * Create a Query instance configured to get the list of children for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      *
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
     public function getTreeQuery($rootNode = null)
     {
@@ -41,9 +41,9 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get tree
+     * Get the tree for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      *
      * @return array
      */
@@ -77,11 +77,11 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get the Tree path query builder by given $node
+     * Create a query builder to fetch the tree path for the given node
      *
      * @param object $node
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getPathQueryBuilder($node)
     {
@@ -123,11 +123,11 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get the Tree path query by given $node
+     * Create a Query instance configured to fetch the tree path for the given node
      *
      * @param object $node
      *
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
     public function getPathQuery($node)
     {
@@ -135,11 +135,11 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get the Tree path of Nodes by given $node
+     * Get the tree path for the given node
      *
      * @param object $node
      *
-     * @return array - list of Nodes in path
+     * @return array
      */
     public function getPath($node)
     {

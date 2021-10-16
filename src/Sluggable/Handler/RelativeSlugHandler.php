@@ -11,9 +11,10 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
  * Sluggable handler which should be used in order to prefix
- * a slug of related object. For instance user may belong to a company
- * in this case user slug could look like 'company-name/user-firstname'
- * where path separator separates the relative slug
+ * the slug of a related object. For instance, the user may
+ * belong to a company; in this case user slug could be
+ * 'company-name/user-firstname' where a path separator
+ * separates the relative slug.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -40,8 +41,7 @@ class RelativeSlugHandler implements SlugHandlerInterface
     private $usedOptions;
 
     /**
-     * Callable of original transliterator
-     * which is used by sluggable
+     * Callable of the original transliterator which is used by the extension.
      *
      * @var callable
      */
@@ -106,8 +106,7 @@ class RelativeSlugHandler implements SlugHandlerInterface
     }
 
     /**
-     * Transliterates the slug and prefixes the slug
-     * by relative one
+     * Transliterates the slug and prefixes the generated slug with the relative slug.
      *
      * @param string $text
      * @param string $separator

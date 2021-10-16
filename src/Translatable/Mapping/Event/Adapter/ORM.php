@@ -8,11 +8,13 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Gedmo\Mapping\Event\Adapter\ORM as BaseAdapterORM;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
+use Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation;
+use Gedmo\Translatable\Entity\Translation;
 use Gedmo\Translatable\Mapping\Event\TranslatableAdapter;
 
 /**
- * Doctrine event adapter for ORM adapted
- * for Translatable behavior
+ * Doctrine event adapter for the ORM, adapted
+ * for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -28,7 +30,7 @@ final class ORM extends BaseAdapterORM implements TranslatableAdapter
             ->getObjectManager()
             ->getClassMetadata($translationClassName)
             ->getReflectionClass()
-            ->isSubclassOf('Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation')
+            ->isSubclassOf(AbstractPersonalTranslation::class)
         ;
     }
 
@@ -37,7 +39,7 @@ final class ORM extends BaseAdapterORM implements TranslatableAdapter
      */
     public function getDefaultTranslationClass()
     {
-        return 'Gedmo\\Translatable\\Entity\\Translation';
+        return Translation::class;
     }
 
     /**
@@ -98,13 +100,13 @@ final class ORM extends BaseAdapterORM implements TranslatableAdapter
     }
 
     /**
-     * Transforms foreigh key of translation to appropriate PHP value
-     * to prevent database level cast
+     * Transforms the foreign key of a translation to the appropriate PHP value
+     * to prevent a database level cast
      *
-     * @param $key - foreign key value
-     * @param $className - translation class name
+     * @param mixed        $key       Foreign key value
+     * @param class-string $className Translation class name
      *
-     * @return transformed foreign key
+     * @return int|string Transformed foreign key
      */
     private function foreignKey($key, $className)
     {

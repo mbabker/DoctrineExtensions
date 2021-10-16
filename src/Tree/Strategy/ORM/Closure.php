@@ -15,8 +15,7 @@ use Gedmo\Tree\Strategy;
 use Gedmo\Tree\TreeListener;
 
 /**
- * This strategy makes tree act like
- * a closure table.
+ * This strategy manages a tree using a Closure strategy
  *
  * @author Gustavo Adrian <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * IpTraceable Trait, usable with PHP >= 5.4
+ * Trait integrating common IpTraceable properties for objects with ORM annotations.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,6 +15,7 @@ trait IpTraceableEntity
 {
     /**
      * @var string
+     *
      * @Gedmo\IpTraceable(on="create")
      * @ORM\Column(length=45, nullable=true)
      */
@@ -23,6 +24,7 @@ trait IpTraceableEntity
 
     /**
      * @var string
+     *
      * @Gedmo\IpTraceable(on="update")
      * @ORM\Column(length=45, nullable=true)
      */
@@ -30,7 +32,7 @@ trait IpTraceableEntity
     protected $updatedFromIp;
 
     /**
-     * Sets createdFromIp.
+     * Sets the created from IP.
      *
      * @param string $createdFromIp
      *
@@ -44,7 +46,7 @@ trait IpTraceableEntity
     }
 
     /**
-     * Returns createdFromIp.
+     * Returns the created from IP.
      *
      * @return string
      */
@@ -54,7 +56,7 @@ trait IpTraceableEntity
     }
 
     /**
-     * Sets updatedFromIp.
+     * Sets the updated from IP.
      *
      * @param string $updatedFromIp
      *
@@ -68,7 +70,7 @@ trait IpTraceableEntity
     }
 
     /**
-     * Returns updatedFromIp.
+     * Returns the updated from IP.
      *
      * @return string
      */

@@ -2,15 +2,15 @@
 
 namespace Gedmo\Sluggable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
- * This is a yaml mapping driver for Sluggable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Sluggable
- * extension.
+ * YAML mapping driver for the Sluggable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Sluggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -25,9 +25,9 @@ class Yaml extends File implements Driver
     protected $_extension = '.dcm.yml';
 
     /**
-     * List of types which are valid for slug and sluggable fields
+     * List of types which are valid for slugs and sluggable fields.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'string',
@@ -63,14 +63,14 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 
     /**
-     * Checks if $field type is valid as Sluggable field
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

@@ -2,6 +2,8 @@
 
 namespace Gedmo\SoftDeleteable\Query\TreeWalker;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Query\AST\DeleteClause;
 use Doctrine\ORM\Query\AST\DeleteStatement;
 use Doctrine\ORM\Query\Exec\SingleTableDeleteUpdateExecutor;
@@ -11,7 +13,8 @@ use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 /**
  * This SqlWalker is needed when you need to use a DELETE DQL query.
- * It will update the "deletedAt" field with the actual date, instead
+ *
+ * It will update the "deletedAt" field with the actual date instead
  * of actually deleting it.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
@@ -20,9 +23,21 @@ use Gedmo\SoftDeleteable\SoftDeleteableListener;
  */
 class SoftDeleteableWalker extends SqlWalker
 {
+    /**
+     * @var Connection
+     */
     protected $conn;
+
+    /**
+     * @var AbstractPlatform|null
+     */
     protected $platform;
+
+    /**
+     * @var SoftDeleteableListener
+     */
     protected $listener;
+
     protected $configuration;
     protected $alias;
     protected $deletedAtField;
@@ -59,9 +74,9 @@ class SoftDeleteableWalker extends SqlWalker
     }
 
     /**
-     * Change a DELETE clause for an UPDATE clause
+     * Change a DELETE statement to an UPDATE statement.
      *
-     * @return string the SQL
+     * @return string
      */
     public function walkDeleteClause(DeleteClause $deleteClause)
     {
@@ -80,9 +95,9 @@ class SoftDeleteableWalker extends SqlWalker
     /**
      * Get the currently used SoftDeleteableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return SoftDeleteableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     private function getSoftDeleteableListener()
     {
@@ -110,7 +125,7 @@ class SoftDeleteableWalker extends SqlWalker
     }
 
     /**
-     * Search for components in the delete clause
+     * Search for components in the delete clause of a query.
      *
      * @return void
      */

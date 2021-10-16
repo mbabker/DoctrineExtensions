@@ -5,12 +5,14 @@ namespace Gedmo\Mapping\Event\Adapter;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\UnitOfWork;
+use Doctrine\Persistence\ObjectManager;
 use Gedmo\Exception\RuntimeException;
 use Gedmo\Mapping\Event\AdapterInterface;
 
 /**
- * Doctrine event adapter for ODM specific
- * event arguments
+ * Doctrine event adapter interfacing with the MongoDB ODM.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -18,12 +20,12 @@ use Gedmo\Mapping\Event\AdapterInterface;
 class ODM implements AdapterInterface
 {
     /**
-     * @var \Doctrine\Common\EventArgs
+     * @var EventArgs
      */
     private $args;
 
     /**
-     * @var \Doctrine\ODM\MongoDB\DocumentManager
+     * @var DocumentManager
      */
     private $dm;
 
@@ -53,6 +55,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param ClassMetadata $meta
      */
     public function getRootObjectClass($meta)
     {
@@ -81,6 +85,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function getObjectState($uow, $object)
     {
@@ -102,6 +108,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function getObjectChangeSet($uow, $object)
     {
@@ -110,6 +118,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param ClassMetadata $meta
      */
     public function getSingleIdentifierFieldName($meta)
     {
@@ -118,6 +128,9 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork    $uow
+     * @param ClassMetadata $meta
      */
     public function recomputeSingleObjectChangeSet($uow, $meta, $object)
     {
@@ -126,6 +139,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function getScheduledObjectUpdates($uow)
     {
@@ -137,6 +152,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function getScheduledObjectInsertions($uow)
     {
@@ -145,6 +162,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function getScheduledObjectDeletions($uow)
     {
@@ -153,6 +172,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function setOriginalObjectProperty($uow, $oid, $property, $value)
     {
@@ -161,6 +182,8 @@ class ODM implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param UnitOfWork $uow
      */
     public function clearObjectChangeSet($uow, $oid)
     {
@@ -168,15 +191,15 @@ class ODM implements AdapterInterface
     }
 
     /**
-     * Creates a ODM specific LifecycleEventArgs.
+     * Creates an ODM specific LifecycleEventArgs instance.
      *
-     * @param object                                $document
-     * @param \Doctrine\ODM\MongoDB\DocumentManager $documentManager
+     * @param object        $object
+     * @param ObjectManager $om
      *
-     * @return \Doctrine\ODM\MongoDB\Event\LifecycleEventArgs
+     * @return LifecycleEventArgs
      */
-    public function createLifecycleEventArgsInstance($document, $documentManager)
+    public function createLifecycleEventArgsInstance($object, $om)
     {
-        return new LifecycleEventArgs($document, $documentManager);
+        return new LifecycleEventArgs($object, $om);
     }
 }

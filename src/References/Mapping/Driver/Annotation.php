@@ -2,11 +2,17 @@
 
 namespace Gedmo\References\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
+use Gedmo\Mapping\Annotation\Reference;
+use Gedmo\Mapping\Annotation\ReferenceMany;
+use Gedmo\Mapping\Annotation\ReferenceManyEmbed;
+use Gedmo\Mapping\Annotation\ReferenceOne;
 use Gedmo\Mapping\Driver\AnnotationDriverInterface;
 
 /**
- * This is an annotation mapping driver for References
- * behavioral extension.
+ * Annotation mapping driver for the References behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the References extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -16,20 +22,23 @@ use Gedmo\Mapping\Driver\AnnotationDriverInterface;
 class Annotation implements AnnotationDriverInterface
 {
     /**
-     * Annotation to mark field as reference to one
+     * Annotation class for the References extension to mark a field as having a reference to one.
      */
-    public const REFERENCE_ONE = 'Gedmo\\Mapping\\Annotation\\ReferenceOne';
+    public const REFERENCE_ONE = ReferenceOne::class;
 
     /**
-     * Annotation to mark field as reference to many
+     * Annotation class for the References extension to mark a field as having a reference to many.
      */
-    public const REFERENCE_MANY = 'Gedmo\\Mapping\\Annotation\\ReferenceMany';
+    public const REFERENCE_MANY = ReferenceMany::class;
 
     /**
-     * Annotation to mark field as reference to many
+     * Annotation class for the References extension to mark a field as having a reference to many embeds.
      */
-    public const REFERENCE_MANY_EMBED = 'Gedmo\\Mapping\\Annotation\\ReferenceManyEmbed';
+    public const REFERENCE_MANY_EMBED = ReferenceManyEmbed::class;
 
+    /**
+     * @var array<string, class-string<Reference>>
+     */
     private $annotations = [
         'referenceOne' => self::REFERENCE_ONE,
         'referenceMany' => self::REFERENCE_MANY,
@@ -44,7 +53,9 @@ class Annotation implements AnnotationDriverInterface
     private $reader;
 
     /**
-     * original driver if it is available
+     * Original mapping driver, if available.
+     *
+     * @var MappingDriver|null
      */
     protected $_originalDriver = null;
 
@@ -72,6 +83,7 @@ class Annotation implements AnnotationDriverInterface
                     continue;
                 }
 
+                /** @var Reference $reference */
                 if ($reference = $this->reader->getPropertyAnnotation($property, $annotation)) {
                     $config[$key][$property->getName()] = [
                         'field' => $property->getName(),
@@ -89,7 +101,7 @@ class Annotation implements AnnotationDriverInterface
     /**
      * Passes in the mapping read by original driver
      *
-     * @param $driver
+     * @param MappingDriver $driver
      *
      * @return void
      */

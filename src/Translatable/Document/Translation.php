@@ -7,7 +7,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\UniqueIndex;
 
 /**
- * Gedmo\Translatable\Document\Translation
+ * Document object for translations for the MongoDB ODM.
  *
  * @Document(repositoryClass="Gedmo\Translatable\Document\Repository\TranslationRepository")
  * @UniqueIndex(name="lookup_unique_idx", keys={

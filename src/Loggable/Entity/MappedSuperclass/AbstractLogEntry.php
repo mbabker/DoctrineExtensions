@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Gedmo\Loggable\Entity\AbstractLog
+ * Base Entity object for log entries for the ORM.
  *
  * @ORM\MappedSuperclass
  */
@@ -82,7 +82,7 @@ abstract class AbstractLogEntry
     protected $username;
 
     /**
-     * Get id
+     * Get the entity ID.
      *
      * @return int
      */
@@ -92,7 +92,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get action
+     * Get the action.
      *
      * @return string
      */
@@ -102,7 +102,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set action
+     * Set the action.
      *
      * @param string $action
      */
@@ -112,7 +112,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get object class
+     * Get the object class.
      *
      * @return string
      */
@@ -122,7 +122,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set object class
+     * Set the object class.
      *
      * @param string $objectClass
      */
@@ -132,7 +132,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get object id
+     * Get the object identifier.
      *
      * @return string
      */
@@ -142,7 +142,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set object id
+     * Set the object identifier.
      *
      * @param string $objectId
      */
@@ -152,7 +152,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get username
+     * Get the username of the user who performed the action.
      *
      * @return string
      */
@@ -162,7 +162,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set username
+     * Set the username of the user who performed the action.
      *
      * @param string $username
      */
@@ -172,7 +172,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get loggedAt
+     * Get the time the action was logged at.
      *
      * @return \DateTime
      */
@@ -182,7 +182,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set loggedAt to "now"
+     * Set the time the action was logged at to "now".
      */
     public function setLoggedAt()
     {
@@ -190,7 +190,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Get data
+     * Get the data for the log entry.
      *
      * @return array
      */
@@ -200,7 +200,7 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set data
+     * Set the data for the log entry.
      *
      * @param array $data
      */
@@ -210,22 +210,22 @@ abstract class AbstractLogEntry
     }
 
     /**
-     * Set current version
-     *
-     * @param int $version
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * Get current version
+     * Get the object version.
      *
      * @return int
      */
     public function getVersion()
     {
         return $this->version;
+    }
+
+    /**
+     * Set the object version.
+     *
+     * @param int $version
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 }

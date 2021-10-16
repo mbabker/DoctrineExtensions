@@ -2,17 +2,18 @@
 
 namespace Gedmo\References\Mapping\Event\Adapter;
 
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ODM\MongoDB\DocumentManager as MongoDocumentManager;
-use Doctrine\ODM\MongoDB\Proxy\Proxy as MongoDBProxy;
 use Doctrine\ODM\PHPCR\DocumentManager as PhpcrDocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Proxy\Proxy as ORMProxy;
 use Gedmo\Exception\InvalidArgumentException;
 use Gedmo\Mapping\Event\Adapter\ORM as BaseAdapterORM;
 use Gedmo\References\Mapping\Event\ReferencesAdapter;
+use ProxyManager\Proxy\GhostObjectInterface;
 
 /**
- * Doctrine event adapter for ORM references behavior
+ * Doctrine event adapter for the ORM, adapted
+ * for the References extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -32,7 +33,7 @@ final class ORM extends BaseAdapterORM implements ReferencesAdapter
 
         if ($om instanceof MongoDocumentManager) {
             $meta = $om->getClassMetadata(get_class($object));
-            if ($object instanceof MongoDBProxy) {
+            if ($object instanceof GhostObjectInterface) {
                 $id = $om->getUnitOfWork()->getDocumentIdentifier($object);
             } else {
                 $id = $meta->getReflectionProperty($meta->identifier)->getValue($object);
@@ -79,7 +80,7 @@ final class ORM extends BaseAdapterORM implements ReferencesAdapter
      */
     public function extractIdentifier($om, $object, $single = true)
     {
-        if ($object instanceof ORMProxy) {
+        if ($object instanceof Proxy) {
             $id = $om->getUnitOfWork()->getEntityIdentifier($object);
         } else {
             $meta = $om->getClassMetadata(get_class($object));
@@ -106,7 +107,7 @@ final class ORM extends BaseAdapterORM implements ReferencesAdapter
     private function throwIfNotDocumentManager($dm)
     {
         if (!($dm instanceof MongoDocumentManager) && !($dm instanceof PhpcrDocumentManager)) {
-            throw new InvalidArgumentException(sprintf('Expected a %s or %s instance but got "%s"', 'Doctrine\ODM\MongoDB\DocumentManager', 'Doctrine\ODM\PHPCR\DocumentManager', is_object($dm) ? get_class($dm) : gettype($dm)));
+            throw new InvalidArgumentException(sprintf('Expected a %s or %s instance but got "%s"', MongoDocumentManager::class, PhpcrDocumentManager::class, is_object($dm) ? get_class($dm) : gettype($dm)));
         }
     }
 }

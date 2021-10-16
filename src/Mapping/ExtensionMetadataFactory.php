@@ -4,6 +4,7 @@ namespace Gedmo\Mapping;
 
 use Doctrine\Bundle\DoctrineBundle\Mapping\MappingDriver as DoctrineBundleMappingDriver;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\Driver\DefaultFileLocator;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -24,14 +25,14 @@ class ExtensionMetadataFactory
     /**
      * Extension driver
      *
-     * @var \Gedmo\Mapping\Driver
+     * @var Driver
      */
     protected $driver;
 
     /**
-     * Object manager, entity or document
+     * Object manager
      *
-     * @var object
+     * @var ObjectManager
      */
     protected $objectManager;
 
@@ -60,16 +61,16 @@ class ExtensionMetadataFactory
         $this->objectManager = $objectManager;
         $this->annotationReader = $annotationReader;
         $this->extensionNamespace = $extensionNamespace;
-        $omDriver = $objectManager->getConfiguration()->getMetadataDriverImpl();
-        $this->driver = $this->getDriver($omDriver);
+        $mappingDriver = $objectManager->getConfiguration()->getMetadataDriverImpl();
+        $this->driver = $this->getDriver($mappingDriver);
     }
 
     /**
      * Reads extension metadata
      *
-     * @param object $meta
+     * @param ClassMetadata $meta
      *
-     * @return array - the metatada configuration
+     * @return array|null
      */
     public function getExtensionMetadata($meta)
     {
@@ -114,7 +115,7 @@ class ExtensionMetadataFactory
     }
 
     /**
-     * Get the cache id
+     * Get the cache id.
      *
      * @param string $className
      * @param string $extensionNamespace
@@ -127,34 +128,33 @@ class ExtensionMetadataFactory
     }
 
     /**
-     * Get the extended driver instance which will
-     * read the metadata required by extension
+     * Get the extended driver instance which will read the metadata required by extension.
      *
-     * @param object $omDriver
+     * @param MappingDriver $mappingDriver
+     *
+     * @return Driver
      *
      * @throws \Gedmo\Exception\RuntimeException if driver was not found in extension
-     *
-     * @return \Gedmo\Mapping\Driver
      */
-    protected function getDriver($omDriver)
+    protected function getDriver($mappingDriver)
     {
-        if ($omDriver instanceof DoctrineBundleMappingDriver) {
-            $propertyReflection = (new \ReflectionClass($omDriver))
+        if ($mappingDriver instanceof DoctrineBundleMappingDriver) {
+            $propertyReflection = (new \ReflectionClass($mappingDriver))
                 ->getProperty('driver');
             $propertyReflection->setAccessible(true);
-            $omDriver = $propertyReflection->getValue($omDriver);
+            $mappingDriver = $propertyReflection->getValue($mappingDriver);
         }
 
         $driver = null;
-        $className = get_class($omDriver);
+        $className = get_class($mappingDriver);
         $driverName = substr($className, strrpos($className, '\\') + 1);
-        if ($omDriver instanceof MappingDriverChain || 'DriverChain' == $driverName) {
+        if ($mappingDriver instanceof MappingDriverChain || 'DriverChain' == $driverName) {
             $driver = new Driver\Chain();
-            foreach ($omDriver->getDrivers() as $namespace => $nestedOmDriver) {
+            foreach ($mappingDriver->getDrivers() as $namespace => $nestedOmDriver) {
                 $driver->addDriver($this->getDriver($nestedOmDriver), $namespace);
             }
-            if (null !== $omDriver->getDefaultDriver()) {
-                $driver->setDefaultDriver($this->getDriver($omDriver->getDefaultDriver()));
+            if (null !== $mappingDriver->getDefaultDriver()) {
+                $driver->setDefaultDriver($this->getDriver($mappingDriver->getDefaultDriver()));
             }
         } else {
             $driverName = substr($driverName, 0, strpos($driverName, 'Driver'));
@@ -173,16 +173,16 @@ class ExtensionMetadataFactory
                 }
             }
             $driver = new $driverClassName();
-            $driver->setOriginalDriver($omDriver);
+            $driver->setOriginalDriver($mappingDriver);
             if ($driver instanceof FileDriver) {
                 /* @var $driver FileDriver */
-                if ($omDriver instanceof MappingDriver) {
-                    $driver->setLocator($omDriver->getLocator());
+                if ($mappingDriver instanceof MappingDriver) {
+                    $driver->setLocator($mappingDriver->getLocator());
                 // BC for Doctrine 2.2
                 } elseif ($isSimplified) {
-                    $driver->setLocator(new SymfonyFileLocator($omDriver->getNamespacePrefixes(), $omDriver->getFileExtension()));
+                    $driver->setLocator(new SymfonyFileLocator($mappingDriver->getNamespacePrefixes(), $mappingDriver->getFileExtension()));
                 } else {
-                    $driver->setLocator(new DefaultFileLocator($omDriver->getPaths(), $omDriver->getFileExtension()));
+                    $driver->setLocator(new DefaultFileLocator($mappingDriver->getPaths(), $mappingDriver->getFileExtension()));
                 }
             }
             if ($driver instanceof AnnotationDriverInterface) {

@@ -17,7 +17,7 @@ class Validator
     /**
      * List of types which are valid for timestamp
      *
-     * @var array
+     * @var string[]
      */
     public static $validTypes = [
         'date',

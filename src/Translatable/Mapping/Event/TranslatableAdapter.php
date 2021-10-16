@@ -6,8 +6,7 @@ use Gedmo\Mapping\Event\AdapterInterface;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
- * Doctrine event adapter interface
- * for Translatable behavior
+ * Doctrine event adapter for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,17 +14,16 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 interface TranslatableAdapter extends AdapterInterface
 {
     /**
-     * Checks if $translationClassName is a subclass
-     * of personal translation
+     * Checks if the given translation class is a subclass of the personal translation class.
      *
-     * @param string $translationClassName
+     * @param class-string $translationClassName
      *
      * @return bool
      */
     public function usesPersonalTranslation($translationClassName);
 
     /**
-     * Get default LogEntry class used to store the logs
+     * Get the default translation class used to store translations.
      *
      * @return string
      */
@@ -34,32 +32,32 @@ interface TranslatableAdapter extends AdapterInterface
     /**
      * Load the translations for a given object
      *
-     * @param object $object
-     * @param string $translationClass
-     * @param string $locale
-     * @param string $objectClass
+     * @param object       $object
+     * @param class-string $translationClass
+     * @param string       $locale
+     * @param class-string $objectClass
      *
      * @return array
      */
     public function loadTranslations($object, $translationClass, $locale, $objectClass);
 
     /**
-     * Search for existing translation record
+     * Search for an existing translation record
      *
-     * @param string $locale
-     * @param string $field
-     * @param string $translationClass
-     * @param string $objectClass
+     * @param string       $locale
+     * @param string       $field
+     * @param class-string $translationClass
+     * @param class-string $objectClass
      *
-     * @return mixed - null if nothing is found, Translation otherwise
+     * @return mixed null if nothing is found, translation object otherwise
      */
     public function findTranslation(AbstractWrapper $wrapped, $locale, $field, $translationClass, $objectClass);
 
     /**
-     * Removes all associated translations for given object
+     * Removes all associated translations for the given object
      *
-     * @param string $transClass
-     * @param string $objectClass
+     * @param class-string $transClass
+     * @param class-string $objectClass
      */
     public function removeAssociatedTranslations(AbstractWrapper $wrapped, $transClass, $objectClass);
 
@@ -71,8 +69,7 @@ interface TranslatableAdapter extends AdapterInterface
     public function insertTranslationRecord($translation);
 
     /**
-     * Get the transformed value for translation
-     * storage
+     * Get the transformed value for translation storage
      *
      * @param object $object
      * @param string $field
@@ -83,8 +80,7 @@ interface TranslatableAdapter extends AdapterInterface
     public function getTranslationValue($object, $field, $value = false);
 
     /**
-     * Transform the value from database
-     * for translation
+     * Transform the value from the database for translation
      *
      * @param object $object
      * @param string $field

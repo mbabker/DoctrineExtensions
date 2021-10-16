@@ -10,9 +10,9 @@ use Gedmo\Sluggable\SluggableListener;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
- * Sluggable handler which should be used for inversed relation mapping
- * used together with RelativeSlugHandler. Updates back related slug on
- * relation changes
+ * Sluggable handler which should be used for inversed relation mapping,
+ * used together with RelativeSlugHandler. Updates the related slug on
+ * relation changes.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

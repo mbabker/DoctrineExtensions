@@ -2,15 +2,16 @@
 
 namespace Gedmo\References\Mapping\Event\Adapter;
 
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Proxy\Proxy as MongoDBProxy;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Proxy\Proxy as ORMProxy;
 use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\References\Mapping\Event\ReferencesAdapter;
+use ProxyManager\Proxy\GhostObjectInterface;
 
 /**
- * Doctrine event adapter for ODM references behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the References extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -29,7 +30,7 @@ final class ODM extends BaseAdapterODM implements ReferencesAdapter
         }
 
         if ($om instanceof EntityManagerInterface) {
-            if ($object instanceof ORMProxy) {
+            if ($object instanceof Proxy) {
                 $id = $om->getUnitOfWork()->getEntityIdentifier($object);
             } else {
                 $meta = $om->getClassMetadata(get_class($object));
@@ -56,7 +57,6 @@ final class ODM extends BaseAdapterODM implements ReferencesAdapter
      */
     public function getSingleReference($om, $class, $identifier)
     {
-        $this->throwIfNotEntityManager($om);
         $meta = $om->getClassMetadata($class);
 
         if (!$meta->isInheritanceTypeNone()) {
@@ -72,7 +72,7 @@ final class ODM extends BaseAdapterODM implements ReferencesAdapter
     public function extractIdentifier($om, $object, $single = true)
     {
         $meta = $om->getClassMetadata(get_class($object));
-        if ($object instanceof MongoDBProxy) {
+        if ($object instanceof GhostObjectInterface) {
             $id = $om->getUnitOfWork()->getDocumentIdentifier($object);
         } else {
             $id = $meta->getReflectionProperty($meta->identifier)->getValue($object);
@@ -83,12 +83,5 @@ final class ODM extends BaseAdapterODM implements ReferencesAdapter
         } else {
             return [$meta->identifier => $id];
         }
-    }
-
-    /**
-     * Override so we don't get an exception. We want to allow this.
-     */
-    private function throwIfNotEntityManager(EntityManagerInterface $em)
-    {
     }
 }

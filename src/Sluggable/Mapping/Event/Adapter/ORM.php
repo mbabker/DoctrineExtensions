@@ -9,8 +9,8 @@ use Gedmo\Sluggable\Mapping\Event\SluggableAdapter;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
- * Doctrine event adapter for ORM adapted
- * for sluggable behavior
+ * Doctrine event adapter for the ORM, adapted
+ * for the Sluggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

@@ -3,11 +3,10 @@
 namespace Gedmo\Tool\Wrapper;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Proxy\Proxy;
+use ProxyManager\Proxy\GhostObjectInterface;
 
 /**
- * Wraps document or proxy for more convenient
- * manipulation
+ * Wraps a managed document from the MongoDB ODM for more convenient manipulation.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -22,14 +21,14 @@ class MongoDocumentWrapper extends AbstractWrapper
     private $identifier;
 
     /**
-     * True if document or proxy is loaded
+     * Internal flag to track if the wrapper is initialized.
      *
      * @var bool
      */
     private $initialized = false;
 
     /**
-     * Wrap document
+     * Wraps a document.
      *
      * @param object $document
      */
@@ -83,7 +82,7 @@ class MongoDocumentWrapper extends AbstractWrapper
     public function getIdentifier($single = true)
     {
         if (!$this->identifier) {
-            if ($this->object instanceof Proxy) {
+            if ($this->object instanceof GhostObjectInterface) {
                 $uow = $this->om->getUnitOfWork();
                 if ($uow->isInIdentityMap($this->object)) {
                     $this->identifier = (string) $uow->getDocumentIdentifier($this->object);
@@ -100,15 +99,14 @@ class MongoDocumentWrapper extends AbstractWrapper
     }
 
     /**
-     * Initialize the document if it is proxy
-     * required when is detached or not initialized
+     * Initializes the document if it is a proxy
      */
     protected function initialize()
     {
         if (!$this->initialized) {
-            if ($this->object instanceof Proxy) {
+            if ($this->object instanceof GhostObjectInterface) {
                 $uow = $this->om->getUnitOfWork();
-                if (!$this->object->__isInitialized__) {
+                if (!$this->object->isProxyInitialized()) {
                     $persister = $uow->getDocumentPersister($this->meta->name);
                     $identifier = null;
                     if ($uow->isInIdentityMap($this->object)) {

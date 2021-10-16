@@ -6,10 +6,8 @@ use Doctrine\ORM\Internal\Hydration\ObjectHydrator as BaseObjectHydrator;
 use Gedmo\Translatable\TranslatableListener;
 
 /**
- * If query uses TranslationQueryWalker and is hydrating
- * objects - when it requires this custom object hydrator
- * in order to skip onLoad event from triggering retranslation
- * of the fields
+ * Extended object hydrator supporting a TranslationWalker to ensure
+ * translatable fields are not re-translated when loaded.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,7 +15,7 @@ use Gedmo\Translatable\TranslatableListener;
 class ObjectHydrator extends BaseObjectHydrator
 {
     /**
-     * State of skipOnLoad for listener between hydrations
+     * State of skipOnLoad for the listener between hydrations
      *
      * @see ObjectHydrator::prepare()
      * @see ObjectHydrator::cleanup()
@@ -50,9 +48,9 @@ class ObjectHydrator extends BaseObjectHydrator
     /**
      * Get the currently used TranslatableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return TranslatableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     protected function getTranslatableListener()
     {

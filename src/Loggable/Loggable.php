@@ -3,9 +3,8 @@
 namespace Gedmo\Loggable;
 
 /**
- * This interface is not necessary but can be implemented for
- * Domain Objects which in some cases needs to be identified as
- * Loggable
+ * Optional interface which can be used to identify
+ * Loggable objects.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

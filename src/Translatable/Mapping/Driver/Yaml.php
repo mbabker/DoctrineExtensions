@@ -7,10 +7,9 @@ use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
- * This is a yaml mapping driver for Translatable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Translatable
- * extension.
+ * YAML mapping driver for the Translatable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -71,14 +70,14 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 
     private function buildFieldConfiguration($field, $fieldMapping, array &$config)
     {
         if (is_array($fieldMapping) && isset($fieldMapping['gedmo'])) {
             if (in_array('translatable', $fieldMapping['gedmo']) || isset($fieldMapping['gedmo']['translatable'])) {
-                // fields cannot be overrided and throws mapping exception
+                // fields cannot be overridden and throws mapping exception
                 $config['fields'][] = $field;
                 if (isset($fieldMapping['gedmo']['translatable']['fallback'])) {
                     $config['fallback'][$field] = $fieldMapping['gedmo']['translatable']['fallback'];

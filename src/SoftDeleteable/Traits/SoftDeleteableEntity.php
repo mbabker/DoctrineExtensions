@@ -7,8 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * A soft deletable trait you can apply to your Doctrine ORM entities.
- * Includes default annotation mapping.
+ * Trait integrating common SoftDeleteable properties for objects with ORM annotations.
  *
  * @author Wesley van Opdorp <wesley.van.opdorp@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -36,8 +35,9 @@ trait SoftDeleteableEntity
     }
 
     /**
-     * Get the deleted at timestamp value. Will return null if
-     * the entity has not been soft deleted.
+     * Get the deleted at timestamp value.
+     *
+     * Will return null if the entity has not been soft-deleted.
      *
      * @return DateTime|null
      */
@@ -47,7 +47,7 @@ trait SoftDeleteableEntity
     }
 
     /**
-     * Check if the entity has been soft deleted.
+     * Check if the entity has been soft-deleted.
      *
      * @return bool
      */

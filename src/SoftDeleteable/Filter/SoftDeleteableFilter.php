@@ -8,8 +8,8 @@ use Doctrine\ORM\Query\Filter\SQLFilter;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 /**
- * The SoftDeleteableFilter adds the condition necessary to
- * filter entities which were deleted "softly"
+ * The SoftDeleteableFilter adds the conditions necessary to
+ * filter entities which were deleted "softly".
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -29,7 +29,7 @@ class SoftDeleteableFilter extends SQLFilter
     protected $entityManager;
 
     /**
-     * @var string[bool]
+     * @var array<class-string, bool>
      */
     protected $disabled = [];
 
@@ -66,7 +66,7 @@ class SoftDeleteableFilter extends SQLFilter
     }
 
     /**
-     * @param string $class
+     * @param class-string $class
      */
     public function disableForEntity($class)
     {
@@ -76,7 +76,7 @@ class SoftDeleteableFilter extends SQLFilter
     }
 
     /**
-     * @param string $class
+     * @param class-string $class
      */
     public function enableForEntity($class)
     {
@@ -88,7 +88,7 @@ class SoftDeleteableFilter extends SQLFilter
     /**
      * @return SoftDeleteableListener
      *
-     * @throws \RuntimeException
+     * @throws \RuntimeException if the listener is not registered
      */
     protected function getListener()
     {
@@ -120,7 +120,7 @@ class SoftDeleteableFilter extends SQLFilter
     protected function getEntityManager()
     {
         if (null === $this->entityManager) {
-            $refl = new \ReflectionProperty('Doctrine\ORM\Query\Filter\SQLFilter', 'em');
+            $refl = new \ReflectionProperty(SQLFilter::class, 'em');
             $refl->setAccessible(true);
             $this->entityManager = $refl->getValue($this);
         }

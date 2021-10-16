@@ -10,7 +10,7 @@ use Gedmo\Loggable\LoggableListener;
 use Gedmo\Tool\Wrapper\EntityWrapper;
 
 /**
- * The LogEntryRepository has some useful functions
+ * The LogEntryRepository provides some useful functions
  * to interact with log entries.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -26,7 +26,7 @@ class LogEntryRepository extends EntityRepository
     private $listener;
 
     /**
-     * Loads all log entries for the given entity
+     * Loads all log entries for the given entity.
      *
      * @param object $entity
      *
@@ -40,7 +40,7 @@ class LogEntryRepository extends EntityRepository
     }
 
     /**
-     * Get the query for loading of log entries
+     * Create the query to load all log entries for the given entity.
      *
      * @param object $entity
      *
@@ -64,17 +64,18 @@ class LogEntryRepository extends EntityRepository
     }
 
     /**
-     * Reverts given $entity to $revision by
-     * restoring all fields from that $revision.
-     * After this operation you will need to
-     * persist and flush the $entity.
+     * Reverts the given entity to the specified version.
+     *
+     * This method will restore the value of all fields from
+     * the given version. After this operation, you will need
+     * to persist and flush the entity.
      *
      * @param object $entity
      * @param int    $version
      *
-     * @throws \Gedmo\Exception\UnexpectedValueException
-     *
      * @return void
+     *
+     * @throws \Gedmo\Exception\UnexpectedValueException
      */
     public function revert($entity, $version = 1)
     {
@@ -118,6 +119,8 @@ class LogEntryRepository extends EntityRepository
     }
 
     /**
+     * Maps a value to a field.
+     *
      * @param string $field
      * @param mixed  $value
      */
@@ -134,9 +137,9 @@ class LogEntryRepository extends EntityRepository
     /**
      * Get the currently used LoggableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return LoggableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     private function getLoggableListener()
     {

@@ -3,14 +3,24 @@
 namespace Gedmo\Tree\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Tree;
+use Gedmo\Mapping\Annotation\TreeClosure;
+use Gedmo\Mapping\Annotation\TreeLeft;
+use Gedmo\Mapping\Annotation\TreeLevel;
+use Gedmo\Mapping\Annotation\TreeLockTime;
+use Gedmo\Mapping\Annotation\TreeParent;
+use Gedmo\Mapping\Annotation\TreePath;
+use Gedmo\Mapping\Annotation\TreePathHash;
+use Gedmo\Mapping\Annotation\TreePathSource;
+use Gedmo\Mapping\Annotation\TreeRight;
+use Gedmo\Mapping\Annotation\TreeRoot;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 use Gedmo\Tree\Mapping\Validator;
 
 /**
- * This is an annotation mapping driver for Tree
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Tree
- * extension.
+ * Annotation mapping driver for the Tree behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Tree extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author <rocco@roccosportal.com>
@@ -21,62 +31,62 @@ class Annotation extends AbstractAnnotationDriver
     /**
      * Annotation to define the tree type
      */
-    public const TREE = 'Gedmo\\Mapping\\Annotation\\Tree';
+    public const TREE = Tree::class;
 
     /**
-     * Annotation to mark field as one which will store left value
+     * Annotation to mark a field as the one which will store the left value
      */
-    public const LEFT = 'Gedmo\\Mapping\\Annotation\\TreeLeft';
+    public const LEFT = TreeLeft::class;
 
     /**
-     * Annotation to mark field as one which will store right value
+     * Annotation to mark a field as the one which will store the right value
      */
-    public const RIGHT = 'Gedmo\\Mapping\\Annotation\\TreeRight';
+    public const RIGHT = TreeRight::class;
 
     /**
-     * Annotation to mark relative parent field
+     * Annotation to mark a field as the relative parent
      */
-    public const PARENT = 'Gedmo\\Mapping\\Annotation\\TreeParent';
+    public const PARENT = TreeParent::class;
 
     /**
-     * Annotation to mark node level
+     * Annotation to mark a field as the one which stores the node level
      */
-    public const LEVEL = 'Gedmo\\Mapping\\Annotation\\TreeLevel';
+    public const LEVEL = TreeLevel::class;
 
     /**
-     * Annotation to mark field as tree root
+     * Annotation to mark a field as the tree root
      */
-    public const ROOT = 'Gedmo\\Mapping\\Annotation\\TreeRoot';
+    public const ROOT = TreeRoot::class;
 
     /**
-     * Annotation to specify closure tree class
+     * Annotation to specify a Closure tree class
      */
-    public const CLOSURE = 'Gedmo\\Mapping\\Annotation\\TreeClosure';
+    public const CLOSURE = TreeClosure::class;
 
     /**
-     * Annotation to specify path class
+     * Annotation to specify a path class
      */
-    public const PATH = 'Gedmo\\Mapping\\Annotation\\TreePath';
+    public const PATH = TreePath::class;
 
     /**
-     * Annotation to specify path source class
+     * Annotation to specify a path source class
      */
-    public const PATH_SOURCE = 'Gedmo\\Mapping\\Annotation\\TreePathSource';
+    public const PATH_SOURCE = TreePathSource::class;
 
     /**
-     * Annotation to specify path hash class
+     * Annotation to specify the path hash class
      */
-    public const PATH_HASH = 'Gedmo\\Mapping\\Annotation\\TreePathHash';
+    public const PATH_HASH = TreePathHash::class;
 
     /**
      * Annotation to mark the field to be used to hold the lock time
      */
-    public const LOCK_TIME = 'Gedmo\\Mapping\\Annotation\\TreeLockTime';
+    public const LOCK_TIME = TreeLockTime::class;
 
     /**
      * List of tree strategies available
      *
-     * @var array
+     * @var string[]
      */
     protected $strategies = [
         'nested',
@@ -91,7 +101,8 @@ class Annotation extends AbstractAnnotationDriver
     {
         $validator = new Validator();
         $class = $this->getMetaReflectionClass($meta);
-        // class annotations
+
+        /** @var Tree|null $annot */
         if ($annot = $this->reader->getClassAnnotation($class, self::TREE)) {
             if (!in_array($annot->type, $this->strategies)) {
                 throw new InvalidMappingException("Tree type: {$annot->type} is not available.");
@@ -104,6 +115,8 @@ class Annotation extends AbstractAnnotationDriver
                 throw new InvalidMappingException('Tree Locking Timeout must be at least of 1 second.');
             }
         }
+
+        /** @var TreeClosure|null $annot */
         if ($annot = $this->reader->getClassAnnotation($class, self::CLOSURE)) {
             if (!$cl = $this->getRelatedClassName($meta, $annot->class)) {
                 throw new InvalidMappingException("Tree closure class: {$annot->class} does not exist.");
@@ -176,7 +189,8 @@ class Annotation extends AbstractAnnotationDriver
                 }
                 $config['level'] = $field;
             }
-            // path
+
+            /** @var TreePath|null $pathAnnotation */
             if ($pathAnnotation = $this->reader->getPropertyAnnotation($property, self::PATH)) {
                 $field = $property->getName();
                 if (!$meta->hasField($field)) {

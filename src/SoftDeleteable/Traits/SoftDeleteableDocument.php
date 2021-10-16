@@ -6,8 +6,7 @@ use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * A soft deletable trait you can apply to your MongoDB entities.
- * Includes default annotation mapping.
+ * Trait integrating common SoftDeleteable properties for objects with MongoDB ODM annotations.
  *
  * @author Wesley van Opdorp <wesley.van.opdorp@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -34,8 +33,9 @@ trait SoftDeleteableDocument
     }
 
     /**
-     * Get the deleted at timestamp value. Will return null if
-     * the entity has not been soft deleted.
+     * Get the deleted at timestamp value.
+     *
+     * Will return null if the entity has not been soft-deleted.
      *
      * @return DateTime|null
      */
@@ -45,7 +45,7 @@ trait SoftDeleteableDocument
     }
 
     /**
-     * Check if the entity has been soft deleted.
+     * Check if the entity has been soft-deleted.
      *
      * @return bool
      */

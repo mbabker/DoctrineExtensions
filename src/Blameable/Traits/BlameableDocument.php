@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Blameable Trait, usable with PHP >= 5.4
+ * Trait integrating common Blameable properties for objects with MongoDB ODM annotations.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -15,6 +15,7 @@ trait BlameableDocument
 {
     /**
      * @var string
+     *
      * @Gedmo\Blameable(on="create")
      * @ODM\Field(type="string")
      */
@@ -22,13 +23,14 @@ trait BlameableDocument
 
     /**
      * @var string
+     *
      * @Gedmo\Blameable(on="update")
      * @ODM\Field(type="string")
      */
     protected $updatedBy;
 
     /**
-     * Sets createdBy.
+     * Sets the created by information.
      *
      * @param string $createdBy
      *
@@ -42,7 +44,7 @@ trait BlameableDocument
     }
 
     /**
-     * Returns createdBy.
+     * Returns the created by information.
      *
      * @return string
      */
@@ -52,7 +54,7 @@ trait BlameableDocument
     }
 
     /**
-     * Sets updatedBy.
+     * Sets the updated by information.
      *
      * @param string $updatedBy
      *
@@ -66,7 +68,7 @@ trait BlameableDocument
     }
 
     /**
-     * Returns updatedBy.
+     * Returns the updated by information.
      *
      * @return string
      */

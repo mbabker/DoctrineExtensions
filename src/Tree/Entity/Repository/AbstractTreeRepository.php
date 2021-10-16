@@ -5,6 +5,8 @@ namespace Gedmo\Tree\Entity\Repository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Gedmo\Exception\InvalidArgumentException;
 use Gedmo\Tool\Wrapper\EntityWrapper;
 use Gedmo\Tree\RepositoryInterface;
@@ -12,10 +14,13 @@ use Gedmo\Tree\RepositoryUtils;
 use Gedmo\Tree\RepositoryUtilsInterface;
 use Gedmo\Tree\TreeListener;
 
+/**
+ * Base entity repository for ORM tree repositories.
+ */
 abstract class AbstractTreeRepository extends EntityRepository implements RepositoryInterface
 {
     /**
-     * Tree listener on event manager
+     * Tree listener from the event manager
      *
      * @var TreeListener
      */
@@ -23,11 +28,15 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
 
     /**
      * Repository utils
+     *
+     * @var RepositoryUtilsInterface
      */
     protected $repoUtils = null;
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Gedmo\Exception\InvalidMappingException if the configuration is invalid
      */
     public function __construct(EntityManagerInterface $em, ClassMetadata $class)
     {
@@ -58,7 +67,9 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @return \Doctrine\ORM\QueryBuilder
+     * Create a new query empty builder.
+     *
+     * @return QueryBuilder
      */
     protected function getQueryBuilder()
     {
@@ -66,9 +77,9 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * Sets the RepositoryUtilsInterface instance
+     * Sets the repository utils instance.
      *
-     * @return static
+     * @return $this
      */
     public function setRepoUtils(RepositoryUtilsInterface $repoUtils)
     {
@@ -78,9 +89,9 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * Returns the RepositoryUtilsInterface instance
+     * Sets the repository utils instance.
      *
-     * @return \Gedmo\Tree\RepositoryUtilsInterface|null
+     * @return RepositoryUtilsInterface|null
      */
     public function getRepoUtils()
     {
@@ -127,7 +138,7 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::childrenHierarchy
+     * {@inheritdoc}
      */
     public function childrenHierarchy($node = null, $direct = false, array $options = [], $includeNode = false)
     {
@@ -135,7 +146,7 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::buildTree
+     * {@inheritdoc}
      */
     public function buildTree(array $nodes, array $options = [])
     {
@@ -143,7 +154,7 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::buildTreeArray
+     * {@inheritdoc}
      */
     public function buildTreeArray(array $nodes)
     {
@@ -151,7 +162,7 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::setChildrenIndex
+     * {@inheritdoc}
      */
     public function setChildrenIndex($childrenIndex)
     {
@@ -159,7 +170,7 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::getChildrenIndex
+     * {@inheritdoc}
      */
     public function getChildrenIndex()
     {
@@ -167,80 +178,79 @@ abstract class AbstractTreeRepository extends EntityRepository implements Reposi
     }
 
     /**
-     * Checks if current repository is right
-     * for currently used tree strategy
+     * Checks if the current repository is right for the currently used tree strategy.
      *
      * @return bool
      */
     abstract protected function validate();
 
     /**
-     * Get all root nodes query builder
+     * Create a query builder to get all root nodes.
      *
-     * @param string - Sort by field
-     * @param string - Sort direction ("asc" or "desc")
+     * @param string $sortByField Sort by field
+     * @param string $direction   Sort direction ("asc" or "desc")
      *
-     * @return \Doctrine\ORM\QueryBuilder - QueryBuilder object
+     * @return QueryBuilder
      */
     abstract public function getRootNodesQueryBuilder($sortByField = null, $direction = 'asc');
 
     /**
-     * Get all root nodes query
+     * Create a Query instance to get all root nodes.
      *
-     * @param string - Sort by field
-     * @param string - Sort direction ("asc" or "desc")
+     * @param string $sortByField Sort by field
+     * @param string $direction   Sort direction ("asc" or "desc")
      *
-     * @return \Doctrine\ORM\Query - Query object
+     * @return Query
      */
     abstract public function getRootNodesQuery($sortByField = null, $direction = 'asc');
 
     /**
-     * Returns a QueryBuilder configured to return an array of nodes suitable for buildTree method
+     * Create a query builder to get an array of nodes to be used for building a tree.
      *
-     * @param object $node        - Root node
-     * @param bool   $direct      - Obtain direct children?
-     * @param array  $options     - Options
-     * @param bool   $includeNode - Include node in results?
+     * @param object $node        Root node
+     * @param bool   $direct      Flag indicating whether only direct children should be retrieved
+     * @param array  $options     Options, see {@see RepositoryUtilsInterface::buildTree()} for supported keys
+     * @param bool   $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\ORM\QueryBuilder - QueryBuilder object
+     * @return QueryBuilder
      */
     abstract public function getNodesHierarchyQueryBuilder($node = null, $direct = false, array $options = [], $includeNode = false);
 
     /**
-     * Returns a Query configured to return an array of nodes suitable for buildTree method
+     * Create a Query instance configured to get an array of nodes to be used for building a tree.
      *
-     * @param object $node        - Root node
-     * @param bool   $direct      - Obtain direct children?
-     * @param array  $options     - Options
-     * @param bool   $includeNode - Include node in results?
+     * @param object $node        Root node
+     * @param bool   $direct      Flag indicating whether only direct children should be retrieved
+     * @param array  $options     Options, see {@see RepositoryUtilsInterface::buildTree()} for supported keys
+     * @param bool   $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\ORM\Query - Query object
+     * @return Query
      */
     abstract public function getNodesHierarchyQuery($node = null, $direct = false, array $options = [], $includeNode = false);
 
     /**
-     * Get list of children followed by given $node. This returns a QueryBuilder object
+     * Create a query builder to get the list of children for the given node.
      *
-     * @param object $node        - if null, all tree nodes will be taken
-     * @param bool   $direct      - true to take only direct children
-     * @param string $sortByField - field name to sort by
-     * @param string $direction   - sort direction : "ASC" or "DESC"
-     * @param bool   $includeNode - Include the root node in results?
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\ORM\QueryBuilder - QueryBuilder object
+     * @return QueryBuilder
      */
     abstract public function getChildrenQueryBuilder($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false);
 
     /**
-     * Get list of children followed by given $node. This returns a Query
+     * Create a Query instance configured to get the list of children for the given node.
      *
-     * @param object $node        - if null, all tree nodes will be taken
-     * @param bool   $direct      - true to take only direct children
-     * @param string $sortByField - field name to sort by
-     * @param string $direction   - sort direction : "ASC" or "DESC"
-     * @param bool   $includeNode - Include the root node in results?
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\ORM\Query - Query object
+     * @return Query
      */
     abstract public function getChildrenQuery($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false);
 }

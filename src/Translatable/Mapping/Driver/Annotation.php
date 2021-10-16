@@ -3,13 +3,16 @@
 namespace Gedmo\Translatable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Language;
+use Gedmo\Mapping\Annotation\Locale;
+use Gedmo\Mapping\Annotation\Translatable;
+use Gedmo\Mapping\Annotation\TranslationEntity;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Translatable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Translatable
- * extension.
+ * Annotation mapping driver for the Translatable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,26 +20,28 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to identity translation entity to be used for translation storage
+     * Annotation to identity a translation entity to be used for translation storage
      */
-    public const ENTITY_CLASS = 'Gedmo\\Mapping\\Annotation\\TranslationEntity';
+    public const ENTITY_CLASS = TranslationEntity::class;
 
     /**
-     * Annotation to identify field as translatable
+     * Annotation to identify a field as translatable
      */
-    public const TRANSLATABLE = 'Gedmo\\Mapping\\Annotation\\Translatable';
+    public const TRANSLATABLE = Translatable::class;
 
     /**
-     * Annotation to identify field which can store used locale or language
-     * alias is LANGUAGE
+     * Annotation to identify a field which can store the used locale or language
+     *
+     * Alias of {@see self::LANGUAGE}
      */
-    public const LOCALE = 'Gedmo\\Mapping\\Annotation\\Locale';
+    public const LOCALE = Locale::class;
 
     /**
-     * Annotation to identify field which can store used locale or language
-     * alias is LOCALE
+     * Annotation to identify a field which can store the used locale or language
+     *
+     * Alias of {@see self::LOCALE}
      */
-    public const LANGUAGE = 'Gedmo\\Mapping\\Annotation\\Language';
+    public const LANGUAGE = Language::class;
 
     /**
      * {@inheritdoc}
@@ -44,7 +49,8 @@ class Annotation extends AbstractAnnotationDriver
     public function readExtendedMetadata($meta, array &$config)
     {
         $class = $this->getMetaReflectionClass($meta);
-        // class annotations
+
+        /** @var TranslationEntity|null $annot */
         if ($annot = $this->reader->getClassAnnotation($class, self::ENTITY_CLASS)) {
             if (!$cl = $this->getRelatedClassName($meta, $annot->class)) {
                 throw new InvalidMappingException("Translation class: {$annot->class} does not exist.");
@@ -60,13 +66,14 @@ class Annotation extends AbstractAnnotationDriver
             ) {
                 continue;
             }
-            // translatable property
+
+            /** @var Translatable|null $translatable */
             if ($translatable = $this->reader->getPropertyAnnotation($property, self::TRANSLATABLE)) {
                 $field = $property->getName();
                 if (!$meta->hasField($field)) {
                     throw new InvalidMappingException("Unable to find translatable [{$field}] as mapped property in entity - {$meta->name}");
                 }
-                // fields cannot be overrided and throws mapping exception
+                // fields cannot be overridden and throws mapping exception
                 $config['fields'][] = $field;
                 if (isset($translatable->fallback)) {
                     $config['fallback'][$field] = $translatable->fallback;
@@ -96,6 +103,7 @@ class Annotation extends AbstractAnnotationDriver
                 }
                 $embeddedClass = new \ReflectionClass($embeddedClassInfo['class']);
                 foreach ($embeddedClass->getProperties() as $embeddedProperty) {
+                    /** @var Translatable|null $translatable */
                     if ($translatable = $this->reader->getPropertyAnnotation($embeddedProperty, self::TRANSLATABLE)) {
                         $field = $propertyName.'.'.$embeddedProperty->getName();
 

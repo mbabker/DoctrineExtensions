@@ -2,15 +2,15 @@
 
 namespace Gedmo\Sortable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
- * This is a yaml mapping driver for Sortable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Sortable
- * extension.
+ * YAML mapping driver for the Sortable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Sortable extension.
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -25,9 +25,9 @@ class Yaml extends File implements Driver
     protected $_extension = '.dcm.yml';
 
     /**
-     * List of types which are valid for position fields
+     * List of types which are valid for a position field.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'int',
@@ -89,14 +89,14 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 
     /**
-     * Checks if $field type is valid as SortablePosition field
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

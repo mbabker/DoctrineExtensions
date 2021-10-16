@@ -5,13 +5,15 @@ namespace Gedmo\Sluggable;
 use Doctrine\Common\EventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Gedmo\Mapping\MappedEventSubscriber;
+use Gedmo\Sluggable\Handler\SlugHandlerInterface;
 use Gedmo\Sluggable\Handler\SlugHandlerWithUniqueCallbackInterface;
 use Gedmo\Sluggable\Mapping\Event\SluggableAdapter;
+use Gedmo\Sluggable\Util\Urlizer;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
- * The SluggableListener handles the generation of slugs
- * for documents and entities.
+ * The Sluggable listener handles the generation of slugs
+ * on objects when created and updated.
  *
  * This behavior can impact the performance of your application
  * since it does some additional calculations on persisted objects.
@@ -23,55 +25,54 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 class SluggableListener extends MappedEventSubscriber
 {
     /**
-     * The power exponent to jump
-     * the slug unique number by tens.
+     * The power exponent to jump the slug unique number by tens.
      *
      * @var int
      */
     private $exponent = 0;
 
     /**
-     * Transliteration callback for slugs
+     * Transliteration callback for slugs.
      *
      * @var callable
      */
-    private $transliterator = ['Gedmo\Sluggable\Util\Urlizer', 'transliterate'];
+    private $transliterator = [Urlizer::class, 'transliterate'];
 
     /**
-     * Urlize callback for slugs
+     * Urlize callback for slugs.
      *
      * @var callable
      */
-    private $urlizer = ['Gedmo\Sluggable\Util\Urlizer', 'urlize'];
+    private $urlizer = [Urlizer::class, 'urlize'];
 
     /**
      * List of inserted slugs for each object class.
-     * This is needed in case there are identical slug
-     * composition in number of persisted objects
-     * during the same flush
+     *
+     * This is needed in case there are identical slug composition in
+     * number of persisted objects during the same flush.
      *
      * @var array
      */
     private $persisted = [];
 
     /**
-     * List of initialized slug handlers
+     * List of initialized slug handlers.
      *
-     * @var array
+     * @var array<class-string<SlugHandlerInterface>, SlugHandlerInterface>
      */
     private $handlers = [];
 
     /**
-     * List of filters which are manipulated when slugs are generated
+     * List of filters which are manipulated when slugs are generated.
      *
      * @var array
      */
     private $managedFilters = [];
 
     /**
-     * Specifies the list of events to listen
+     * Specifies the list of events to listen on.
      *
-     * @return array
+     * @return string[]
      */
     public function getSubscribedEvents()
     {
@@ -83,14 +84,13 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Set the transliteration callable method
-     * to transliterate slugs
+     * Set the callable to transliterate slugs.
      *
      * @param callable $callable
      *
-     * @throws \Gedmo\Exception\InvalidArgumentException
-     *
      * @return void
+     *
+     * @throws \Gedmo\Exception\InvalidArgumentException
      */
     public function setTransliterator($callable)
     {
@@ -101,10 +101,13 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Set the urlization callable method
-     * to urlize slugs
+     * Set the callable to urlize slugs.
      *
      * @param callable $callable
+     *
+     * @return void
+     *
+     * @throws \Gedmo\Exception\InvalidArgumentException
      */
     public function setUrlizer($callable)
     {
@@ -115,7 +118,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Get currently used transliterator callable
+     * Get the currently used transliterator callable.
      *
      * @return callable
      */
@@ -125,7 +128,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Get currently used urlizer callable
+     * Get the currently used urlizer callable.
      *
      * @return callable
      */
@@ -135,7 +138,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Enables or disables the given filter when slugs are generated
+     * Enables or disables the given filter when slugs are generated.
      *
      * @param string $name
      * @param bool   $disable True by default
@@ -146,7 +149,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Removes a filter from the managed set
+     * Removes a filter from the managed set.
      *
      * @param string $name
      */
@@ -156,7 +159,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Mapps additional metadata
+     * Maps additional metadata for the object.
      *
      * @return void
      */
@@ -167,7 +170,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Allows identifier fields to be slugged as usual
+     * Allows identifier fields to be slugged.
      *
      * @return void
      */
@@ -188,8 +191,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Generate slug on objects being updated during flush
-     * if they require changing
+     * Generate a slug on objects being updated during flush if they require changing.
      *
      * @return void
      */
@@ -237,11 +239,11 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Get the slug handler instance by $class name
+     * Get the slug handler instance for the given class name, creating it if needed.
      *
-     * @param string $class
+     * @param class-string<SlugHandlerInterface> $class
      *
-     * @return \Gedmo\Sluggable\Handler\SlugHandlerInterface
+     * @return SlugHandlerInterface
      */
     private function getHandler($class)
     {
@@ -253,7 +255,7 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Creates the slug for object being flushed
+     * Creates the slug for an object being flushed.
      *
      * @param object $object
      *
@@ -412,14 +414,14 @@ class SluggableListener extends MappedEventSubscriber
     }
 
     /**
-     * Generates the unique slug
+     * Generates a unique slug for the object.
      *
      * @param object $object
      * @param string $preferredSlug
      * @param bool   $recursing
      * @param array  $config[$slugField]
      *
-     * @return string - unique slug
+     * @return string
      */
     private function makeUniqueSlug(SluggableAdapter $ea, $object, $preferredSlug, $recursing = false, $config = [])
     {
@@ -535,9 +537,9 @@ class SluggableListener extends MappedEventSubscriber
     /**
      * Retrieves a FilterCollection instance from the given ObjectManager.
      *
-     * @throws \Gedmo\Exception\InvalidArgumentException
-     *
      * @return mixed
+     *
+     * @throws \Gedmo\Exception\InvalidArgumentException
      */
     private function getFilterCollectionFromObjectManager(ObjectManager $om)
     {

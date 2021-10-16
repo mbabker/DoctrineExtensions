@@ -3,9 +3,8 @@
 namespace Gedmo\ReferenceIntegrity;
 
 /**
- * This interface is not necessary but can be implemented for
- * Entities which in some cases needs to be identified te have
- * ReferenceIntegrity checks
+ * Optional interface which can be used to identify
+ * objects which have ReferenceIntegrity checked.
  *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

@@ -3,9 +3,8 @@
 namespace Gedmo\SoftDeleteable;
 
 /**
- * This interface is not necessary but can be implemented for
- * Domain Objects which in some cases needs to be identified as
- * SoftDeleteable
+ * Optional interface which can be used to identify
+ * SoftDeleteable objects.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>

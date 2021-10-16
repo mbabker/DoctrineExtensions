@@ -2,14 +2,14 @@
 
 namespace Gedmo\Blameable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Blameable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Blameable
- * extension.
+ * XML mapping driver for the Blameable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Blameable extension.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,9 +17,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * List of types which are valid for blame
+     * List of types which are valid to blame.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'one',
@@ -32,22 +32,14 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $mapping */
         $mapping = $this->_getMapping($meta->name);
 
         if (isset($mapping->field)) {
-            /**
-             * @var \SimpleXmlElement
-             */
             foreach ($mapping->field as $fieldMapping) {
                 $fieldMappingDoctrine = $fieldMapping;
                 $fieldMapping = $fieldMapping->children(self::GEDMO_NAMESPACE_URI);
                 if (isset($fieldMapping->blameable)) {
-                    /**
-                     * @var \SimpleXmlElement
-                     */
                     $data = $fieldMapping->blameable;
 
                     $field = $this->_getAttribute($fieldMappingDoctrine, 'name');
@@ -113,10 +105,10 @@ class Xml extends BaseXml
     }
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

@@ -5,12 +5,16 @@ namespace Gedmo\References;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * Lazy collection for loading reference many associations.
+ * Lazy collection for loading a reference to many associations.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
+ *
+ * @psalm-template TKey of array-key
+ * @psalm-template T
+ * @template-implements Collection<TKey,T>
  */
 class LazyCollection implements Collection
 {

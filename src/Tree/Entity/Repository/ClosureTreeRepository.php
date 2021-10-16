@@ -3,15 +3,14 @@
 namespace Gedmo\Tree\Entity\Repository;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Gedmo\Exception\InvalidArgumentException;
 use Gedmo\Tool\Wrapper\EntityWrapper;
 use Gedmo\Tree\Entity\MappedSuperclass\AbstractClosure;
 use Gedmo\Tree\Strategy;
 
 /**
- * The ClosureTreeRepository has some useful functions
- * to interact with Closure tree. Repository uses
- * the strategy used by listener
+ * Entity repository for ORM closure tree repositories.
  *
  * @author Gustavo Adrian <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -62,9 +61,9 @@ class ClosureTreeRepository extends AbstractTreeRepository
      *
      * @param object $node
      *
-     * @throws InvalidArgumentException - if input is not valid
-     *
      * @return Query
+     *
+     * @throws InvalidArgumentException if the input is not valid
      */
     public function getPathQuery($node)
     {
@@ -89,11 +88,11 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get the Tree path of Nodes by given $node
+     * Get the tree path for the given node
      *
      * @param object $node
      *
-     * @return array - list of Nodes in path
+     * @return array
      */
     public function getPath($node)
     {
@@ -103,7 +102,15 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * @see getChildrenQueryBuilder
+     * Create a query builder to get the list of children for the given node.
+     *
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
+     *
+     * @return QueryBuilder
      */
     public function childrenQueryBuilder($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
     {
@@ -161,7 +168,15 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * @see getChildrenQuery
+     * Create a Query instance configured to get the list of children for the given node.
+     *
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
+     *
+     * @return Query
      */
     public function childrenQuery($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
     {
@@ -169,7 +184,15 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * @see getChildren
+     * Get the list of children for the given node
+     *
+     * @param object|null          $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool                 $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|string[]|null $sortByField Field name(s) to sort by
+     * @param string               $direction   Sort direction : "ASC" or "DESC"
+     * @param bool                 $includeNode Flag indicating whether the given node should be included in the results
+     *
+     * @return array|null List of children or null on failure
      */
     public function children($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
     {
@@ -208,14 +231,14 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * Removes given $node from the tree and reparents its descendants
-     *
-     * @todo may be improved, to issue single query on reparenting
+     * Removes the given node from the tree and reparents its descendants
      *
      * @param object $node
      *
-     * @throws \Gedmo\Exception\InvalidArgumentException
-     * @throws \Gedmo\Exception\RuntimeException         - if something fails in transaction
+     * @throws \Gedmo\Exception\InvalidArgumentException if the configuration is invalid
+     * @throws \Gedmo\Exception\RuntimeException         if something fails in the transaction
+     *
+     * @todo may be improved, to issue single query on reparenting
      */
     public function removeFromTree($node)
     {
@@ -278,12 +301,7 @@ class ClosureTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * Process nodes and produce an array with the
-     * structure of the tree
-     *
-     * @param array - Array of nodes
-     *
-     * @return array - Array with tree structure
+     * {@inheritdoc}
      */
     public function buildTreeArray(array $nodes)
     {

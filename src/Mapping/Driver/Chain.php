@@ -2,11 +2,12 @@
 
 namespace Gedmo\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Gedmo\Mapping\Driver;
 
 /**
- * The chain mapping driver enables chained
- * extension mapping driver support
+ * The chain mapping driver allows chaining of multiple
+ * mapping drivers.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -14,21 +15,21 @@ use Gedmo\Mapping\Driver;
 class Chain implements Driver
 {
     /**
-     * The default driver
+     * The default driver.
      *
      * @var Driver|null
      */
     private $defaultDriver;
 
     /**
-     * List of drivers nested
+     * List of chained drivers.
      *
      * @var Driver[]
      */
     private $_drivers = [];
 
     /**
-     * Add a nested driver.
+     * Add a driver to the chain.
      *
      * @param string $namespace
      */
@@ -38,9 +39,9 @@ class Chain implements Driver
     }
 
     /**
-     * Get the array of nested drivers.
+     * Get the list of drivers in the chain.
      *
-     * @return Driver[] $drivers
+     * @return Driver[]
      */
     public function getDrivers()
     {
@@ -89,9 +90,9 @@ class Chain implements Driver
     }
 
     /**
-     * Passes in the mapping read by original driver
+     * Sets the original mapping driver.
      *
-     * @param $driver
+     * @param MappingDriver $driver
      *
      * @return void
      */

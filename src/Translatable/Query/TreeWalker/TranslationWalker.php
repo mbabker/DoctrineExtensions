@@ -2,6 +2,8 @@
 
 namespace Gedmo\Translatable\Query\TreeWalker;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
@@ -12,18 +14,20 @@ use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\Exec\SingleSelectExecutor;
 use Doctrine\ORM\Query\SqlWalker;
+use Gedmo\Translatable\Hydrator\ORM\ObjectHydrator;
+use Gedmo\Translatable\Hydrator\ORM\SimpleObjectHydrator;
 use Gedmo\Translatable\Mapping\Event\Adapter\ORM as TranslatableEventAdapter;
 use Gedmo\Translatable\TranslatableListener;
 
 /**
- * The translation sql output walker makes it possible
- * to translate all query components during single query.
- * It works with any select query, any hydration method.
+ * The translation SQL output walker makes it possible
+ * to translate all query components during a single query.
+ * It works with any select query and any hydration method.
  *
  * Behind the scenes, during the object hydration it forces
- * custom hydrator in order to interact with TranslatableListener
- * and skip postLoad event which would cause automatic retranslation
- * of the fields.
+ * a custom hydrator to be used in order to interact with
+ * the TranslatableListener and skip the postLoad event
+ * which would cause automatic retranslation of the fields.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -52,29 +56,28 @@ class TranslationWalker extends SqlWalker
     public const HYDRATE_SIMPLE_OBJECT_TRANSLATION = '__gedmo.translatable.simple_object.hydrator';
 
     /**
-     * Stores all component references from select clause
+     * Stores all component references from the SELECT clause
      *
      * @var array
      */
     private $translatedComponents = [];
 
     /**
-     * DBAL database platform
+     * Database platform object
      *
-     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
+     * @var AbstractPlatform
      */
     private $platform;
 
     /**
-     * DBAL database connection
+     * Database connection object
      *
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $conn;
 
     /**
-     * List of aliases to replace with translation
-     * content reference
+     * List of aliases to replace with translation content reference
      *
      * @var array
      */
@@ -104,7 +107,7 @@ class TranslationWalker extends SqlWalker
      */
     public function getExecutor($AST)
     {
-        // If it's not a Select, the TreeWalker ought to skip it, and just return the parent.
+        // If it's not a Select query, the TreeWalker ought to skip it, and just return the parent.
         // @see https://github.com/Atlantic18/DoctrineExtensions/issues/2013
         if (!$AST instanceof SelectStatement) {
             return parent::getExecutor($AST);
@@ -129,14 +132,14 @@ class TranslationWalker extends SqlWalker
             $this->getQuery()->setHydrationMode(self::HYDRATE_OBJECT_TRANSLATION);
             $this->getEntityManager()->getConfiguration()->addCustomHydrationMode(
                 self::HYDRATE_OBJECT_TRANSLATION,
-                'Gedmo\\Translatable\\Hydrator\\ORM\\ObjectHydrator'
+                ObjectHydrator::class
             );
             $this->getQuery()->setHint(Query::HINT_REFRESH, true);
         } elseif (Query::HYDRATE_SIMPLEOBJECT === $hydrationMode) {
             $this->getQuery()->setHydrationMode(self::HYDRATE_SIMPLE_OBJECT_TRANSLATION);
             $this->getEntityManager()->getConfiguration()->addCustomHydrationMode(
                 self::HYDRATE_SIMPLE_OBJECT_TRANSLATION,
-                'Gedmo\\Translatable\\Hydrator\\ORM\\SimpleObjectHydrator'
+                SimpleObjectHydrator::class
             );
             $this->getQuery()->setHint(Query::HINT_REFRESH, true);
         }
@@ -238,7 +241,7 @@ class TranslationWalker extends SqlWalker
     }
 
     /**
-     * Walks from clause, and creates translation joins
+     * Walks the FROM clause and creates translation joins
      * for the translated components
      *
      * @param \Doctrine\ORM\Query\AST\FromClause $from
@@ -278,8 +281,7 @@ class TranslationWalker extends SqlWalker
     }
 
     /**
-     * Creates a left join list for translations
-     * on used query components
+     * Creates a left join list for translations on used query components
      *
      * @todo: make it cleaner
      *
@@ -371,7 +373,7 @@ class TranslationWalker extends SqlWalker
         $q = $this->getQuery();
         $fallback = $q->getHint(TranslatableListener::HINT_FALLBACK);
         if (false === $fallback) {
-            // non overrided
+            // non overridden
             $fallback = $this->listener->getTranslationFallback();
         }
 
@@ -380,7 +382,7 @@ class TranslationWalker extends SqlWalker
     }
 
     /**
-     * Search for translated components in the select clause
+     * Search for translated components in the SELECT clause
      */
     private function extractTranslatedComponents(array $queryComponents)
     {
@@ -400,9 +402,9 @@ class TranslationWalker extends SqlWalker
     /**
      * Get the currently used TranslatableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return TranslatableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     private function getTranslatableListener()
     {
@@ -419,8 +421,7 @@ class TranslationWalker extends SqlWalker
     }
 
     /**
-     * Replaces given sql $str with required
-     * results
+     * Replaces given SQL statement with required results
      *
      * @param string $str
      *
@@ -440,11 +441,11 @@ class TranslationWalker extends SqlWalker
     /**
      * Casts a foreign key if needed
      *
-     * @NOTE: personal translations manages that for themselves.
+     * @note Personal translations manage that for themselves.
      *
-     * @param $component - a column with an alias to cast
-     * @param $typeFK - translation table foreign key type
-     * @param $typePK - primary key type which references translation table
+     * @param string $component A column with an alias to cast
+     * @param string $typeFK    A translation table foreign key type
+     * @param string $typePK    A primary key type which references translation table
      *
      * @return string - modified $component if needed
      */

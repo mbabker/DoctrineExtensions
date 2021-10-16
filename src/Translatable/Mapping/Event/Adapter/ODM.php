@@ -6,11 +6,13 @@ use Doctrine\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\Tool\Wrapper\AbstractWrapper;
+use Gedmo\Translatable\Document\MappedSuperclass\AbstractPersonalTranslation;
+use Gedmo\Translatable\Document\Translation;
 use Gedmo\Translatable\Mapping\Event\TranslatableAdapter;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for Translatable behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the Translatable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -26,7 +28,7 @@ final class ODM extends BaseAdapterODM implements TranslatableAdapter
             ->getObjectManager()
             ->getClassMetadata($translationClassName)
             ->getReflectionClass()
-            ->isSubclassOf('Gedmo\Translatable\Document\MappedSuperclass\AbstractPersonalTranslation')
+            ->isSubclassOf(AbstractPersonalTranslation::class)
         ;
     }
 
@@ -35,7 +37,7 @@ final class ODM extends BaseAdapterODM implements TranslatableAdapter
      */
     public function getDefaultTranslationClass()
     {
-        return 'Gedmo\\Translatable\\Document\\Translation';
+        return Translation::class;
     }
 
     /**

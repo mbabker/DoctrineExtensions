@@ -6,10 +6,8 @@ use Gedmo\Exception\InvalidMappingException;
 use SimpleXMLElement;
 
 /**
- * The mapping XmlDriver abstract class, defines the
- * metadata extraction function common among all
- * all drivers used on these extensions by file based
- * drivers.
+ * This is an abstract class to implement common functionality
+ * for extension XML mapping drivers.
  *
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -28,14 +26,16 @@ abstract class Xml extends File
     protected $_extension = '.dcm.xml';
 
     /**
-     * Get attribute value.
-     * As we are supporting namespaces the only way to get to the attributes under a node is to use attributes function on it
+     * Get the attribute value.
+     *
+     * As we are supporting namespaces the only way to get to the attributes under a node is
+     * to use the attributes function on it.
      *
      * @param string $attributeName
      *
      * @return string
      */
-    protected function _getAttribute(SimpleXmlElement $node, $attributeName)
+    protected function _getAttribute(SimpleXMLElement $node, $attributeName)
     {
         $attributes = $node->attributes();
 
@@ -43,14 +43,16 @@ abstract class Xml extends File
     }
 
     /**
-     * Get boolean attribute value.
-     * As we are supporting namespaces the only way to get to the attributes under a node is to use attributes function on it
+     * Get a boolean attribute value.
+     *
+     * As we are supporting namespaces the only way to get to the attributes under a node is
+     * to use the attributes function on it.
      *
      * @param string $attributeName
      *
      * @return bool
      */
-    protected function _getBooleanAttribute(SimpleXmlElement $node, $attributeName)
+    protected function _getBooleanAttribute(SimpleXMLElement $node, $attributeName)
     {
         $rawValue = strtolower($this->_getAttribute($node, $attributeName));
         if ('1' === $rawValue || 'true' === $rawValue) {
@@ -63,14 +65,16 @@ abstract class Xml extends File
     }
 
     /**
-     * does attribute exist under a specific node
-     * As we are supporting namespaces the only way to get to the attributes under a node is to use attributes function on it
+     * Checks if an attribute exists under the given node.
+     *
+     * As we are supporting namespaces the only way to get to the attributes under a node is
+     * to use the attributes function on it.
      *
      * @param string $attributeName
      *
-     * @return string
+     * @return bool
      */
-    protected function _isAttributeSet(SimpleXmlElement $node, $attributeName)
+    protected function _isAttributeSet(SimpleXMLElement $node, $attributeName)
     {
         $attributes = $node->attributes();
 

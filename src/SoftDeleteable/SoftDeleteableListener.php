@@ -7,7 +7,8 @@ use Doctrine\ODM\MongoDB\UnitOfWork as MongoDBUnitOfWork;
 use Gedmo\Mapping\MappedEventSubscriber;
 
 /**
- * SoftDeleteable listener
+ * The SoftDeleteable listener changes a DELETE query for managed
+ * objects which should be soft-deleted.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -41,8 +42,8 @@ class SoftDeleteableListener extends MappedEventSubscriber
     }
 
     /**
-     * If it's a SoftDeleteable object, update the "deletedAt" field
-     * and skip the removal of the object
+     * Checks for SoftDeletable objects and updates the "deletedAt"
+     * timestamp instead of deleting the object.
      *
      * @return void
      */
@@ -93,7 +94,7 @@ class SoftDeleteableListener extends MappedEventSubscriber
     }
 
     /**
-     * Maps additional metadata
+     * Maps additional metadata for the object.
      *
      * @return void
      */

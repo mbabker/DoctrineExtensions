@@ -2,12 +2,13 @@
 
 namespace Gedmo\Loggable\Mapping\Event\Adapter;
 
+use Gedmo\Loggable\Entity\LogEntry;
 use Gedmo\Loggable\Mapping\Event\LoggableAdapter;
 use Gedmo\Mapping\Event\Adapter\ORM as BaseAdapterORM;
 
 /**
- * Doctrine event adapter for ORM adapted
- * for Loggable behavior
+ * Doctrine event adapter for the ORM, adapted
+ * for the Loggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -19,7 +20,7 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
      */
     public function getDefaultLogEntryClass()
     {
-        return 'Gedmo\\Loggable\\Entity\\LogEntry';
+        return LogEntry::class;
     }
 
     /**

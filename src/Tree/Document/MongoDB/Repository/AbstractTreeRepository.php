@@ -4,28 +4,38 @@ namespace Gedmo\Tree\Document\MongoDB\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use Gedmo\Tree\RepositoryInterface;
 use Gedmo\Tree\RepositoryUtils;
 use Gedmo\Tree\RepositoryUtilsInterface;
+use Gedmo\Tree\TreeListener;
 
+/**
+ * Base document repository for MongoDB ODM tree repositories.
+ */
 abstract class AbstractTreeRepository extends DocumentRepository implements RepositoryInterface
 {
     /**
-     * Tree listener on event manager
+     * Tree listener from the event manager
      *
-     * @var AbstractTreeListener
+     * @var TreeListener
      */
     protected $listener = null;
 
     /**
      * Repository utils
+     *
+     * @var RepositoryUtilsInterface
      */
     protected $repoUtils = null;
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Gedmo\Exception\InvalidMappingException if the configuration is invalid
      */
     public function __construct(DocumentManager $em, UnitOfWork $uow, ClassMetadata $class)
     {
@@ -33,7 +43,7 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
         $treeListener = null;
         foreach ($em->getEventManager()->getListeners() as $listeners) {
             foreach ($listeners as $listener) {
-                if ($listener instanceof \Gedmo\Tree\TreeListener) {
+                if ($listener instanceof TreeListener) {
                     $treeListener = $listener;
                     break;
                 }
@@ -56,7 +66,7 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
     }
 
     /**
-     * Sets the RepositoryUtilsInterface instance
+     * Sets the repository utils instance.
      *
      * @return $this
      */
@@ -68,9 +78,9 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
     }
 
     /**
-     * Returns the RepositoryUtilsInterface instance
+     * Sets the repository utils instance.
      *
-     * @return \Gedmo\Tree\RepositoryUtilsInterface|null
+     * @return RepositoryUtilsInterface|null
      */
     public function getRepoUtils()
     {
@@ -94,7 +104,7 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::setChildrenIndex
+     * {@inheritdoc}
      */
     public function setChildrenIndex($childrenIndex)
     {
@@ -102,7 +112,7 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
     }
 
     /**
-     * @see \Gedmo\Tree\RepositoryUtilsInterface::getChildrenIndex
+     * {@inheritdoc}
      */
     public function getChildrenIndex()
     {
@@ -118,80 +128,79 @@ abstract class AbstractTreeRepository extends DocumentRepository implements Repo
     }
 
     /**
-     * Checks if current repository is right
-     * for currently used tree strategy
+     * Checks if the current repository is right for the currently used tree strategy.
      *
      * @return bool
      */
     abstract protected function validate();
 
     /**
-     * Get all root nodes query builder
+     * Create a query builder to get all root nodes.
      *
-     * @param string - Sort by field
-     * @param string - Sort direction ("asc" or "desc")
+     * @param string $sortByField Sort by field
+     * @param string $direction   Sort direction ("asc" or "desc")
      *
-     * @return \Doctrine\MongoDB\Query\Builder - QueryBuilder object
+     * @return Builder
      */
     abstract public function getRootNodesQueryBuilder($sortByField = null, $direction = 'asc');
 
     /**
-     * Get all root nodes query
+     * Create a Query instance to get all root nodes.
      *
-     * @param string - Sort by field
-     * @param string - Sort direction ("asc" or "desc")
+     * @param string $sortByField Sort by field
+     * @param string $direction   Sort direction ("asc" or "desc")
      *
-     * @return \Doctrine\MongoDB\Query\Query - Query object
+     * @return Query
      */
     abstract public function getRootNodesQuery($sortByField = null, $direction = 'asc');
 
     /**
-     * Returns a QueryBuilder configured to return an array of nodes suitable for buildTree method
+     * Create a query builder to get an array of nodes to be used for building a tree.
      *
-     * @param object $node        - Root node
-     * @param bool   $direct      - Obtain direct children?
-     * @param array  $options     - Options
-     * @param bool   $includeNode - Include node in results?
+     * @param object $node        Root node
+     * @param bool   $direct      Flag indicating whether only direct children should be retrieved
+     * @param array  $options     Options, see {@see RepositoryUtilsInterface::buildTree()} for supported keys
+     * @param bool   $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\MongoDB\Query\Builder - QueryBuilder object
+     * @return Builder
      */
     abstract public function getNodesHierarchyQueryBuilder($node = null, $direct = false, array $options = [], $includeNode = false);
 
     /**
-     * Returns a Query configured to return an array of nodes suitable for buildTree method
+     * Create a Query instance configured to get an array of nodes to be used for building a tree.
      *
-     * @param object $node        - Root node
-     * @param bool   $direct      - Obtain direct children?
-     * @param array  $options     - Options
-     * @param bool   $includeNode - Include node in results?
+     * @param object $node        Root node
+     * @param bool   $direct      Flag indicating whether only direct children should be retrieved
+     * @param array  $options     Options, see {@see RepositoryUtilsInterface::buildTree()} for supported keys
+     * @param bool   $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\MongoDB\Query\Query - Query object
+     * @return Query
      */
     abstract public function getNodesHierarchyQuery($node = null, $direct = false, array $options = [], $includeNode = false);
 
     /**
-     * Get list of children followed by given $node. This returns a QueryBuilder object
+     * Create a query builder to get the list of children for the given node.
      *
-     * @param object $node        - if null, all tree nodes will be taken
-     * @param bool   $direct      - true to take only direct children
-     * @param string $sortByField - field name to sort by
-     * @param string $direction   - sort direction : "ASC" or "DESC"
-     * @param bool   $includeNode - Include the root node in results?
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\MongoDB\Query\Builder - QueryBuilder object
+     * @return Builder
      */
     abstract public function getChildrenQueryBuilder($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false);
 
     /**
-     * Get list of children followed by given $node. This returns a Query
+     * Create a Query instance configured to get the list of children for the given node.
      *
-     * @param object $node        - if null, all tree nodes will be taken
-     * @param bool   $direct      - true to take only direct children
-     * @param string $sortByField - field name to sort by
-     * @param string $direction   - sort direction : "ASC" or "DESC"
-     * @param bool   $includeNode - Include the root node in results?
+     * @param object|null $node        The object to fetch children for; if null, all nodes will be retrieved
+     * @param bool        $direct      Flag indicating whether only direct children should be retrieved
+     * @param string|null $sortByField Field name to sort by
+     * @param string      $direction   Sort direction : "ASC" or "DESC"
+     * @param bool        $includeNode Flag indicating whether the given node should be included in the results
      *
-     * @return \Doctrine\MongoDB\Query\Query - Query object
+     * @return Query
      */
     abstract public function getChildrenQuery($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false);
 }

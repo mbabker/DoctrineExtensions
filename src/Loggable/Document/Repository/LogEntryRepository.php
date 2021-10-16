@@ -10,7 +10,7 @@ use Gedmo\Loggable\LoggableListener;
 use Gedmo\Tool\Wrapper\MongoDocumentWrapper;
 
 /**
- * The LogEntryRepository has some useful functions
+ * The LogEntryRepository provides some useful functions
  * to interact with log entries.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -26,8 +26,7 @@ class LogEntryRepository extends DocumentRepository
     private $listener;
 
     /**
-     * Loads all log entries for the
-     * given $document
+     * Loads all log entries for the given document.
      *
      * @param object $document
      *
@@ -53,17 +52,18 @@ class LogEntryRepository extends DocumentRepository
     }
 
     /**
-     * Reverts given $document to $revision by
-     * restoring all fields from that $revision.
-     * After this operation you will need to
-     * persist and flush the $document.
+     * Reverts the given document to the specified version.
+     *
+     * This method will restore the value of all fields from
+     * the given version. After this operation, you will need
+     * to persist and flush the document.
      *
      * @param object $document
      * @param int    $version
      *
-     * @throws \Gedmo\Exception\UnexpectedValueException
-     *
      * @return void
+     *
+     * @throws \Gedmo\Exception\UnexpectedValueException
      */
     public function revert($document, $version = 1)
     {
@@ -94,7 +94,7 @@ class LogEntryRepository extends DocumentRepository
     }
 
     /**
-     * Fills a documents versioned fields with data
+     * Fills a document's versioned fields with the given data.
      *
      * @param object $document
      */
@@ -134,15 +134,15 @@ class LogEntryRepository extends DocumentRepository
     /**
      * Get the currently used LoggableListener
      *
-     * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     *
      * @return LoggableListener
+     *
+     * @throws \Gedmo\Exception\RuntimeException if the listener is not registered
      */
     private function getLoggableListener()
     {
         if (is_null($this->listener)) {
-            foreach ($this->dm->getEventManager()->getListeners() as $event => $listeners) {
-                foreach ($listeners as $hash => $listener) {
+            foreach ($this->dm->getEventManager()->getListeners() as $listeners) {
+                foreach ($listeners as $listener) {
                     if ($listener instanceof LoggableListener) {
                         $this->listener = $listener;
                         break;

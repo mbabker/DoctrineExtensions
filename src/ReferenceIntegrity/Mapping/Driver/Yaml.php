@@ -8,10 +8,9 @@ use Gedmo\Mapping\Driver\File;
 use Gedmo\ReferenceIntegrity\Mapping\Validator;
 
 /**
- * This is a yaml mapping driver for ReferenceIntegrity
- * extension. Used for extraction of extended
- * metadata from yaml specifically for ReferenceIntegrity
- * extension.
+ * YAML mapping driver for the ReferenceIntegrity behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the ReferenceIntegrity extension.
  *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -60,6 +59,6 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 }

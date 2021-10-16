@@ -3,18 +3,26 @@
 namespace Gedmo\Sortable\Mapping\Event\Adapter;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\Sortable\Mapping\Event\SortableAdapter;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for sortable behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the Sortable extension.
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 final class ODM extends BaseAdapterODM implements SortableAdapter
 {
+    /**
+     * @param array         $config
+     * @param ClassMetadata $meta
+     * @param array         $groups
+     *
+     * @return mixed
+     */
     public function getMaxPosition(array $config, $meta, $groups)
     {
         $dm = $this->getObjectManager();

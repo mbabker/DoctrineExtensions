@@ -2,16 +2,17 @@
 
 namespace Gedmo\Sluggable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Slug;
 use Gedmo\Mapping\Annotation\SlugHandler;
 use Gedmo\Mapping\Annotation\SlugHandlerOption;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Sluggable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Sluggable
- * extension.
+ * Annotation mapping driver for the Sluggable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Sluggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -19,25 +20,25 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation to identify field as one which holds the slug
-     * together with slug options
+     * Annotation class to identify a field as one which holds the slug
+     * together with slug options.
      */
-    public const SLUG = 'Gedmo\\Mapping\\Annotation\\Slug';
+    public const SLUG = Slug::class;
 
     /**
-     * SlugHandler extension annotation
+     * Annotation class for a slug handler.
      */
-    public const HANDLER = 'Gedmo\\Mapping\\Annotation\\SlugHandler';
+    public const HANDLER = SlugHandler::class;
 
     /**
-     * SlugHandler option annotation
+     * Annotation class for an option for a slug handler.
      */
-    public const HANDLER_OPTION = 'Gedmo\\Mapping\\Annotation\\SlugHandlerOption';
+    public const HANDLER_OPTION = SlugHandlerOption::class;
 
     /**
-     * List of types which are valid for slug and sluggable fields
+     * List of types which are valid for slugs and sluggable fields.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         'string',
@@ -80,16 +81,17 @@ class Annotation extends AbstractAnnotationDriver
     }
 
     /**
-     * @param $meta
-     * @param $property
-     * @param $fieldNamePrefix
+     * @param ClassMetadata       $meta
+     * @param \ReflectionProperty $property
+     * @param string              $fieldNamePrefix
      *
      * @return array
      */
     private function retrieveSlug($meta, array &$config, $property, $fieldNamePrefix)
     {
         $fieldName = $fieldNamePrefix ? ($fieldNamePrefix.'.'.$property->getName()) : $property->getName();
-        // slug property
+
+        /** @var Slug|null $slug */
         if ($slug = $this->reader->getPropertyAnnotation($property, self::SLUG)) {
             if (!$meta->hasField($fieldName)) {
                 throw new InvalidMappingException("Unable to find slug [{$fieldName}] as mapped property in entity - {$meta->name}");

@@ -3,22 +3,35 @@
 namespace Gedmo\Translator;
 
 /**
- * Base translation class.
+ * Base object for translations.
  *
  * @author  Konstantin Kudryashov <ever.zet@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 abstract class Translation implements TranslationInterface
 {
+    /**
+     * @var object
+     */
     protected $translatable;
+
+    /**
+     * @var string
+     */
     protected $locale;
+
+    /**
+     * @var string
+     */
     protected $property;
+
+    /**
+     * @var string
+     */
     protected $value;
 
     /**
-     * Set translatable
-     *
-     * @param string $translatable
+     * {@inheritdoc}
      */
     public function setTranslatable($translatable)
     {
@@ -26,9 +39,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Get translatable
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getTranslatable()
     {
@@ -36,9 +47,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Set locale
-     *
-     * @param string $locale
+     * {@inheritdoc}
      */
     public function setLocale($locale)
     {
@@ -46,9 +55,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Get locale
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLocale()
     {
@@ -56,9 +63,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Set property
-     *
-     * @param string $property
+     * {@inheritdoc}
      */
     public function setProperty($property)
     {
@@ -66,9 +71,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Get property
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getProperty()
     {
@@ -76,11 +79,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Set value
-     *
-     * @param string $value
-     *
-     * @return static
+     * {@inheritdoc}
      */
     public function setValue($value)
     {
@@ -90,9 +89,7 @@ abstract class Translation implements TranslationInterface
     }
 
     /**
-     * Get value
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getValue()
     {

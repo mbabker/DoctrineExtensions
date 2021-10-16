@@ -3,13 +3,13 @@
 namespace Gedmo\Blameable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Blameable;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Blameable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Blameable
- * extension.
+ * Annotation mapping driver for the Blameable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Blameable extension.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,14 +17,14 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation field is blameable
+     * Annotation class for the Blameable extension.
      */
-    public const BLAMEABLE = 'Gedmo\\Mapping\\Annotation\\Blameable';
+    public const BLAMEABLE = Blameable::class;
 
     /**
-     * List of types which are valid for blame
+     * List of types which are valid to blame.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         'one',
@@ -46,6 +46,8 @@ class Annotation extends AbstractAnnotationDriver
             ) {
                 continue;
             }
+
+            /** @var Blameable|null $blameable */
             if ($blameable = $this->reader->getPropertyAnnotation($property, self::BLAMEABLE)) {
                 $field = $property->getName();
 

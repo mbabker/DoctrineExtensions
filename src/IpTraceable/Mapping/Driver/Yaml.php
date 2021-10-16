@@ -2,15 +2,15 @@
 
 namespace Gedmo\IpTraceable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
- * This is a yaml mapping driver for IpTraceable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for IpTraceable
- * extension.
+ * YAML mapping driver for the IpTraceable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the IpTraceable extension.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -25,9 +25,9 @@ class Yaml extends File implements Driver
     protected $_extension = '.dcm.yml';
 
     /**
-     * List of types which are valid for IP
+     * List of types which are valid for IP tracing.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'string',
@@ -108,14 +108,14 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

@@ -4,13 +4,13 @@ namespace Gedmo\Tool\Wrapper;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Gedmo\Exception\UnsupportedObjectManagerException;
 use Gedmo\Tool\WrapperInterface;
 
 /**
- * Wraps entity or proxy for more convenient
- * manipulation
+ * Base wrapper for a managed object.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -20,7 +20,7 @@ abstract class AbstractWrapper implements WrapperInterface
     /**
      * Object metadata
      *
-     * @var object
+     * @var ClassMetadata
      */
     protected $meta;
 
@@ -34,7 +34,7 @@ abstract class AbstractWrapper implements WrapperInterface
     /**
      * Object manager instance
      *
-     * @var \Doctrine\Persistence\ObjectManager
+     * @var ObjectManager
      */
     protected $om;
 
@@ -46,13 +46,13 @@ abstract class AbstractWrapper implements WrapperInterface
     private static $wrappedObjectReferences;
 
     /**
-     * Wrap object factory method
+     * Factory method to create a wrapper for supported object managers.
      *
      * @param object $object
      *
-     * @throws \Gedmo\Exception\UnsupportedObjectManagerException
+     * @return WrapperInterface
      *
-     * @return \Gedmo\Tool\WrapperInterface
+     * @throws \Gedmo\Exception\UnsupportedObjectManagerException
      */
     public static function wrap($object, ObjectManager $om)
     {

@@ -3,9 +3,8 @@
 namespace Gedmo\IpTraceable;
 
 /**
- * This interface is not necessary but can be implemented for
- * Entities which in some cases needs to be identified as
- * IpTraceable
+ * Optional interface which can be used to identify
+ * IpTraceable objects.
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)

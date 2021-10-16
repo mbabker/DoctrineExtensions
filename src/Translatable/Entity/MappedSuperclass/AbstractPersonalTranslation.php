@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation
+ * Base Entity object for personal translations for the ORM.
  *
  * @ORM\MappedSuperclass
  */
@@ -42,8 +42,8 @@ abstract class AbstractPersonalTranslation
     protected $field;
 
     /**
-     * Related entity with ManyToOne relation
-     * must be mapped by user
+     * Related entity with a ManyToOne relation,
+     * must be mapped by the user.
      *
      * @var object
      */
@@ -58,9 +58,9 @@ abstract class AbstractPersonalTranslation
     protected $content;
 
     /**
-     * Get id
+     * Get the entity ID.
      *
-     * @return int $id
+     * @return int
      */
     public function getId()
     {
@@ -68,11 +68,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set locale
+     * Set the translation locale
      *
      * @param string $locale
      *
-     * @return static
+     * @return $this
      */
     public function setLocale($locale)
     {
@@ -82,7 +82,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get locale
+     * Get the translation locale
      *
      * @return string
      */
@@ -92,11 +92,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set field
+     * Set the translated field
      *
      * @param string $field
      *
-     * @return static
+     * @return $this
      */
     public function setField($field)
     {
@@ -106,9 +106,9 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get field
+     * Get the translated field
      *
-     * @return string $field
+     * @return string
      */
     public function getField()
     {
@@ -116,11 +116,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set object related
+     * Set the related object
      *
      * @param object $object
      *
-     * @return static
+     * @return $this
      */
     public function setObject($object)
     {
@@ -130,7 +130,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get related object
+     * Get the related object
      *
      * @return object
      */
@@ -140,11 +140,11 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Set content
+     * Set the translation content
      *
      * @param string $content
      *
-     * @return static
+     * @return $this
      */
     public function setContent($content)
     {
@@ -154,7 +154,7 @@ abstract class AbstractPersonalTranslation
     }
 
     /**
-     * Get content
+     * Get the translation content
      *
      * @return string
      */

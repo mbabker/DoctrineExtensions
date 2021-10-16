@@ -3,13 +3,13 @@
 namespace Gedmo\Timestampable\Mapping\Driver;
 
 use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Annotation\Timestampable;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 
 /**
- * This is an annotation mapping driver for Timestampable
- * behavioral extension. Used for extraction of extended
- * metadata from Annotations specifically for Timestampable
- * extension.
+ * Annotation mapping driver for the Timestampable behavioral extension.
+ * Used for extraction of extended metadata from annotations
+ * specifically for the Timestampable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,14 +17,14 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 class Annotation extends AbstractAnnotationDriver
 {
     /**
-     * Annotation field is timestampable
+     * Annotation class for the Timestampable extension.
      */
-    public const TIMESTAMPABLE = 'Gedmo\\Mapping\\Annotation\\Timestampable';
+    public const TIMESTAMPABLE = Timestampable::class;
 
     /**
-     * List of types which are valid for timestamp
+     * List of types which are valid for a timestamp field.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [
         'date',
@@ -54,6 +54,8 @@ class Annotation extends AbstractAnnotationDriver
             ) {
                 continue;
             }
+
+            /** @var Timestampable|null $timestampable */
             if ($timestampable = $this->reader->getPropertyAnnotation($property, self::TIMESTAMPABLE)) {
                 $field = $property->getName();
                 if (!$meta->hasField($field)) {

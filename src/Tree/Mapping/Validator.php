@@ -2,12 +2,11 @@
 
 namespace Gedmo\Tree\Mapping;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 
 /**
- * This is a validator for all mapping drivers for Tree
- * behavioral extension, containing methods to validate
- * mapping information
+ * Helper class to validate the mapping configurations for the Tree extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -19,7 +18,7 @@ class Validator
     /**
      * List of types which are valid for tree fields
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'integer',
@@ -31,7 +30,7 @@ class Validator
     /**
      * List of types which are valid for the path (materialized path strategy)
      *
-     * @var array
+     * @var string[]
      */
     private $validPathTypes = [
         'string',
@@ -41,7 +40,7 @@ class Validator
     /**
      * List of types which are valid for the path source (materialized path strategy)
      *
-     * @var array
+     * @var string[]
      */
     private $validPathSourceTypes = [
         'id',
@@ -56,7 +55,7 @@ class Validator
     /**
      * List of types which are valid for the path hash (materialized path strategy)
      *
-     * @var array
+     * @var string[]
      */
     private $validPathHashTypes = [
         'string',
@@ -65,7 +64,7 @@ class Validator
     /**
      * List of types which are valid for the path source (materialized path strategy)
      *
-     * @var array
+     * @var string[]
      */
     private $validRootTypes = [
         'integer',
@@ -77,10 +76,10 @@ class Validator
     ];
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -92,10 +91,10 @@ class Validator
     }
 
     /**
-     * Checks if $field type is valid for Path field
+     * Checks if the field type is valid for a path field
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -107,10 +106,10 @@ class Validator
     }
 
     /**
-     * Checks if $field type is valid for PathSource field
+     * Checks if the field type is valid for a path source field
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -122,10 +121,10 @@ class Validator
     }
 
     /**
-     * Checks if $field type is valid for PathHash field
+     * Checks if the field type is valid for a path hash field
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -137,10 +136,10 @@ class Validator
     }
 
     /**
-     * Checks if $field type is valid for LockTime field
+     * Checks if the field type is valid for a lock time field
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -152,10 +151,10 @@ class Validator
     }
 
     /**
-     * Checks if $field type is valid for Root field
+     * Checks if the field type is valid for a root field
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -167,9 +166,9 @@ class Validator
     }
 
     /**
-     * Validates metadata for nested type tree
+     * Validates metadata for a nested tree configuration
      *
-     * @param object $meta
+     * @param ClassMetadata $meta
      *
      * @throws InvalidMappingException
      */
@@ -191,9 +190,9 @@ class Validator
     }
 
     /**
-     * Validates metadata for closure type tree
+     * Validates metadata for a Closure tree configuration
      *
-     * @param object $meta
+     * @param ClassMetadata $meta
      *
      * @throws InvalidMappingException
      */
@@ -212,9 +211,9 @@ class Validator
     }
 
     /**
-     * Validates metadata for materialized path type tree
+     * Validates metadata for a materialized path tree configuration
      *
-     * @param object $meta
+     * @param ClassMetadata $meta
      *
      * @throws InvalidMappingException
      */

@@ -2,14 +2,14 @@
 
 namespace Gedmo\Sluggable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Sluggable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Sluggable
- * extension.
+ * XML mapping driver for the Sluggable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Sluggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
@@ -18,9 +18,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * List of types which are valid for slug and sluggable fields
+     * List of types which are valid for slugs and sluggable fields.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'string',
@@ -36,9 +36,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
 
         if (isset($xml->field)) {
@@ -58,15 +56,9 @@ class Xml extends BaseXml
 
     private function buildFieldConfiguration($meta, $field, \SimpleXMLElement $mapping, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
         $mapping = $mapping->children(self::GEDMO_NAMESPACE_URI);
 
         if (isset($mapping->slug)) {
-            /**
-             * @var \SimpleXmlElement
-             */
             $slug = $mapping->slug;
             if (!$this->isValidField($meta, $field)) {
                 throw new InvalidMappingException("Cannot use field - [{$field}] for slug storage, type is not valid and must be 'string' in class - {$meta->name}");
@@ -131,10 +123,10 @@ class Xml extends BaseXml
     }
 
     /**
-     * Checks if $field type is valid as Sluggable field
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

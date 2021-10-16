@@ -3,6 +3,7 @@
 namespace Gedmo\Mapping\Driver;
 
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 
 /**
  * This is an abstract class to implement common functionality
@@ -21,14 +22,16 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     protected $reader;
 
     /**
-     * Original driver if it is available
+     * Original mapping driver, if available.
+     *
+     * @var MappingDriver|null
      */
     protected $_originalDriver = null;
 
     /**
-     * List of types which are valid for extension
+     * List of types which are valid for the extension.
      *
-     * @var array
+     * @var string[]
      */
     protected $validTypes = [];
 
@@ -43,7 +46,9 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     /**
      * Passes in the mapping read by original driver
      *
-     * @param object $driver
+     * @param MappingDriver $driver
+     *
+     * @return void
      */
     public function setOriginalDriver($driver)
     {
@@ -51,7 +56,7 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     }
 
     /**
-     * @param object $meta
+     * @param ClassMetadata $meta
      *
      * @return \ReflectionClass
      */
@@ -69,10 +74,10 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     }
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */
@@ -88,12 +93,12 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     }
 
     /**
-     * Try to find out related class name out of mapping
+     * Try to find the related class name from the mapping data.
      *
-     * @param ClassMetadata $metadata - the mapped class metadata
-     * @param $name - the related object class name
+     * @param ClassMetadata $metadata The mapped class metadata
+     * @param string        $name     The related object class name
      *
-     * @return string - related class name or empty string if does not exist
+     * @return string The related class name or an empty string if it does not exist
      */
     protected function getRelatedClassName($metadata, $name)
     {

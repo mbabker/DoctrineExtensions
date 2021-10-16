@@ -6,7 +6,7 @@ use Doctrine\Persistence\ObjectManager;
 use Gedmo\Mapping\Event\AdapterInterface;
 
 /**
- * Doctrine event adapter interface for References behavior
+ * Doctrine event adapter for the References extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
@@ -22,7 +22,7 @@ interface ReferencesAdapter extends AdapterInterface
      * @param object        $object
      * @param bool          $single
      *
-     * @return array|string|int $id - array or single identifier
+     * @return array|string|int array or single identifier
      */
     public function getIdentifier($om, $object, $single = true);
 
@@ -42,7 +42,7 @@ interface ReferencesAdapter extends AdapterInterface
      * @param object        $object
      * @param bool          $single
      *
-     * @return array|string|int - array or single identifier
+     * @return array|string|int array or single identifier
      */
     public function extractIdentifier($om, $object, $single = true);
 }

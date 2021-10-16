@@ -7,10 +7,9 @@ use Gedmo\Mapping\Driver;
 use Gedmo\Mapping\Driver\File;
 
 /**
- * This is a yaml mapping driver for Loggable
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Loggable
- * extension.
+ * YAML mapping driver for the Loggable behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Loggable extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -52,7 +51,7 @@ class Yaml extends File implements Driver
                         if ($meta->isCollectionValuedAssociation($field)) {
                             throw new InvalidMappingException("Cannot apply versioning to field [{$field}] as it is collection in object - {$meta->name}");
                         }
-                        // fields cannot be overrided and throws mapping exception
+                        // fields cannot be overridden and throws mapping exception
                         $config['versioned'][] = $field;
                     }
                 }
@@ -66,7 +65,7 @@ class Yaml extends File implements Driver
                         if ($meta->isCollectionValuedAssociation($field)) {
                             throw new InvalidMappingException("Cannot apply versioning to field [{$field}] as it is collection in object - {$meta->name}");
                         }
-                        // fields cannot be overrided and throws mapping exception
+                        // fields cannot be overridden and throws mapping exception
                         $config['versioned'][] = $field;
                     }
                 }
@@ -80,7 +79,7 @@ class Yaml extends File implements Driver
                         if ($meta->isCollectionValuedAssociation($field)) {
                             throw new InvalidMappingException("Cannot apply versioning to field [{$field}] as it is collection in object - {$meta->name}");
                         }
-                        // fields cannot be overrided and throws mapping exception
+                        // fields cannot be overridden and throws mapping exception
                         $config['versioned'][] = $field;
                     }
                 }
@@ -94,7 +93,7 @@ class Yaml extends File implements Driver
                         if ($meta->isCollectionValuedAssociation($field)) {
                             throw new InvalidMappingException("Cannot apply versioning to field [{$field}] as it is collection in object - {$meta->name}");
                         }
-                        // fields cannot be overrided and throws mapping exception
+                        // fields cannot be overridden and throws mapping exception
                         $config['versioned'][] = $field;
                     }
                 }
@@ -108,7 +107,7 @@ class Yaml extends File implements Driver
                         if ($meta->isCollectionValuedAssociation($field)) {
                             throw new InvalidMappingException("Cannot apply versioning to field [{$field}] as it is collection in object - {$meta->name}");
                         }
-                        // fields cannot be overrided and throws mapping exception
+                        // fields cannot be overridden and throws mapping exception
                         $mapping = $this->_getMapping($fieldMapping['class']);
                         $this->inspectEmbeddedForVersioned($field, $mapping, $config);
                     }
@@ -131,7 +130,7 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 
     /**

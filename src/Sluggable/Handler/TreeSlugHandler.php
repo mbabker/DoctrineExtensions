@@ -11,8 +11,8 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 
 /**
  * Sluggable handler which slugs all parent nodes
- * recursively and synchronizes on updates. For instance
- * category tree slug could look like "food/fruits/apples"
+ * recursively and synchronizes on update. For instance, a
+ * category tree slug could look like "food/fruits/apples".
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -42,21 +42,21 @@ class TreeSlugHandler implements SlugHandlerWithUniqueCallbackInterface
     private $suffix;
 
     /**
-     * True if node is being inserted
+     * Flag tracking if the current operation is an insert operation.
      *
      * @var bool
      */
     private $isInsert = false;
 
     /**
-     * Transliterated parent slug
+     * Transliterated parent slug.
      *
      * @var string
      */
     private $parentSlug;
 
     /**
-     * Used path separator
+     * Used path separator.
      *
      * @var string
      */
@@ -168,8 +168,7 @@ class TreeSlugHandler implements SlugHandlerWithUniqueCallbackInterface
     }
 
     /**
-     * Transliterates the slug and prefixes the slug
-     * by collection of parent slugs
+     * Transliterates the slug and prefixes the slug with the collection of parent slugs.
      *
      * @param string $text
      * @param string $separator

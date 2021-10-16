@@ -8,10 +8,9 @@ use Gedmo\Mapping\Driver\File;
 use Gedmo\Tree\Mapping\Validator;
 
 /**
- * This is a yaml mapping driver for Tree
- * behavioral extension. Used for extraction of extended
- * metadata from yaml specifically for Tree
- * extension.
+ * YAML mapping driver for the Tree behavioral extension.
+ * Used for extraction of extended metadata from YAML files
+ * specifically for the Tree extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -28,7 +27,7 @@ class Yaml extends File implements Driver
     /**
      * List of tree strategies available
      *
-     * @var array
+     * @var string[]
      */
     private $strategies = [
         'nested',
@@ -209,6 +208,6 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+        return \Symfony\Component\Yaml\Yaml::parseFile($file);
     }
 }

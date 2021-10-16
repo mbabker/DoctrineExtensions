@@ -6,10 +6,9 @@ use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for References
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for References
- * extension.
+ * XML mapping driver for the References behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the References extension.
  *
  * @author Aram Alipoor <aram.alipoor@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -17,7 +16,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * @var array
+     * List of valid object types.
+     *
+     * @var string[]
      */
     private $validTypes = [
         'document',
@@ -25,7 +26,9 @@ class Xml extends BaseXml
     ];
 
     /**
-     * @var array
+     * List of valid reference types.
+     *
+     * @var string[]
      */
     private $validReferences = [
         'referenceOne',
@@ -38,9 +41,7 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $xml */
         $xml = $this->_getMapping($meta->name);
         $xmlDoctrine = $xml;
 
@@ -48,9 +49,6 @@ class Xml extends BaseXml
 
         if ('entity' === $xmlDoctrine->getName() || 'document' === $xmlDoctrine->getName() || 'mapped-superclass' === $xmlDoctrine->getName()) {
             if (isset($xml->reference)) {
-                /**
-                 * @var \SimpleXMLElement
-                 */
                 foreach ($xml->reference as $element) {
                     if (!$this->_isAttributeSet($element, 'type')) {
                         throw new InvalidMappingException("Reference type (document or entity) is not set in class - {$meta->name}");

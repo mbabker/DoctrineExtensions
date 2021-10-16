@@ -2,6 +2,7 @@
 
 namespace Gedmo\Mapping;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use function class_exists;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -16,13 +17,8 @@ use Gedmo\Mapping\Event\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
- * This is extension of event subscriber class and is
- * used specifically for handling the extension metadata
- * mapping for extensions.
- *
- * It dries up some reusable code which is common for
- * all extensions who maps additional metadata through
- * extended drivers
+ * This is a base event subscriber providing common
+ * functionality to event listeners for all extensions.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -30,33 +26,33 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 abstract class MappedEventSubscriber implements EventSubscriber
 {
     /**
-     * Static List of cached object configurations
-     * leaving it static for reasons to look into
+     * List of cached object configurations.
+     *
+     * Leaving it static for reasons to look into
      * other listener configuration
      *
-     * @var array
+     * @var array<string, array<string, mixed>>
      */
     protected static $configurations = [];
 
     /**
-     * Listener name, etc: sluggable
+     * Listener name.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * ExtensionMetadataFactory used to read the extension
-     * metadata through the extension drivers
+     * Metadata factories used to read the extension metadata for each object manager.
      *
-     * @var ExtensionMetadataFactory
+     * @var array<string, ExtensionMetadataFactory>
      */
     private $extensionMetadataFactory = [];
 
     /**
      * List of event adapters used for this listener
      *
-     * @var array
+     * @var array<string, AdapterInterface>
      */
     private $adapters = [];
 
@@ -68,7 +64,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
     private $annotationReader;
 
     /**
-     * @var \Doctrine\Common\Annotations\AnnotationReader
+     * @var AnnotationReader
      */
     private static $defaultAnnotationReader;
 
@@ -82,12 +78,11 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Get an event adapter to handle event specific
-     * methods
+     * Get an event adapter to handle event specific methods.
+     *
+     * @return AdapterInterface
      *
      * @throws \Gedmo\Exception\InvalidArgumentException - if event is not recognized
-     *
-     * @return \Gedmo\Mapping\Event\AdapterInterface
      */
     protected function getEventAdapter(EventArgs $args)
     {
@@ -109,8 +104,9 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Get the configuration for specific object class
-     * if cache driver is present it scans it also
+     * Get the configuration for a specific object class.
+     *
+     * If a cache driver is present, it scans that as well.
      *
      * @param string $class
      *
@@ -137,7 +133,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
                     }
                 }
 
-                $objectClass = isset($config['useObjectClass']) ? $config['useObjectClass'] : $class;
+                $objectClass = $config['useObjectClass'] ?? $class;
                 if ($objectClass !== $class) {
                     $this->getConfiguration($objectManager, $objectClass);
                 }
@@ -148,7 +144,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Get extended metadata mapping reader
+     * Get the metadata factory for an object manager.
      *
      * @return ExtensionMetadataFactory
      */
@@ -187,10 +183,11 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Scans the objects for extended annotations
-     * event subscribers must subscribe to loadClassMetadata event
+     * Scans the objects for extended annotations.
      *
-     * @param object $metadata
+     * Event subscribers must subscribe to the loadClassMetadata event.
+     *
+     * @param ClassMetadata $metadata
      *
      * @return void
      */
@@ -209,18 +206,20 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Get the namespace of extension event subscriber.
-     * used for cache id of extensions also to know where
-     * to find Mapping drivers and event adapters
+     * Get the namespace of the extension event subscriber.
+     *
+     * Used for cache id of extensions, also to know where
+     * to find mapping drivers and event adapters.
      *
      * @return string
      */
     abstract protected function getNamespace();
 
     /**
-     * Create default annotation reader for extensions
+     * Retrieve a default annotation reader for extensions,
+     * lazily creating it on the first call to this method.
      *
-     * @return \Doctrine\Common\Annotations\AnnotationReader
+     * @return AnnotationReader
      */
     private function getDefaultAnnotationReader()
     {
@@ -242,7 +241,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Sets the value for a mapped field
+     * Sets the value for a mapped field.
      *
      * @param object $object
      * @param string $field

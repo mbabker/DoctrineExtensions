@@ -3,7 +3,7 @@
 namespace Gedmo\Blameable\Traits;
 
 /**
- * Blameable Trait, usable with PHP >= 5.4
+ * Trait integrating common Blameable properties for objects.
  *
  * @author David Buchmann <mail@davidbu.ch>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -21,7 +21,7 @@ trait Blameable
     private $updatedBy;
 
     /**
-     * Sets createdBy.
+     * Sets the created by information.
      *
      * @param string $createdBy
      *
@@ -35,7 +35,7 @@ trait Blameable
     }
 
     /**
-     * Returns createdBy.
+     * Returns the created by information.
      *
      * @return string
      */
@@ -45,7 +45,7 @@ trait Blameable
     }
 
     /**
-     * Sets updatedBy.
+     * Sets the updated by information.
      *
      * @param string $updatedBy
      *
@@ -59,7 +59,7 @@ trait Blameable
     }
 
     /**
-     * Returns updatedBy.
+     * Returns the updated by information.
      *
      * @return string
      */

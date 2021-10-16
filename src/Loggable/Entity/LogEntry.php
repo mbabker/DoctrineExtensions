@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 
 /**
- * Gedmo\Loggable\Entity\LogEntry
+ * Entity object for log entries for the ORM.
  *
  * @ORM\Table(
  *     name="ext_log_entries",
@@ -28,7 +28,4 @@ use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 #[ORM\Index(name: 'log_version_lookup_idx', columns: ['object_id', 'object_class', 'version'])]
 class LogEntry extends MappedSuperclass\AbstractLogEntry
 {
-    /*
-     * All required columns are mapped through inherited superclass
-     */
 }

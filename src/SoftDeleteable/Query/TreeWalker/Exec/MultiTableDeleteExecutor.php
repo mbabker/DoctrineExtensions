@@ -9,7 +9,7 @@ use Doctrine\ORM\Query\Exec\MultiTableDeleteExecutor as BaseMultiTableDeleteExec
 
 /**
  * This class is used when a DELETE DQL query is called for entities
- * that are part of an inheritance tree
+ * that are part of an inheritance tree.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>

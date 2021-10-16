@@ -3,15 +3,15 @@
 namespace Gedmo\Tree\Document\MongoDB\Repository;
 
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
+use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Query\Query;
 use Gedmo\Exception\InvalidArgumentException;
 use Gedmo\Tool\Wrapper\MongoDocumentWrapper;
 use Gedmo\Tree\Strategy;
 use MongoDB\BSON\Regex;
 
 /**
- * The MaterializedPathRepository has some useful functions
- * to interact with MaterializedPath tree. Repository uses
- * the strategy used by listener
+ * Document repository for MongoDB ODM materialized tree repositories.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
@@ -20,11 +20,11 @@ use MongoDB\BSON\Regex;
 class MaterializedPathRepository extends AbstractTreeRepository
 {
     /**
-     * Get tree query builder
+     * Create a query builder to get the list of children for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      *
-     * @return \Doctrine\ODM\MongoDB\Query\Builder
+     * @return Builder
      */
     public function getTreeQueryBuilder($rootNode = null)
     {
@@ -32,11 +32,11 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get tree query
+     * Create a Query instance configured to get the list of children for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      *
-     * @return \Doctrine\ODM\MongoDB\Query\Query
+     * @return Query
      */
     public function getTreeQuery($rootNode = null)
     {
@@ -44,9 +44,9 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * Get tree
+     * Get the tree for the given node.
      *
-     * @param object $rootNode
+     * @param object|null $rootNode The object to fetch the tree for; if null, all nodes will be retrieved
      */
     public function getTree($rootNode = null): Iterator
     {
@@ -144,7 +144,7 @@ class MaterializedPathRepository extends AbstractTreeRepository
     }
 
     /**
-     * G{@inheritdoc}
+     * {@inheritdoc}
      */
     public function getChildrenQuery($node = null, $direct = false, $sortByField = null, $direction = 'asc', $includeNode = false)
     {

@@ -5,32 +5,48 @@ namespace Gedmo\Translator;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * Proxy class for Entity/Document translations.
+ * Proxy class for object translations.
  *
  * @author  Konstantin Kudryashov <ever.zet@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class TranslationProxy
 {
-    protected $locale;
-    protected $translatable;
-    protected $properties = [];
-    protected $class;
     /**
-     * @var Collection|TranslationInterface[]
+     * @var string
+     */
+    protected $locale;
+
+    /**
+     * @var object
+     */
+    protected $translatable;
+
+    /**
+     * @var string[]
+     */
+    protected $properties = [];
+
+    /**
+     * @var class-string<TranslationInterface>
+     */
+    protected $class;
+
+    /**
+     * @var Collection<array-key, TranslationInterface>
      */
     protected $coll;
 
     /**
-     * Initializes translations collection
+     * Initializes the translation proxy.
      *
-     * @param object     $translatable object to translate
-     * @param string     $locale       translation name
-     * @param array      $properties   object properties to translate
-     * @param string     $class        translation entity|document class
-     * @param Collection $coll         translations collection
+     * @param object                                      $translatable Object to translate
+     * @param string                                      $locale       Translation locale
+     * @param string[]                                    $properties   Object properties to translate
+     * @param class-string<TranslationInterface>          $class        Translation object class
+     * @param Collection<array-key, TranslationInterface> $coll         Translations collection
      *
-     * @throws \InvalidArgumentException Translation class doesn't implement TranslationInterface
+     * @throws \InvalidArgumentException if the translation class doesn't implement TranslationInterface
      */
     public function __construct($translatable, $locale, array $properties, $class, Collection $coll)
     {
@@ -41,11 +57,17 @@ class TranslationProxy
         $this->coll = $coll;
 
         $translationClass = new \ReflectionClass($class);
-        if (!$translationClass->implementsInterface('Gedmo\Translator\TranslationInterface')) {
-            throw new \InvalidArgumentException(sprintf('Translation class should implement Gedmo\Translator\TranslationInterface, "%s" given', $class));
+        if (!$translationClass->implementsInterface(TranslationInterface::class)) {
+            throw new \InvalidArgumentException(sprintf('Translation class must implement Gedmo\Translator\TranslationInterface, "%s" given', $class));
         }
     }
 
+    /**
+     * @param string $method
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
     public function __call($method, $arguments)
     {
         $matches = [];
@@ -75,6 +97,11 @@ class TranslationProxy
         return $return;
     }
 
+    /**
+     * @param string $property
+     *
+     * @return string
+     */
     public function __get($property)
     {
         if (in_array($property, $this->properties)) {
@@ -88,6 +115,12 @@ class TranslationProxy
         return $this->translatable->$property;
     }
 
+    /**
+     * @param string $property
+     * @param string $value
+     *
+     * @return mixed
+     */
     public function __set($property, $value)
     {
         if (in_array($property, $this->properties)) {
@@ -101,13 +134,18 @@ class TranslationProxy
         $this->translatable->$property = $value;
     }
 
+    /**
+     * @param string $property
+     *
+     * @return bool
+     */
     public function __isset($property)
     {
         return in_array($property, $this->properties);
     }
 
     /**
-     * Returns locale name for the current translation proxy instance.
+     * Returns the locale name for the current translation proxy instance.
      *
      * @return string
      */
@@ -117,11 +155,11 @@ class TranslationProxy
     }
 
     /**
-     * Returns translated value for specific property.
+     * Returns the translated value for specific property.
      *
      * @param string $property property name
      *
-     * @return mixed
+     * @return string
      */
     public function getTranslatedValue($property)
     {
@@ -131,10 +169,10 @@ class TranslationProxy
     }
 
     /**
-     * Sets translated value for specific property.
+     * Sets the translated value for a property.
      *
-     * @param string $property property name
-     * @param string $value    value
+     * @param string $property Property name
+     * @param string $value    Translation
      */
     public function setTranslatedValue($property, $value)
     {
@@ -144,12 +182,12 @@ class TranslationProxy
     }
 
     /**
-     * Finds existing or creates new translation for specified property
+     * Finds an existing translation or creates a new one for the specified property.
      *
-     * @param string $property object property name
-     * @param string $locale   locale name
+     * @param string $property Object property name
+     * @param string $locale   Locale name
      *
-     * @return Translation
+     * @return TranslationInterface
      */
     private function findOrCreateTranslationForProperty($property, $locale)
     {

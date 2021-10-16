@@ -6,7 +6,7 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
 use Gedmo\Tree\Strategy\AbstractMaterializedPath;
 
 /**
- * This strategy makes tree using materialized path strategy
+ * This strategy manages a tree using a materialized path strategy
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>

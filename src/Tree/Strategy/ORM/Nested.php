@@ -13,7 +13,7 @@ use Gedmo\Tree\Strategy;
 use Gedmo\Tree\TreeListener;
 
 /**
- * This strategy makes the tree act like a nested set.
+ * This strategy manages a tree using a nested set strategy
  *
  * This behavior can impact the performance of your application
  * since nested set trees are slow on inserts and updates.
@@ -275,11 +275,10 @@ class Nested implements Strategy
     }
 
     /**
-     * Update the $node with a diferent $parent
-     * destination
+     * Set a new parent on the given node
      *
-     * @param object $node     - target node
-     * @param object $parent   - destination node
+     * @param object $node     Target node
+     * @param object $parent   Destination node
      * @param string $position
      *
      * @throws \Gedmo\Exception\UnexpectedValueException
@@ -532,10 +531,10 @@ class Nested implements Strategy
     }
 
     /**
-     * Get the edge of tree
+     * Get the edge of a tree
      *
-     * @param string $class
-     * @param int    $rootId
+     * @param class-string $class
+     * @param int          $rootId
      *
      * @return int
      */
@@ -560,14 +559,10 @@ class Nested implements Strategy
     /**
      * Shift tree left and right values by delta
      *
-     * @param EntityManager $em
-     * @param string        $class
-     * @param int           $first
-     * @param int           $delta
-     * @param string        $class
-     * @param int           $first
-     * @param int           $delta
-     * @param int|string    $root
+     * @param class-string $class
+     * @param int          $first
+     * @param int          $delta
+     * @param int|string   $root
      */
     public function shiftRL(EntityManagerInterface $em, $class, $first, $delta, $root = null)
     {

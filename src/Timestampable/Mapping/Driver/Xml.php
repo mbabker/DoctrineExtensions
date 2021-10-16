@@ -2,14 +2,14 @@
 
 namespace Gedmo\Timestampable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for Timestampable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for Timestampable
- * extension.
+ * XML mapping driver for the Timestampable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the Timestampable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
@@ -18,9 +18,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * List of types which are valid for timestamp
+     * List of types which are valid for a timestamp field.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'date',
@@ -41,22 +41,14 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $mapping */
         $mapping = $this->_getMapping($meta->name);
 
         if (isset($mapping->field)) {
-            /**
-             * @var \SimpleXmlElement
-             */
             foreach ($mapping->field as $fieldMapping) {
                 $fieldMappingDoctrine = $fieldMapping;
                 $fieldMapping = $fieldMapping->children(self::GEDMO_NAMESPACE_URI);
                 if (isset($fieldMapping->timestampable)) {
-                    /**
-                     * @var \SimpleXmlElement
-                     */
                     $data = $fieldMapping->timestampable;
 
                     $field = $this->_getAttribute($fieldMappingDoctrine, 'name');
@@ -89,10 +81,10 @@ class Xml extends BaseXml
     }
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

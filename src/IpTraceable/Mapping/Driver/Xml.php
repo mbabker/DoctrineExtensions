@@ -2,14 +2,14 @@
 
 namespace Gedmo\IpTraceable\Mapping\Driver;
 
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Driver\Xml as BaseXml;
 
 /**
- * This is a xml mapping driver for IpTraceable
- * behavioral extension. Used for extraction of extended
- * metadata from xml specifically for IpTraceable
- * extension.
+ * XML mapping driver for the IpTraceable behavioral extension.
+ * Used for extraction of extended metadata from XML files
+ * specifically for the IpTraceable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
@@ -19,9 +19,9 @@ use Gedmo\Mapping\Driver\Xml as BaseXml;
 class Xml extends BaseXml
 {
     /**
-     * List of types which are valid for IP
+     * List of types which are valid for IP tracing.
      *
-     * @var array
+     * @var string[]
      */
     private $validTypes = [
         'string',
@@ -32,22 +32,14 @@ class Xml extends BaseXml
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        /**
-         * @var \SimpleXmlElement
-         */
+        /** @var \SimpleXMLElement $mapping */
         $mapping = $this->_getMapping($meta->name);
 
         if (isset($mapping->field)) {
-            /**
-             * @var \SimpleXmlElement
-             */
             foreach ($mapping->field as $fieldMapping) {
                 $fieldMappingDoctrine = $fieldMapping;
                 $fieldMapping = $fieldMapping->children(self::GEDMO_NAMESPACE_URI);
                 if (isset($fieldMapping->{'ip-traceable'})) {
-                    /**
-                     * @var \SimpleXmlElement
-                     */
                     $data = $fieldMapping->{'ip-traceable'};
 
                     $field = $this->_getAttribute($fieldMappingDoctrine, 'name');
@@ -83,9 +75,6 @@ class Xml extends BaseXml
                 $field = $this->_getAttribute($fieldMapping, 'field');
                 $fieldMapping = $fieldMapping->children(self::GEDMO_NAMESPACE_URI);
                 if (isset($fieldMapping->{'ip-traceable'})) {
-                    /**
-                     * @var \SimpleXmlElement
-                     */
                     $data = $fieldMapping->{'ip-traceable'};
 
                     if (!$meta->isSingleValuedAssociation($field)) {
@@ -117,10 +106,10 @@ class Xml extends BaseXml
     }
 
     /**
-     * Checks if $field type is valid
+     * Checks if the given field type is valid.
      *
-     * @param object $meta
-     * @param string $field
+     * @param ClassMetadata $meta
+     * @param string        $field
      *
      * @return bool
      */

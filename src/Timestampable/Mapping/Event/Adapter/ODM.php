@@ -6,8 +6,8 @@ use Gedmo\Mapping\Event\Adapter\ODM as BaseAdapterODM;
 use Gedmo\Timestampable\Mapping\Event\TimestampableAdapter;
 
 /**
- * Doctrine event adapter for ODM adapted
- * for Timestampable behavior
+ * Doctrine event adapter for the MongoDB ODM, adapted
+ * for the Timestampable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
