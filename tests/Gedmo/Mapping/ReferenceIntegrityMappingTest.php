@@ -4,10 +4,10 @@ namespace Gedmo\Tests\Mapping;
 
 use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Gedmo\ReferenceIntegrity\ReferenceIntegrityListener;
-use Gedmo\Tests\Mapping\Fixture\Yaml\Referenced;
-use Gedmo\Tests\Mapping\Fixture\Yaml\Referencer;
+use Gedmo\Tests\Mapping\Fixture\Annotation\Referenced;
+use Gedmo\Tests\Mapping\Fixture\Annotation\Referencer;
 use Gedmo\Tests\Tool\BaseTestCaseOM;
 
 /**
@@ -34,23 +34,21 @@ final class ReferenceIntegrityMappingTest extends BaseTestCaseOM
 
     protected function setUp(): void
     {
-        static::markTestSkipped('Intentionally skipping test. Doctrine MongoDB ODM 2.0 removed the YAML mapping driver; skipping test until it can be rewritten using a supported mapper.');
-
         parent::setUp();
 
-        $yamlDriver = new YamlDriver(__DIR__.'/Driver/Yaml');
+        $driver = new AnnotationDriver($_ENV['annotation_reader'], __DIR__.'/Driver/Annotation');
 
         $this->referenceIntegrity = new ReferenceIntegrityListener();
         $this->evm = new EventManager();
         $this->evm->addEventSubscriber($this->referenceIntegrity);
 
-        $this->dm = $this->getMockDocumentManager('gedmo_extensions_test', $yamlDriver);
+        $this->dm = $this->getMockDocumentManager('gedmo_extensions_test', $driver);
     }
 
-    public function testYamlMapping()
+    public function testMapping()
     {
         $referencerMeta = $this->dm->getClassMetadata(Referencer::class);
-        $referenceeMeta = $this->dm->getClassMetadata(Referenced::class);
+        $referencedMeta = $this->dm->getClassMetadata(Referenced::class);
         $config = $this->referenceIntegrity->getConfiguration($this->dm, $referencerMeta->name);
 
         static::assertNotEmpty($config['referenceIntegrity']);
@@ -58,7 +56,7 @@ final class ReferenceIntegrityMappingTest extends BaseTestCaseOM
             static::assertArrayHasKey($propertyName, $referencerMeta->reflFields);
 
             foreach ($referenceConfiguration as $inversedPropertyName => $integrityType) {
-                static::assertArrayHasKey($inversedPropertyName, $referenceeMeta->reflFields);
+                static::assertArrayHasKey($inversedPropertyName, $referencedMeta->reflFields);
                 static::assertContains($integrityType, ['nullify', 'restrict']);
             }
         }
