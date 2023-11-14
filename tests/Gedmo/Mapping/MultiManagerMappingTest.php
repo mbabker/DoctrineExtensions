@@ -37,6 +37,13 @@ final class MultiManagerMappingTest extends BaseTestCaseOM
 
     private DocumentManager $dm1;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(YamlDriver::class)) {
+            static::markTestSkipped('Test requires deprecated ORM Annotation and YAML mapping.');
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

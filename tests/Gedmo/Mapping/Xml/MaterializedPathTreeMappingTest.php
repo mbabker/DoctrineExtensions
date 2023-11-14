@@ -34,6 +34,13 @@ final class MaterializedPathTreeMappingTest extends BaseTestCaseOM
 
     private TreeListener $tree;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(AnnotationDriver::class)) {
+            static::markTestSkipped('Test requires deprecated ORM Annotation mapping.');
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
