@@ -30,6 +30,13 @@ final class TranslatableMappingTest extends ORMMappingTestCase
 {
     private EntityManager $em;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!class_exists(YamlDriver::class)) {
+            static::markTestSkipped('Test only applies to deprecated ORM YAML mapping.');
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
