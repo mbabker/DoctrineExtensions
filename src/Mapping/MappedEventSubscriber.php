@@ -330,10 +330,10 @@ abstract class MappedEventSubscriber implements EventSubscriber
     private function getDefaultAnnotationReader()
     {
         if (false === self::$defaultAnnotationReader) {
-            if (class_exists(PsrCachedReader::class)) {
-                self::$defaultAnnotationReader = new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
-            } elseif (\PHP_VERSION_ID >= 80000) {
+            if (\PHP_VERSION_ID >= 80000) {
                 self::$defaultAnnotationReader = new AttributeReader();
+            } elseif (class_exists(PsrCachedReader::class)) {
+                self::$defaultAnnotationReader = new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
             } else {
                 self::$defaultAnnotationReader = null;
             }
