@@ -39,13 +39,6 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
 {
     private EntityManager $em;
 
-    public static function setUpBeforeClass(): void
-    {
-        if (!class_exists(YamlDriver::class)) {
-            static::markTestSkipped('Test requires deprecated ORM YAML mapping.');
-        }
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
