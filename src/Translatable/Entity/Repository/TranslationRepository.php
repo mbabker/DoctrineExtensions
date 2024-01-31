@@ -75,7 +75,7 @@ class TranslationRepository extends EntityRepository
             if (isset($config['translationClass'])) {
                 $class = $config['translationClass'];
             } else {
-                $ea = new TranslatableAdapterORM();
+                $ea = new TranslatableAdapterORM($this->getEntityManager());
                 $class = $listener->getTranslationClass($ea, $config['useObjectClass']);
             }
             $foreignKey = $meta->getReflectionProperty($meta->getSingleIdentifierFieldName())->getValue($entity);

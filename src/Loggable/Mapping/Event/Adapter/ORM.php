@@ -9,8 +9,12 @@
 
 namespace Gedmo\Loggable\Mapping\Event\Adapter;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata as EntityClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo as LegacyEntityClassMetadata;
+use Doctrine\ORM\UnitOfWork;
 use Gedmo\Loggable\Entity\LogEntry;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Loggable\Mapping\Event\LoggableAdapter;
 use Gedmo\Mapping\Event\Adapter\ORM as BaseAdapterORM;
 use Gedmo\Tool\Wrapper\EntityWrapper;
@@ -20,22 +24,38 @@ use Gedmo\Tool\Wrapper\EntityWrapper;
  * for Loggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @template TClassMetadata of EntityClassMetadata|LegacyEntityClassMetadata
+ * @template TLogEntry of LogEntry
+ * @template TObjectManager of EntityManagerInterface
+ * @template TUnitOfWork of UnitOfWork
+ *
+ * @template-extends BaseAdapterORM<TClassMetadata, TObjectManager, TUnitOfWork>
+ * @template-implements LoggableAdapter<TClassMetadata, TLogEntry, TObjectManager, TUnitOfWork>
  */
 final class ORM extends BaseAdapterORM implements LoggableAdapter
 {
+    /**
+     * @return string
+     *
+     * @phpstan-return class-string<TLogEntry<Loggable>>
+     */
     public function getDefaultLogEntryClass()
     {
         return LogEntry::class;
     }
 
     /**
-     * @param ClassMetadata $meta
+     * @param TClassMetadata $meta
      */
     public function isPostInsertGenerator($meta)
     {
         return $meta->idGenerator->isPostInsertGenerator();
     }
 
+    /**
+     * @param TClassMetadata $meta
+     */
     public function getNewVersion($meta, $object)
     {
         $em = $this->getObjectManager();

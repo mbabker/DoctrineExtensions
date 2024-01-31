@@ -155,37 +155,50 @@ class LoggableListener extends MappedEventSubscriber
         $om = $args->getObjectManager();
         $oid = spl_object_id($object);
         $uow = $om->getUnitOfWork();
-        if ($this->pendingLogEntryInserts && array_key_exists($oid, $this->pendingLogEntryInserts)) {
-            $wrapped = AbstractWrapper::wrap($object, $om);
 
-            $logEntry = $this->pendingLogEntryInserts[$oid];
-            $logEntryMeta = $om->getClassMetadata(get_class($logEntry));
-
-            $id = $wrapped->getIdentifier(false, true);
-            $logEntryMeta->getReflectionProperty('objectId')->setValue($logEntry, $id);
-            $uow->scheduleExtraUpdate($logEntry, [
-                'objectId' => [null, $id],
-            ]);
-            $ea->setOriginalObjectProperty($uow, $logEntry, 'objectId', $id);
-            unset($this->pendingLogEntryInserts[$oid]);
-        }
-        if ($this->pendingRelatedObjects && array_key_exists($oid, $this->pendingRelatedObjects)) {
-            $wrapped = AbstractWrapper::wrap($object, $om);
-            $identifiers = $wrapped->getIdentifier(false);
-            foreach ($this->pendingRelatedObjects[$oid] as $props) {
-                $logEntry = $props['log'];
-                $logEntryMeta = $om->getClassMetadata(get_class($logEntry));
-                $oldData = $data = $logEntry->getData();
-                $data[$props['field']] = $identifiers;
-
-                $logEntry->setData($data);
-
-                $uow->scheduleExtraUpdate($logEntry, [
-                    'data' => [$oldData, $data],
-                ]);
-                $ea->setOriginalObjectProperty($uow, $logEntry, 'data', $data);
+        try {
+            if (method_exists($ea, 'setEventState')) {
+                $ea->setEventState($args, $object);
+            } else {
+                $ea->setEventArgs($args);
             }
-            unset($this->pendingRelatedObjects[$oid]);
+
+            if ($this->pendingLogEntryInserts && array_key_exists($oid, $this->pendingLogEntryInserts)) {
+                $wrapped = AbstractWrapper::wrap($object, $om);
+
+                $logEntry = $this->pendingLogEntryInserts[$oid];
+                $logEntryMeta = $om->getClassMetadata(get_class($logEntry));
+
+                $id = $wrapped->getIdentifier(false, true);
+                $logEntryMeta->getReflectionProperty('objectId')->setValue($logEntry, $id);
+                $uow->scheduleExtraUpdate($logEntry, [
+                    'objectId' => [null, $id],
+                ]);
+                $ea->setOriginalObjectProperty($uow, $logEntry, 'objectId', $id);
+                unset($this->pendingLogEntryInserts[$oid]);
+            }
+            if ($this->pendingRelatedObjects && array_key_exists($oid, $this->pendingRelatedObjects)) {
+                $wrapped = AbstractWrapper::wrap($object, $om);
+                $identifiers = $wrapped->getIdentifier(false);
+                foreach ($this->pendingRelatedObjects[$oid] as $props) {
+                    $logEntry = $props['log'];
+                    $logEntryMeta = $om->getClassMetadata(get_class($logEntry));
+                    $oldData = $data = $logEntry->getData();
+                    $data[$props['field']] = $identifiers;
+
+                    $logEntry->setData($data);
+
+                    $uow->scheduleExtraUpdate($logEntry, [
+                        'data' => [$oldData, $data],
+                    ]);
+                    $ea->setOriginalObjectProperty($uow, $logEntry, 'data', $data);
+                }
+                unset($this->pendingRelatedObjects[$oid]);
+            }
+        } finally {
+            if (method_exists($ea, 'clearEventState')) {
+                $ea->clearEventState();
+            }
         }
     }
 
@@ -205,14 +218,26 @@ class LoggableListener extends MappedEventSubscriber
         $om = $eventArgs->getObjectManager();
         $uow = $om->getUnitOfWork();
 
-        foreach ($ea->getScheduledObjectInsertions($uow) as $object) {
-            $this->createLogEntry(LogEntryInterface::ACTION_CREATE, $object, $ea);
-        }
-        foreach ($ea->getScheduledObjectUpdates($uow) as $object) {
-            $this->createLogEntry(LogEntryInterface::ACTION_UPDATE, $object, $ea);
-        }
-        foreach ($ea->getScheduledObjectDeletions($uow) as $object) {
-            $this->createLogEntry(LogEntryInterface::ACTION_REMOVE, $object, $ea);
+        try {
+            if (method_exists($ea, 'setEventState')) {
+                $ea->setEventState($eventArgs, null);
+            } else {
+                $ea->setEventArgs($eventArgs);
+            }
+
+            foreach ($ea->getScheduledObjectInsertions($uow) as $object) {
+                $this->createLogEntry(LogEntryInterface::ACTION_CREATE, $object, $ea);
+            }
+            foreach ($ea->getScheduledObjectUpdates($uow) as $object) {
+                $this->createLogEntry(LogEntryInterface::ACTION_UPDATE, $object, $ea);
+            }
+            foreach ($ea->getScheduledObjectDeletions($uow) as $object) {
+                $this->createLogEntry(LogEntryInterface::ACTION_REMOVE, $object, $ea);
+            }
+        } finally {
+            if (method_exists($ea, 'clearEventState')) {
+                $ea->clearEventState();
+            }
         }
     }
 

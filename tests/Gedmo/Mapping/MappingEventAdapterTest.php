@@ -37,21 +37,32 @@ final class MappingEventAdapterTest extends TestCase
         $args = new PrePersistEventArgs(new \stdClass(), $emMock);
 
         $adapter = $subscriber->getAdapter($args);
-        static::assertInstanceOf(EventAdapterORM::class, $adapter);
-        static::assertSame($adapter->getObjectManager(), $emMock);
-        static::assertInstanceOf(\stdClass::class, $adapter->getObject());
+
+        try {
+            $adapter->setEventState($args, $args->getObject());
+
+            static::assertInstanceOf(EventAdapterORM::class, $adapter);
+            static::assertSame($adapter->getObjectManager(), $emMock);
+            static::assertInstanceOf(\stdClass::class, $adapter->getObject());
+        } finally {
+            $adapter->clearEventState();
+        }
     }
 
     public function testAdapterBehavior(): void
     {
         $emMock = $this->createStub(EntityManagerInterface::class);
-        $entity = new \stdClass();
+        $args = new PrePersistEventArgs(new \stdClass(), $emMock);
 
-        $args = new PrePersistEventArgs($entity, $emMock);
+        $eventAdapter = new EventAdapterORM($emMock);
 
-        $eventAdapter = new EventAdapterORM();
-        $eventAdapter->setEventArgs($args);
-        static::assertSame($eventAdapter->getObjectManager(), $emMock);
-        static::assertInstanceOf(\stdClass::class, $eventAdapter->getObject());
+        try {
+            $eventAdapter->setEventState($args, $args->getObject());
+
+            static::assertSame($eventAdapter->getObjectManager(), $emMock);
+            static::assertInstanceOf(\stdClass::class, $eventAdapter->getObject());
+        } finally {
+            $eventAdapter->clearEventState();
+        }
     }
 }

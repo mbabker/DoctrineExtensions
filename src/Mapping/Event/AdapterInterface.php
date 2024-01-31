@@ -10,8 +10,6 @@
 namespace Gedmo\Mapping\Event;
 
 use Doctrine\Common\EventArgs;
-use Doctrine\ODM\MongoDB\UnitOfWork as MongoDBUnitOfWork;
-use Doctrine\ORM\UnitOfWork as ORMUnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
@@ -21,20 +19,27 @@ use Doctrine\Persistence\ObjectManager;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  *
+ * @method $this              __construct(ObjectManager|null $manager)
  * @method LifecycleEventArgs createLifecycleEventArgsInstance(object $object, ObjectManager $manager) @deprecated
- * @method object             getObject()
+ * @method object|null        getObject() The subject object of the event being processed, or null if the event does not have a subject.
+ * @method void               clearEventState()
+ * @method void               setEventState(EventArgs $args, object|null $object)
+ *
+ * @template TClassMetadata of ClassMetadata
+ * @template TObjectManager of ObjectManager
+ * @template TUnitOfWork of object
  */
 interface AdapterInterface
 {
     /**
-     * @deprecated since gedmo/doctrine-extensions 3.5, will be removed in version 4.0.
-     *
      * Calls a method on the event args object.
      *
      * @param string            $method
      * @param array<int, mixed> $args
      *
      * @return mixed
+     *
+     * @deprecated Calling the underlying event object through the event adapter is deprecated and will be removed in 4.0.
      */
     public function __call($method, $args);
 
@@ -42,6 +47,8 @@ interface AdapterInterface
      * Set the event args object.
      *
      * @return void
+     *
+     * @deprecated Use {@see setEventState} instead
      */
     public function setEventArgs(EventArgs $args);
 
@@ -62,26 +69,24 @@ interface AdapterInterface
     /**
      * Get the root object class, handles inheritance
      *
-     * @param ClassMetadata $meta
+     * @param TClassMetadata $meta
      *
-     * @return string
-     *
-     * @phpstan-return class-string
+     * @return class-string
      */
     public function getRootObjectClass($meta);
 
     /**
      * Get the object manager.
      *
-     * @return ObjectManager
+     * @return TObjectManager
      */
     public function getObjectManager();
 
     /**
      * Gets the state of an object from the unit of work.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow    The UnitOfWork as provided by the object manager
-     * @param object                          $object
+     * @param TUnitOfWork $uow    The UnitOfWork as provided by the object manager
+     * @param object      $object
      *
      * @return int The object state as reported by the unit of work
      */
@@ -90,8 +95,8 @@ interface AdapterInterface
     /**
      * Gets the changeset for an object from the unit of work.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow    The UnitOfWork as provided by the object manager
-     * @param object                          $object
+     * @param TUnitOfWork $uow    The UnitOfWork as provided by the object manager
+     * @param object      $object
      *
      * @return array<string, array<int, mixed>|object>
      *
@@ -102,7 +107,7 @@ interface AdapterInterface
     /**
      * Get the single identifier field name.
      *
-     * @param ClassMetadata $meta
+     * @param TClassMetadata $meta
      *
      * @return string
      */
@@ -113,9 +118,9 @@ interface AdapterInterface
      * computeChangeSets() routine that is used at the beginning of a unit
      * of work's commit.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow    The UnitOfWork as provided by the object manager
-     * @param ClassMetadata                   $meta
-     * @param object                          $object
+     * @param TUnitOfWork    $uow    The UnitOfWork as provided by the object manager
+     * @param TClassMetadata $meta
+     * @param object         $object
      *
      * @return void
      */
@@ -124,7 +129,7 @@ interface AdapterInterface
     /**
      * Gets the currently scheduled object updates from the unit of work.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow The UnitOfWork as provided by the object manager
+     * @param TUnitOfWork $uow The UnitOfWork as provided by the object manager
      *
      * @return array<int|string, object>
      */
@@ -133,7 +138,7 @@ interface AdapterInterface
     /**
      * Gets the currently scheduled object insertions in the unit of work.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow The UnitOfWork as provided by the object manager
+     * @param TUnitOfWork $uow The UnitOfWork as provided by the object manager
      *
      * @return array<int|string, object>
      */
@@ -142,7 +147,7 @@ interface AdapterInterface
     /**
      * Gets the currently scheduled object deletions in the unit of work.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow The UnitOfWork as provided by the object manager
+     * @param TUnitOfWork $uow The UnitOfWork as provided by the object manager
      *
      * @return array<int|string, object>
      */
@@ -151,10 +156,10 @@ interface AdapterInterface
     /**
      * Sets a property value of the original data array of an object.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow
-     * @param object                          $object
-     * @param string                          $property
-     * @param mixed                           $value
+     * @param TUnitOfWork $uow
+     * @param object      $object
+     * @param string      $property
+     * @param mixed       $value
      *
      * @return void
      */
@@ -163,8 +168,8 @@ interface AdapterInterface
     /**
      * Clears the property changeset of the object with the given OID.
      *
-     * @param ORMUnitOfWork|MongoDBUnitOfWork $uow
-     * @param object                          $object
+     * @param TUnitOfWork $uow
+     * @param object      $object
      *
      * @return void
      */

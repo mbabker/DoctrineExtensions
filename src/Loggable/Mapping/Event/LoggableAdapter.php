@@ -10,12 +10,22 @@
 namespace Gedmo\Loggable\Mapping\Event;
 
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
+use Gedmo\Loggable\LogEntryInterface;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Event\AdapterInterface;
 
 /**
  * Doctrine event adapter for the Loggable extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @template TClassMetadata of ClassMetadata
+ * @template TLogEntry of LogEntryInterface
+ * @template TObjectManager of ObjectManager
+ * @template TUnitOfWork of object
+ *
+ * @template-extends AdapterInterface<TClassMetadata, TObjectManager, TUnitOfWork>
  */
 interface LoggableAdapter extends AdapterInterface
 {
@@ -24,14 +34,14 @@ interface LoggableAdapter extends AdapterInterface
      *
      * @return string
      *
-     * @phpstan-return class-string
+     * @phpstan-return class-string<TLogEntry<Loggable>>
      */
     public function getDefaultLogEntryClass();
 
     /**
      * Checks whether an identifier should be generated post insert.
      *
-     * @param ClassMetadata $meta
+     * @param TClassMetadata $meta
      *
      * @return bool
      */
@@ -40,8 +50,8 @@ interface LoggableAdapter extends AdapterInterface
     /**
      * Get the new version number for an object.
      *
-     * @param ClassMetadata $meta
-     * @param object        $object
+     * @param TClassMetadata $meta
+     * @param object         $object
      *
      * @return int
      */
