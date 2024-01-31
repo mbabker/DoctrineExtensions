@@ -253,9 +253,8 @@ class SluggableListener extends MappedEventSubscriber
      */
     public function prePersist(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($config = $this->getConfiguration($om, $meta->getName())) {
@@ -281,7 +280,7 @@ class SluggableListener extends MappedEventSubscriber
     {
         $this->persisted = [];
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         $this->manageFiltersBeforeGeneration($om);

@@ -71,7 +71,7 @@ abstract class AbstractTrackingListener extends MappedEventSubscriber
     public function onFlush(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
         // check all scheduled updates
         $all = array_merge($ea->getScheduledObjectInsertions($uow), $ea->getScheduledObjectUpdates($uow));
@@ -177,8 +177,8 @@ abstract class AbstractTrackingListener extends MappedEventSubscriber
     public function prePersist(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         if ($config = $this->getConfiguration($om, $meta->getName())) {
             if (isset($config['update'])) {

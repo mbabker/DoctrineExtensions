@@ -383,7 +383,7 @@ class TranslatableListener extends MappedEventSubscriber
     public function preFlush(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         foreach ($this->translationInDefaultLocale as $oid => $fields) {
@@ -424,7 +424,7 @@ class TranslatableListener extends MappedEventSubscriber
     public function onFlush(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
         // check all scheduled inserts for Translatable objects
         foreach ($ea->getScheduledObjectInsertions($uow) as $object) {
@@ -468,8 +468,8 @@ class TranslatableListener extends MappedEventSubscriber
     public function postPersist(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         // check if entity is tracked by translatable and without foreign key
         if ($this->getConfiguration($om, $meta->getName()) && [] !== $this->pendingTranslationInserts) {
@@ -505,8 +505,8 @@ class TranslatableListener extends MappedEventSubscriber
     public function postLoad(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         $config = $this->getConfiguration($om, $meta->getName());
         $locale = $this->defaultLocale;

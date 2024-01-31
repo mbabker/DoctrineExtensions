@@ -12,6 +12,7 @@ namespace Gedmo\Uploadable;
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Event\ManagerEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
@@ -127,8 +128,7 @@ class UploadableListener extends MappedEventSubscriber
             return;
         }
 
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         foreach ($this->fileInfoObjects as $info) {

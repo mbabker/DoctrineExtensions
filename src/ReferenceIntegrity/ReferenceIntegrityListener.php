@@ -65,9 +65,8 @@ class ReferenceIntegrityListener extends MappedEventSubscriber
      */
     public function preRemove(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $class = get_class($object);
         $meta = $om->getClassMetadata($class);
 

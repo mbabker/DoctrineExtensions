@@ -73,7 +73,7 @@ class SoftDeleteableListener extends MappedEventSubscriber
     {
         $ea = $this->getEventAdapter($args);
         /** @var EntityManagerInterface|DocumentManager $om */
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
         $evm = $om->getEventManager();
 

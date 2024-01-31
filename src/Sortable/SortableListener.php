@@ -96,8 +96,7 @@ class SortableListener extends MappedEventSubscriber
      */
     public function loadClassMetadata(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $this->loadMetadataForObjectClass($ea->getObjectManager(), $args->getClassMetadata());
+        $this->loadMetadataForObjectClass($args->getObjectManager(), $args->getClassMetadata());
     }
 
     /**
@@ -121,7 +120,7 @@ class SortableListener extends MappedEventSubscriber
         $this->persistenceNeeded = true;
 
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         // process all objects being deleted
@@ -167,8 +166,8 @@ class SortableListener extends MappedEventSubscriber
     public function prePersist(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($config = $this->getConfiguration($om, $meta->getName())) {
@@ -239,7 +238,7 @@ class SortableListener extends MappedEventSubscriber
     public function postFlush(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $em = $ea->getObjectManager();
+        $em = $args->getObjectManager();
 
         $updatedObjects = [];
 

@@ -84,8 +84,8 @@ class ReferencesListener extends MappedEventSubscriber
     public function postLoad(EventArgs $eventArgs)
     {
         $ea = $this->getEventAdapter($eventArgs);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $eventArgs->getObjectManager();
+        $object = $eventArgs->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         $config = $this->getConfiguration($om, $meta->getName());
 
@@ -212,8 +212,8 @@ class ReferencesListener extends MappedEventSubscriber
     public function updateManyEmbedReferences(EventArgs $eventArgs)
     {
         $ea = $this->getEventAdapter($eventArgs);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $eventArgs->getObjectManager();
+        $object = $eventArgs->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         $config = $this->getConfiguration($om, $meta->getName());
 
@@ -262,8 +262,8 @@ class ReferencesListener extends MappedEventSubscriber
     private function updateReferences(EventArgs $eventArgs): void
     {
         $ea = $this->getEventAdapter($eventArgs);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $eventArgs->getObjectManager();
+        $object = $eventArgs->getObject();
         $meta = $om->getClassMetadata(get_class($object));
         $config = $this->getConfiguration($om, $meta->getName());
 

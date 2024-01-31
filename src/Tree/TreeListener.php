@@ -151,7 +151,7 @@ class TreeListener extends MappedEventSubscriber
     public function onFlush(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
+        $om = $args->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         // check all scheduled updates for TreeNodes
@@ -196,9 +196,8 @@ class TreeListener extends MappedEventSubscriber
      */
     public function preRemove(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {
@@ -217,9 +216,8 @@ class TreeListener extends MappedEventSubscriber
      */
     public function prePersist(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {
@@ -238,9 +236,8 @@ class TreeListener extends MappedEventSubscriber
      */
     public function preUpdate(EventArgs $args)
     {
-        $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {
@@ -261,8 +258,8 @@ class TreeListener extends MappedEventSubscriber
     public function postPersist(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {
@@ -283,8 +280,8 @@ class TreeListener extends MappedEventSubscriber
     public function postUpdate(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {
@@ -305,8 +302,8 @@ class TreeListener extends MappedEventSubscriber
     public function postRemove(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $om = $ea->getObjectManager();
-        $object = $ea->getObject();
+        $om = $args->getObjectManager();
+        $object = $args->getObject();
         $meta = $om->getClassMetadata(get_class($object));
 
         if ($this->getConfiguration($om, $meta->getName())) {

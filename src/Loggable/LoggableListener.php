@@ -151,8 +151,8 @@ class LoggableListener extends MappedEventSubscriber
     public function postPersist(EventArgs $args)
     {
         $ea = $this->getEventAdapter($args);
-        $object = $ea->getObject();
-        $om = $ea->getObjectManager();
+        $object = $args->getObject();
+        $om = $args->getObjectManager();
         $oid = spl_object_id($object);
         $uow = $om->getUnitOfWork();
         if ($this->pendingLogEntryInserts && array_key_exists($oid, $this->pendingLogEntryInserts)) {
@@ -202,7 +202,7 @@ class LoggableListener extends MappedEventSubscriber
     public function onFlush(EventArgs $eventArgs)
     {
         $ea = $this->getEventAdapter($eventArgs);
-        $om = $ea->getObjectManager();
+        $om = $eventArgs->getObjectManager();
         $uow = $om->getUnitOfWork();
 
         foreach ($ea->getScheduledObjectInsertions($uow) as $object) {
