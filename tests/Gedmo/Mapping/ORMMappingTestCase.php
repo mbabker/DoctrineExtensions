@@ -20,7 +20,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
-use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
@@ -69,10 +68,6 @@ abstract class ORMMappingTestCase extends TestCase
         $chain = new MappingDriverChain();
 
         $chain->addDriver(new XmlDriver(__DIR__.'/Driver/Xml'), 'Gedmo\Tests\Mapping\Fixture\Xml');
-
-        if (class_exists(YamlDriver::class)) {
-            $chain->addDriver(new YamlDriver(__DIR__.'/Driver/Yaml'), 'Gedmo\Tests\Mapping\Fixture\Yaml');
-        }
 
         if (PHP_VERSION_ID >= 80000) {
             $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');

@@ -9,31 +9,85 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gedmo\Tests\Mapping\Fixture\Yaml;
+namespace Fixture;
+
+namespace Gedmo\Tests\Mapping\Fixture;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="materialized_path_categories", indexes={@ORM\Index(name="search_idx", columns={"title"})})
+ * @Gedmo\Tree(type="materializedPath", activateLocking=true)
+ */
+#[ORM\Entity]
+#[ORM\Table(name: 'materialized_path_categories')]
+#[ORM\Index(name: 'search_idx', columns: ['title'])]
+#[Gedmo\Tree(type: 'materializedPath', activateLocking: true)]
 class MaterializedPathCategory
 {
     /**
-     * @var int
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
+    /**
+     * @ORM\Column(type="string", length=64)
+     * @Gedmo\TreePathSource
+     */
+    #[ORM\Column(type: Types::STRING, length: 64)]
+    #[Gedmo\TreePathSource]
     private ?string $title = null;
 
+    /**
+     * @ORM\Column(type="string", length=3000)
+     * @Gedmo\TreePath
+     */
+    #[ORM\Column(type: Types::STRING, length: 3000)]
+    #[Gedmo\TreePath]
     private ?string $path = null;
 
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @Gedmo\TreeLevel
+     */
+    #[ORM\Column(type: Types::INTEGER)]
+    #[Gedmo\TreeLevel]
     private ?int $level = null;
 
     /**
-     * @var Collection<int, Category>
+     * @var Collection<int, self>
+     *
+     * @ORM\OneToMany(targetEntity="Gedmo\Tests\Mapping\Fixture\MaterializedPathCategory", mappedBy="parent")
      */
-    private $children;
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    private Collection $children;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Gedmo\Tests\Mapping\Fixture\MaterializedPathCategory", inversedBy="children")
+     *
+     * @Gedmo\TreeParent
+     */
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    #[Gedmo\TreeParent]
     private ?MaterializedPathCategory $parent = null;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Gedmo\TreeLockTime
+     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Gedmo\TreeLockTime]
     private ?\DateTime $lockTime = null;
 
     public function __construct()

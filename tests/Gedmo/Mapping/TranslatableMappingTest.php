@@ -13,11 +13,9 @@ namespace Gedmo\Tests\Mapping;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
 use Gedmo\Tests\Mapping\Fixture\User as AnnotatedUser;
 use Gedmo\Tests\Mapping\Fixture\Xml\User as XmlUser;
-use Gedmo\Tests\Mapping\Fixture\Yaml\User as YamlUser;
 use Gedmo\Tests\Translatable\Fixture\PersonTranslation;
 use Gedmo\Translatable\TranslatableListener;
 
@@ -55,10 +53,6 @@ final class TranslatableMappingTest extends ORMMappingTestCase
 
         if (class_exists(AnnotationDriver::class)) {
             yield 'Model with annotations' => [AnnotatedUser::class];
-        }
-
-        if (class_exists(YamlDriver::class)) {
-            yield 'Model with YAML mapping' => [YamlUser::class];
         }
     }
 

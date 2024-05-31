@@ -31,10 +31,13 @@ final class ReferenceIntegrityMappingTest extends BaseTestCaseOM
 
     private ReferenceIntegrityListener $referenceIntegrity;
 
+    public static function setUpBeforeClass(): void
+    {
+        self::markTestSkipped('Test requires YAML mapping from doctrine/mongodb-odm which is unsupported as of 2.0');
+    }
+
     protected function setUp(): void
     {
-        static::markTestSkipped('Intentionally skipping test. Doctrine MongoDB ODM 2.0 removed the YAML mapping driver; skipping test until it can be rewritten using a supported mapper.');
-
         parent::setUp();
 
         $yamlDriver = new YamlDriver(__DIR__.'/Driver/Yaml');

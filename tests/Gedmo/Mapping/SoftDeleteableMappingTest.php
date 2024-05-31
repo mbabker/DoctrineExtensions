@@ -13,12 +13,10 @@ namespace Gedmo\Tests\Mapping;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 use Gedmo\Tests\Mapping\Fixture\SoftDeleteable as AnnotatedSoftDeleteable;
 use Gedmo\Tests\Mapping\Fixture\Xml\SoftDeleteable as XmlSoftDeleteable;
-use Gedmo\Tests\Mapping\Fixture\Yaml\SoftDeleteable as YamlSoftDeleteable;
 
 /**
  * These are mapping tests for SoftDeleteable extension
@@ -54,10 +52,6 @@ final class SoftDeleteableMappingTest extends ORMMappingTestCase
 
         if (class_exists(AnnotationDriver::class)) {
             yield 'Model with annotations' => [AnnotatedSoftDeleteable::class];
-        }
-
-        if (class_exists(YamlDriver::class)) {
-            yield 'Model with YAML mapping' => [YamlSoftDeleteable::class];
         }
     }
 
