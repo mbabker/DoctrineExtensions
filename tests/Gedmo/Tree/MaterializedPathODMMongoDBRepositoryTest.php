@@ -24,6 +24,8 @@ use Gedmo\Tree\TreeListener;
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class MaterializedPathODMMongoDBRepositoryTest extends BaseTestCaseMongoODM
 {

@@ -11,9 +11,10 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Wrapper;
 
-use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Proxy;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Wrapper\Fixture\Entity\Article;
 use Gedmo\Tests\Wrapper\Fixture\Entity\Composite;
 use Gedmo\Tests\Wrapper\Fixture\Entity\CompositeRelation;
@@ -24,7 +25,7 @@ use Gedmo\Tool\Wrapper\EntityWrapper;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class EntityWrapperTest extends BaseTestCaseORM
+final class EntityWrapperTest extends ORMTestCase
 {
     private const ARTICLE = Article::class;
     private const COMPOSITE = Composite::class;
@@ -33,19 +34,29 @@ final class EntityWrapperTest extends BaseTestCaseORM
     protected function setUp(): void
     {
         parent::setUp();
-        $this->getDefaultMockSqliteEntityManager(new EventManager());
+
+        $this->createSchemaForObjects([
+            self::ARTICLE,
+            self::COMPOSITE,
+            self::COMPOSITE_RELATION,
+        ]);
+
         $this->populate();
     }
 
     public function testManaged(): void
     {
         $test = $this->em->find(self::ARTICLE, ['id' => 1]);
+
         static::assertInstanceOf(self::ARTICLE, $test);
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         static::assertSame(1, $wrapped->getIdentifier());
         static::assertSame('test', $wrapped->getPropertyValue('title'));
+
         $wrapped->setPropertyValue('title', 'changed');
+
         static::assertSame('changed', $wrapped->getPropertyValue('title'));
 
         static::assertTrue($wrapped->hasValidIdentifier());
@@ -53,12 +64,14 @@ final class EntityWrapperTest extends BaseTestCaseORM
 
     public function testProxy(): void
     {
-        $this->em->clear();
         $test = $this->em->getReference(self::ARTICLE, ['id' => 1]);
+
         static::assertInstanceOf(Proxy::class, $test);
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         $id = $wrapped->getIdentifier(false);
+
         static::assertIsArray($id);
         static::assertCount(1, $id);
         static::assertArrayHasKey('id', $id);
@@ -70,10 +83,12 @@ final class EntityWrapperTest extends BaseTestCaseORM
     public function testComposite(): void
     {
         $test = $this->em->getReference(self::COMPOSITE, ['one' => 1, 'two' => 2]);
-        static::assertInstanceOf(self::COMPOSITE, $test);
-        $wrapped = new EntityWrapper($test, $this->em);
 
+        static::assertInstanceOf(self::COMPOSITE, $test);
+
+        $wrapped = new EntityWrapper($test, $this->em);
         $id = $wrapped->getIdentifier(false);
+
         static::assertIsArray($id);
         static::assertCount(2, $id);
         static::assertArrayHasKey('one', $id);
@@ -82,9 +97,9 @@ final class EntityWrapperTest extends BaseTestCaseORM
         static::assertSame(2, $id['two']);
 
         $id = $wrapped->getIdentifier(false, true);
+
         static::assertIsString($id);
         static::assertSame('1 2', $id);
-
         static::assertSame('test', $wrapped->getPropertyValue('title'));
     }
 
@@ -92,19 +107,21 @@ final class EntityWrapperTest extends BaseTestCaseORM
     {
         $art1 = $this->em->getReference(self::ARTICLE, ['id' => 1]);
         $test = $this->em->getReference(self::COMPOSITE_RELATION, ['article' => $art1->getId(), 'status' => 2]);
-        static::assertInstanceOf(self::COMPOSITE_RELATION, $test);
-        $wrapped = new EntityWrapper($test, $this->em);
 
+        static::assertInstanceOf(self::COMPOSITE_RELATION, $test);
+
+        $wrapped = new EntityWrapper($test, $this->em);
         $id = $wrapped->getIdentifier(false);
+
         static::assertIsArray($id);
         static::assertCount(2, $id);
         static::assertArrayHasKey('article', $id);
         static::assertArrayHasKey('status', $id);
 
         $id = $wrapped->getIdentifier(false, true);
+
         static::assertIsString($id);
         static::assertSame('1 2', $id);
-
         static::assertSame('test', $wrapped->getPropertyValue('title'));
     }
 
@@ -112,6 +129,7 @@ final class EntityWrapperTest extends BaseTestCaseORM
     {
         $test = $this->em->find(self::ARTICLE, ['id' => 1]);
         $this->em->clear();
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         static::assertSame(1, $wrapped->getIdentifier());
@@ -122,6 +140,7 @@ final class EntityWrapperTest extends BaseTestCaseORM
     {
         $test = $this->em->getReference(self::ARTICLE, ['id' => 1]);
         $this->em->clear();
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         static::assertSame(1, $wrapped->getIdentifier());
@@ -132,6 +151,7 @@ final class EntityWrapperTest extends BaseTestCaseORM
     {
         $test = $this->em->getReference(self::COMPOSITE_RELATION, ['article' => 1, 'status' => 2]);
         $this->em->clear();
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         static::assertSame('1 2', $wrapped->getIdentifier(false, true));
@@ -140,10 +160,11 @@ final class EntityWrapperTest extends BaseTestCaseORM
 
     public function testCompositeRelationProxy(): void
     {
-        $this->em->clear();
         $art1 = $this->em->getReference(self::ARTICLE, ['id' => 1]);
         $test = $this->em->getReference(self::COMPOSITE_RELATION, ['article' => $art1->getId(), 'status' => 2]);
+
         static::assertInstanceOf(Proxy::class, $test);
+
         $wrapped = new EntityWrapper($test, $this->em);
 
         static::assertSame('1 2', $wrapped->getIdentifier(false, true));
@@ -156,31 +177,41 @@ final class EntityWrapperTest extends BaseTestCaseORM
         $wrapped = new EntityWrapper($test, $this->em);
 
         $test->setTitle('test');
-        static::assertSame('test', $wrapped->getPropertyValue('title'));
 
+        static::assertSame('test', $wrapped->getPropertyValue('title'));
         static::assertFalse($wrapped->hasValidIdentifier());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
     {
-        return [
-            self::ARTICLE,
-            self::COMPOSITE,
-            self::COMPOSITE_RELATION,
-        ];
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Wrapper\Fixture\Entity');
     }
 
     private function populate(): void
     {
         $article = new Article();
         $article->setTitle('test');
+
         $this->em->persist($article);
+
         $composite = new Composite(1, 2);
         $composite->setTitle('test');
+
         $this->em->persist($composite);
+
         $compositeRelation = new CompositeRelation($article, 2);
         $compositeRelation->setTitle('test');
+
         $this->em->persist($compositeRelation);
         $this->em->flush();
+        $this->em->clear();
     }
 }

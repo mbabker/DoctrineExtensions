@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\Sluggable;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Comment;
 use Gedmo\Tests\Sluggable\Fixture\Page;
 use Gedmo\Tests\Sluggable\Fixture\TranslatableArticle;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 use Gedmo\Translatable\Entity\Translation;
 use Gedmo\Translatable\Translatable;
 use Gedmo\Translatable\TranslatableListener;
@@ -27,7 +29,7 @@ use Gedmo\Translatable\TranslatableListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TranslatableSlugTest extends BaseTestCaseORM
+final class TranslatableSlugTest extends ORMTestCase
 {
     private const ARTICLE = TranslatableArticle::class;
     private const COMMENT = Comment::class;
@@ -36,19 +38,17 @@ final class TranslatableSlugTest extends BaseTestCaseORM
 
     private ?int $articleId = null;
 
-    private TranslatableListener $translatableListener;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $this->translatableListener = new TranslatableListener();
-        $this->translatableListener->setTranslatableLocale('en_US');
-        $evm->addEventSubscriber(new SluggableListener());
-        $evm->addEventSubscriber($this->translatableListener);
+        $this->createSchemaForObjects([
+            self::ARTICLE,
+            self::COMMENT,
+            self::PAGE,
+            self::TRANSLATION,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
         $this->populate();
     }
 
@@ -137,14 +137,27 @@ final class TranslatableSlugTest extends BaseTestCaseORM
         static::assertSame('Cont_Test', $page->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::ARTICLE,
-            self::COMMENT,
-            self::PAGE,
-            self::TRANSLATION,
-        ];
+        $translatableListener = new TranslatableListener();
+        $translatableListener->setTranslatableLocale('en_US');
+
+        $evm->addEventSubscriber(new SluggableListener());
+        $evm->addEventSubscriber($translatableListener);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Translatable\Entity');
     }
 
     private function populate(): void

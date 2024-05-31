@@ -26,6 +26,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class LoggableDocumentTest extends BaseTestCaseMongoODM
 {

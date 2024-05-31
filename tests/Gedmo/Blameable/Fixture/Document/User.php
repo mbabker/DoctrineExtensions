@@ -12,40 +12,15 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Blameable\Fixture\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Doctrine\ODM\MongoDB\Types\Type as MongoDBType;
 
 /**
  * @ODM\Document(collection="users")
  */
 #[ODM\Document(collection: 'users')]
-class User
+class User extends MappedSuperClass
 {
-    /**
-     * @ODM\Id
-     *
-     * @var string|null
-     */
-    #[ODM\Id]
-    private $id;
-
-    /**
-     * @ODM\Field(type="string")
-     */
-    #[ODM\Field(type: MongoDBType::STRING)]
-    private ?string $username = null;
-
-    public function getId(): ?string
+    public function getUsername(): string
     {
-        return $this->id;
-    }
-
-    public function setUsername(?string $username): void
-    {
-        $this->username = $username;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->username;
+        return $this->getName();
     }
 }

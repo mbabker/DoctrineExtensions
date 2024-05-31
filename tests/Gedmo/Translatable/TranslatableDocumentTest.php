@@ -23,6 +23,8 @@ use Gedmo\Translatable\TranslatableListener;
  * These are tests for Translatable behavior ODM implementation
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class TranslatableDocumentTest extends BaseTestCaseMongoODM
 {

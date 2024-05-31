@@ -12,7 +12,10 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Handlers;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Handler\People\Occupation;
 use Gedmo\Tests\Sluggable\Fixture\Handler\People\Person;
 use Gedmo\Tests\Tool\BaseTestCaseORM;
@@ -23,7 +26,7 @@ use Gedmo\Tree\TreeListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class BothSlugHandlerTest extends BaseTestCaseORM
+final class BothSlugHandlerTest extends ORMTestCase
 {
     private const OCCUPATION = Occupation::class;
     private const PERSON = Person::class;
@@ -32,16 +35,16 @@ final class BothSlugHandlerTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new TreeListener());
-        $evm->addEventSubscriber(new SluggableListener());
+        $this->createSchemaForObjects([
+            self::OCCUPATION,
+            self::PERSON,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->populate();
     }
 
     public function testSlugGeneration(): void
     {
-        $this->populate();
         $repo = $this->em->getRepository(self::PERSON);
 
         $herzult = $repo->findOneBy(['name' => 'Herzult']);
@@ -56,7 +59,6 @@ final class BothSlugHandlerTest extends BaseTestCaseORM
 
     public function testSlugUpdates(): void
     {
-        $this->populate();
         $repo = $this->em->getRepository(self::PERSON);
 
         $gedi = $repo->findOneBy(['name' => 'Gedi']);
@@ -84,7 +86,6 @@ final class BothSlugHandlerTest extends BaseTestCaseORM
 
     public function test1093(): void
     {
-        $this->populate();
         $personRepo = $this->em->getRepository(self::PERSON);
         $occupationRepo = $this->em->getRepository(self::OCCUPATION);
 
@@ -108,12 +109,23 @@ final class BothSlugHandlerTest extends BaseTestCaseORM
         static::assertSame('web/enthusiast/php/herzult', $herzult->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::OCCUPATION,
-            self::PERSON,
-        ];
+        $evm->addEventSubscriber(new TreeListener());
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 
     private function populate(): void

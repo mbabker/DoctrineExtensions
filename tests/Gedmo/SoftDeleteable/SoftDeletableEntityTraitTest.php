@@ -21,11 +21,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class SoftDeletableEntityTraitTest extends TestCase
 {
-    /**
-     * @var UsingTrait
-     */
-    protected $entity;
-
     public function testGetSetDeletedAt(): void
     {
         $time = new \DateTime();

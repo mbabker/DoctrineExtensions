@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Handlers;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Handler\TreeSlug;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 use Gedmo\Tree\TreeListener;
 
-final class TreeSlugHandlerUniqueTest extends BaseTestCaseORM
+final class TreeSlugHandlerUniqueTest extends ORMTestCase
 {
     private const TARGET = TreeSlug::class;
 
@@ -25,11 +27,9 @@ final class TreeSlugHandlerUniqueTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-        $evm->addEventSubscriber(new TreeListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->createSchemaForObjects([
+            self::TARGET,
+        ]);
     }
 
     public function testUniqueRoot(): void
@@ -72,10 +72,22 @@ final class TreeSlugHandlerUniqueTest extends BaseTestCaseORM
         static::assertSame('root/foo-1', $foo2->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::TARGET,
-        ];
+        $evm->addEventSubscriber(new TreeListener());
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

@@ -20,6 +20,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * These are tests for sortable behavior
  *
  * @author http://github.com/vetalt
+ *
+ * @requires extension mongodb
  */
 final class SortableDocumentTest extends BaseTestCaseMongoODM
 {

@@ -20,12 +20,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Car extends Vehicle
 {
     /**
-     * @var string|null
-     *
      * @ORM\Column(length=128)
      */
     #[ORM\Column(length: 128)]
-    protected $title;
+    protected ?string $title = null;
 
     /**
      * @ORM\Column(length=128)

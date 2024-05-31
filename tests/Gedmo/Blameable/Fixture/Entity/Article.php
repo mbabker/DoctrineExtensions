@@ -25,8 +25,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Article implements Blameable
 {
     /**
-     * @var int|null
-     *
+     * @ORM\ManyToOne(targetEntity="Type", inversedBy="articles")
+     */
+    #[ORM\ManyToOne(targetEntity: Type::class, inversedBy: 'articles')]
+    public ?Type $type = null;
+
+    /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -34,13 +38,13 @@ class Article implements Blameable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="title", type="string", length=128)
      */
     #[ORM\Column(name: 'title', type: Types::STRING, length: 128)]
-    private ?string $title = null;
+    private string $title;
 
     /**
      * @var Collection<int, Comment>
@@ -48,12 +52,12 @@ class Article implements Blameable
      * @ORM\OneToMany(targetEntity="Gedmo\Tests\Blameable\Fixture\Entity\Comment", mappedBy="article")
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'article')]
-    private $comments;
+    private Collection $comments;
 
     /**
-     * @Gedmo\Blameable(on="create")
-     *
      * @ORM\Column(name="created", type="string")
+     *
+     * @Gedmo\Blameable(on="create")
      */
     #[ORM\Column(name: 'created', type: Types::STRING)]
     #[Gedmo\Blameable(on: 'create')]
@@ -64,8 +68,8 @@ class Article implements Blameable
      *
      * @Gedmo\Blameable
      */
-    #[Gedmo\Blameable]
     #[ORM\Column(name: 'updated', type: Types::STRING)]
+    #[Gedmo\Blameable]
     private ?string $updated = null;
 
     /**
@@ -77,20 +81,11 @@ class Article implements Blameable
     #[Gedmo\Blameable(on: 'change', field: 'type.title', value: 'Published')]
     private ?string $published = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Type", inversedBy="articles")
-     */
-    #[ORM\ManyToOne(targetEntity: Type::class, inversedBy: 'articles')]
-    private ?Type $type = null;
-
-    public function __construct()
+    public function __construct(string $title)
     {
         $this->comments = new ArrayCollection();
-    }
 
-    public function setType(?Type $type): void
-    {
-        $this->type = $type;
+        $this->setTitle($title);
     }
 
     public function getId(): ?int
@@ -98,20 +93,29 @@ class Article implements Blameable
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
+        $this->title = $title;
+    }
+
     public function addComment(Comment $comment): void
     {
-        $comment->setArticle($this);
-        $this->comments[] = $comment;
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->article = $this;
+        }
     }
 
     /**
@@ -132,16 +136,6 @@ class Article implements Blameable
         $this->created = $created;
     }
 
-    public function getPublished(): ?string
-    {
-        return $this->published;
-    }
-
-    public function setPublished(?string $published): void
-    {
-        $this->published = $published;
-    }
-
     public function getUpdated(): ?string
     {
         return $this->updated;
@@ -150,5 +144,15 @@ class Article implements Blameable
     public function setUpdated(?string $updated): void
     {
         $this->updated = $updated;
+    }
+
+    public function getPublished(): ?string
+    {
+        return $this->published;
+    }
+
+    public function setPublished(?string $published): void
+    {
+        $this->published = $published;
     }
 }

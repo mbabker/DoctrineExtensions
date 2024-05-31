@@ -20,6 +20,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * Gedmo\Sluggable\Issue1151Test
  *
  * @author Vaidas Lažauskas <vaidas@notrix.lt>
+ *
+ * @requires extension mongodb
  */
 final class Issue1151Test extends BaseTestCaseMongoODM
 {

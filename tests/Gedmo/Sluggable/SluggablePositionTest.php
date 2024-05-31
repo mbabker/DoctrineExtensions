@@ -12,16 +12,18 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Position;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for Sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class SluggablePositionTest extends BaseTestCaseORM
+final class SluggablePositionTest extends ORMTestCase
 {
     private const POSITION = Position::class;
 
@@ -29,10 +31,10 @@ final class SluggablePositionTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
+        $this->createSchemaForObjects([
+            self::POSITION,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
         $this->populate();
     }
 
@@ -43,20 +45,36 @@ final class SluggablePositionTest extends BaseTestCaseORM
 
         $object = $repo->find(1);
         $slug = $meta->getReflectionProperty('slug')->getValue($object);
+
         static::assertSame('code-other-title-prop', $slug);
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::POSITION,
-        ];
+        $listener = new SluggableListener();
+
+        $evm->addEventSubscriber($listener);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 
     private function populate(): void
     {
         $meta = $this->em->getClassMetadata(self::POSITION);
+
         $object = new Position();
+
         $meta->getReflectionProperty('title')->setValue($object, 'title');
         $meta->getReflectionProperty('prop')->setValue($object, 'prop');
         $meta->getReflectionProperty('code')->setValue($object, 'code');

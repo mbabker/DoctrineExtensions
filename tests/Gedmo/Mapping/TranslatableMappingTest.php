@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -26,26 +26,21 @@ use Gedmo\Translatable\TranslatableListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TranslatableMappingTest extends ORMMappingTestCase
+final class TranslatableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
+    protected function modifyEventManager(EventManager $evm): void
     {
-        parent::setUp();
-
         $listener = new TranslatableListener();
-        $listener->setCacheItemPool($this->cache);
+        $listener->setCacheItemPool($this->metadataCache);
         $listener->setTranslatableLocale('en_us');
 
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
+        $evm->addEventSubscriber($listener);
     }
 
     /**
      * @return \Generator<string, array{class-string}>
      */
-    public static function dataSortableObject(): \Generator
+    public static function dataTranslatableObject(): \Generator
     {
         yield 'Model with XML mapping' => [XmlUser::class];
 
@@ -65,14 +60,14 @@ final class TranslatableMappingTest extends ORMMappingTestCase
     /**
      * @param class-string $className
      *
-     * @dataProvider dataSortableObject
+     * @dataProvider dataTranslatableObject
      */
     public function testTranslatableMapping(string $className): void
     {
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Translatable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('translationClass', $config);
         static::assertSame(PersonTranslation::class, $config['translationClass']);

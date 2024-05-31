@@ -28,8 +28,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class RelatedArticle implements Loggable
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -37,7 +35,7 @@ class RelatedArticle implements Loggable
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue()]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @Gedmo\Versioned
@@ -63,7 +61,7 @@ class RelatedArticle implements Loggable
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="article")
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'article')]
-    private $comments;
+    private Collection $comments;
 
     public function __construct()
     {

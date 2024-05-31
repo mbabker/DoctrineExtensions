@@ -13,13 +13,14 @@ namespace Gedmo\Tests\IpTraceable\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\IpTraceable\IpTraceable;
 use Gedmo\IpTraceable\Traits\IpTraceableEntity;
 
 /**
  * @ORM\Entity
  */
 #[ORM\Entity]
-class UsingTrait
+class UsingTrait implements IpTraceable
 {
     /*
      * Hook ipTraceable behavior
@@ -28,8 +29,6 @@ class UsingTrait
     use IpTraceableEntity;
 
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -37,7 +36,7 @@ class UsingTrait
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(length=128)

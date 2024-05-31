@@ -26,9 +26,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Geo
 {
     /**
-     * @var string|null
-     *
-     * @phpstan-var numeric-string|null
+     * @phpstan-var numeric-string
      *
      * @ORM\Column(type="decimal", precision=9, scale=6)
      *
@@ -36,12 +34,10 @@ class Geo
      */
     #[ORM\Column(type: Types::DECIMAL, precision: 9, scale: 6)]
     #[Gedmo\Versioned]
-    protected $latitude;
+    private string $latitude;
 
     /**
-     * @var string|null
-     *
-     * @phpstan-var numeric-string|null
+     * @phpstan-var numeric-string
      *
      * @ORM\Column(type="decimal", precision=9, scale=6)
      *
@@ -49,18 +45,16 @@ class Geo
      */
     #[ORM\Column(type: Types::DECIMAL, precision: 9, scale: 6)]
     #[Gedmo\Versioned]
-    protected $longitude;
+    private string $longitude;
 
     /**
-     * @var GeoLocation
-     *
      * @ORM\Embedded(class="Gedmo\Tests\Loggable\Fixture\Entity\GeoLocation")
      *
      * @Gedmo\Versioned
      */
     #[ORM\Embedded(class: GeoLocation::class)]
     #[Gedmo\Versioned]
-    protected $geoLocation;
+    private GeoLocation $geoLocation;
 
     public function __construct(float $latitude, float $longitude, GeoLocation $geoLocation)
     {

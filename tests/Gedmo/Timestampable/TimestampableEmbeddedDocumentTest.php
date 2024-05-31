@@ -21,6 +21,8 @@ use Gedmo\Timestampable\TimestampableListener;
  * These are tests for Timestampable behavior ODM implementation
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class TimestampableEmbeddedDocumentTest extends BaseTestCaseMongoODM
 {

@@ -12,15 +12,17 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Prefix;
 use Gedmo\Tests\Sluggable\Fixture\PrefixWithTreeHandler;
 use Gedmo\Tests\Sluggable\Fixture\Suffix;
 use Gedmo\Tests\Sluggable\Fixture\SuffixWithTreeHandler;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 use Gedmo\Tree\TreeListener;
 
-final class SluggablePrefixSuffixTest extends BaseTestCaseORM
+final class SluggablePrefixSuffixTest extends ORMTestCase
 {
     private const PREFIX = Prefix::class;
     private const SUFFIX = Suffix::class;
@@ -31,11 +33,12 @@ final class SluggablePrefixSuffixTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-        $evm->addEventSubscriber(new TreeListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->createSchemaForObjects([
+            self::SUFFIX,
+            self::PREFIX,
+            self::SUFFIX_TREE,
+            self::PREFIX_TREE,
+        ]);
     }
 
     public function testPrefix(): void
@@ -100,16 +103,22 @@ final class SluggablePrefixSuffixTest extends BaseTestCaseORM
         static::assertSame('test.foo/test.bar/test.baz', $baz->getSlug());
     }
 
-    /**
-     * Get a list of used fixture classes
-     */
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::SUFFIX,
-            self::PREFIX,
-            self::SUFFIX_TREE,
-            self::PREFIX_TREE,
-        ];
+        $evm->addEventSubscriber(new SluggableListener());
+        $evm->addEventSubscriber(new TreeListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

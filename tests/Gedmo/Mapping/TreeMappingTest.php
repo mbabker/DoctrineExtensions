@@ -11,11 +11,8 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Mapping\ExtensionMetadataFactory;
 use Gedmo\Tests\Mapping\Fixture\Yaml\Category;
@@ -29,44 +26,11 @@ use Gedmo\Tree\TreeListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TreeMappingTest extends ORMMappingTestCase
+final class TreeMappingTest extends MappingORMTestCase
 {
     private const TEST_YAML_ENTITY_CLASS = Category::class;
     private const YAML_CLOSURE_CATEGORY = ClosureCategory::class;
     private const YAML_MATERIALIZED_PATH_CATEGORY = MaterializedPathCategory::class;
-
-    private EntityManager $em;
-
-    private TreeListener $listener;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $config = $this->getBasicConfiguration();
-
-        $chain = new MappingDriverChain();
-
-        // TODO - The ORM's YAML mapping is deprecated and removed in 3.0
-        $chain->addDriver(new YamlDriver(__DIR__.'/Driver/Yaml'), 'Gedmo\Tests\Mapping\Fixture\Yaml');
-
-        if (PHP_VERSION_ID >= 80000) {
-            $annotationOrAttributeDriver = new AttributeDriver([]);
-        } else {
-            $annotationOrAttributeDriver = new AnnotationDriver(new AnnotationReader());
-        }
-
-        $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Tree\Fixture');
-        $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tree');
-
-        $config->setMetadataDriverImpl($chain);
-
-        $this->listener = new TreeListener();
-        $this->listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager($config);
-        $this->em->getEventManager()->addEventSubscriber($this->listener);
-    }
 
     /**
      * @group legacy
@@ -94,7 +58,7 @@ final class TreeMappingTest extends ORMMappingTestCase
             self::TEST_YAML_ENTITY_CLASS,
             'Gedmo\Tree'
         );
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
         static::assertArrayHasKey('left', $config);
         static::assertSame('left', $config['left']);
         static::assertArrayHasKey('right', $config);
@@ -117,7 +81,7 @@ final class TreeMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata(self::YAML_CLOSURE_CATEGORY);
         $cacheId = ExtensionMetadataFactory::getCacheId(self::YAML_CLOSURE_CATEGORY, 'Gedmo\Tree');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('parent', $config);
         static::assertSame('parent', $config['parent']);
@@ -129,8 +93,9 @@ final class TreeMappingTest extends ORMMappingTestCase
 
     public function testYamlMaterializedPathMapping(): void
     {
-        $meta = $this->em->getClassMetadata(self::YAML_MATERIALIZED_PATH_CATEGORY);
-        $config = $this->listener->getConfiguration($this->em, $meta->getName());
+        $this->em->getClassMetadata(self::YAML_MATERIALIZED_PATH_CATEGORY);
+        $cacheId = ExtensionMetadataFactory::getCacheId(self::YAML_MATERIALIZED_PATH_CATEGORY, 'Gedmo\Tree');
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('strategy', $config);
         static::assertSame('materializedPath', $config['strategy']);
@@ -146,5 +111,29 @@ final class TreeMappingTest extends ORMMappingTestCase
         static::assertSame('path', $config['path']);
         static::assertArrayHasKey('path_separator', $config);
         static::assertSame(',', $config['path_separator']);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        parent::addMetadataDriversToChain($driver);
+
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Tree\Fixture');
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tree');
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new TreeListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

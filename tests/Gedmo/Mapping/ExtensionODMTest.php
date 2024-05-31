@@ -19,6 +19,9 @@ use Gedmo\Tests\Mapping\Mock\Extension\Encoder\EncoderListener;
 use Gedmo\Tests\Mapping\Mock\Extension\Encoder\Mapping\Event\Adapter\ODM;
 use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
 
+/**
+ * @requires extension mongodb
+ */
 final class ExtensionODMTest extends BaseTestCaseMongoODM
 {
     private const USER = User::class;

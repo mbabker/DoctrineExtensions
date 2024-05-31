@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -25,21 +25,8 @@ use Gedmo\Tests\Mapping\Fixture\Yaml\Sortable as YamlSortable;
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
  */
-final class SortableMappingTest extends ORMMappingTestCase
+final class SortableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $listener = new SortableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
-    }
-
     /**
      * @return \Generator<string, array{class-string}>
      */
@@ -70,7 +57,7 @@ final class SortableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Sortable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('position', $config);
         static::assertSame('position', $config['position']);
@@ -79,5 +66,13 @@ final class SortableMappingTest extends ORMMappingTestCase
         static::assertSame('grouping', $config['groups'][0]);
         static::assertSame('sortable_group', $config['groups'][1]);
         static::assertSame('sortable_groups', $config['groups'][2]);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SortableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

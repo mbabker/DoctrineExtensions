@@ -31,8 +31,6 @@ class Post
     private ?string $title = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Id
      *
      * @Gedmo\Slug(updatable=true, unique=true, fields={"title"})
@@ -42,7 +40,7 @@ class Post
     #[ORM\Id]
     #[ORM\Column(length: 64, nullable: true)]
     #[Gedmo\Slug(updatable: true, unique: true, fields: ['title'])]
-    private $slug;
+    private ?string $slug = null;
 
     /**
      * @var Collection<int, Comment>

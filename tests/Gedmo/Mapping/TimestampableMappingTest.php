@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -25,21 +25,8 @@ use Gedmo\Timestampable\TimestampableListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TimestampableMappingTest extends ORMMappingTestCase
+final class TimestampableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $listener = new TimestampableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
-    }
-
     /**
      * @return \Generator<string, array{class-string}>
      *
@@ -70,7 +57,7 @@ final class TimestampableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Timestampable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('create', $config);
         static::assertSame('created', $config['create'][0]);
@@ -91,7 +78,7 @@ final class TimestampableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Timestampable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('create', $config);
         static::assertSame('created', $config['create'][0]);
@@ -103,5 +90,13 @@ final class TimestampableMappingTest extends ORMMappingTestCase
         static::assertSame('published', $onChange['field']);
         static::assertSame('status.title', $onChange['trackedField']);
         static::assertSame('Published', $onChange['value']);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new TimestampableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

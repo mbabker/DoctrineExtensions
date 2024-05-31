@@ -13,17 +13,16 @@ namespace Gedmo\Tests\IpTraceable\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\IpTraceable\IpTraceable;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\MappedSuperclass
  */
 #[ORM\MappedSuperclass]
-class MappedSupperClass
+class MappedSuperClass implements IpTraceable
 {
     /**
-     * @var int|null
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -31,7 +30,7 @@ class MappedSupperClass
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
-    protected $id;
+    protected ?int $id = null;
 
     /**
      * @var string|null
@@ -39,7 +38,7 @@ class MappedSupperClass
      * @Gedmo\Locale
      */
     #[Gedmo\Locale]
-    protected $locale;
+    protected ?string $locale = null;
 
     /**
      * @var string|null
@@ -50,7 +49,7 @@ class MappedSupperClass
      */
     #[Gedmo\Translatable]
     #[ORM\Column(name: 'name', type: Types::STRING, length: 191)]
-    protected $name;
+    protected ?string $name = null;
 
     /**
      * @var string|null
@@ -61,11 +60,8 @@ class MappedSupperClass
      */
     #[ORM\Column(name: 'created_at', type: Types::STRING, length: 45)]
     #[Gedmo\IpTraceable(on: 'create')]
-    protected $createdFromIp;
+    protected ?string $createdFromIp = null;
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function getId(): ?int
     {
         return $this->id;

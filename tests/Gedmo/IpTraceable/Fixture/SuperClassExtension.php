@@ -18,7 +18,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  */
 #[ORM\Entity]
-class SupperClassExtension extends MappedSupperClass
+class SuperClassExtension extends MappedSuperClass
 {
     /**
      * @ORM\Column(length=128)

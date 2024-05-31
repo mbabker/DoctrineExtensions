@@ -20,6 +20,8 @@ use Gedmo\Tool\Wrapper\MongoDocumentWrapper;
  * Mongo Document wrapper tests
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class MongoDocumentWrapperTest extends BaseTestCaseMongoODM
 {

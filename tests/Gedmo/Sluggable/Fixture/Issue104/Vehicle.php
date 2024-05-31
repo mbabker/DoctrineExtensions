@@ -27,11 +27,9 @@ class Vehicle
      * @ORM\Column(length=128)
      */
     #[ORM\Column(length: 128)]
-    protected $title;
+    protected ?string $title = null;
 
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -39,18 +37,16 @@ class Vehicle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string|null
-     *
      * @Gedmo\Slug(fields={"title"})
      *
      * @ORM\Column(length=128, unique=true)
      */
     #[Gedmo\Slug(fields: ['title'])]
     #[ORM\Column(length: 128, unique: true)]
-    private $slug;
+    private ?string $slug = null;
 
     public function getId(): ?int
     {

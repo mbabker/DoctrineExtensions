@@ -14,6 +14,7 @@ namespace Gedmo\Tests\Uploadable\Fixture\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Uploadable\Uploadable;
 
 /**
  * @ORM\Entity
@@ -22,7 +23,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[ORM\Entity]
 #[Gedmo\Uploadable(allowOverwrite: true, pathMethod: 'getPath', callback: 'callbackMethod')]
-class File
+class File implements Uploadable
 {
     /**
      * @var bool

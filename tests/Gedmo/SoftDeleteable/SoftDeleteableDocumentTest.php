@@ -27,6 +27,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Patrik Votoček <patrik@votocek.cz>
+ *
+ * @requires extension mongodb
  */
 final class SoftDeleteableDocumentTest extends BaseTestCaseMongoODM
 {

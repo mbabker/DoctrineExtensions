@@ -12,30 +12,40 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Blameable\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity
  */
 #[ORM\Entity]
-class SupperClassExtension extends MappedSupperClass
+class Editorial extends MappedSuperClass
 {
     /**
      * @ORM\Column(length=128)
-     *
-     * @Gedmo\Translatable
      */
     #[ORM\Column(length: 128)]
-    #[Gedmo\Translatable]
-    private ?string $title = null;
+    private string $title;
 
-    public function setTitle(?string $title): void
+    public function __construct(string $name, string $title)
     {
-        $this->title = $title;
+        parent::__construct($name);
+
+        $this->setTitle($title);
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
+        $this->title = $title;
     }
 }

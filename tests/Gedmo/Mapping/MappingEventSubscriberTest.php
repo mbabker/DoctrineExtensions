@@ -11,10 +11,6 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Gedmo\Mapping\ExtensionMetadataFactory;
 use Gedmo\Sluggable\SluggableListener;
@@ -23,79 +19,32 @@ use Gedmo\Tests\Mapping\Fixture\SuperClassExtension;
 use Gedmo\Tests\Mapping\Mock\Extension\Encoder\EncoderListener;
 use Psr\Cache\CacheItemPoolInterface;
 
-final class MappingEventSubscriberTest extends ORMMappingTestCase
+final class MappingEventSubscriberTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $config = $this->getBasicConfiguration();
-
-        if (PHP_VERSION_ID >= 80000) {
-            $config->setMetadataDriverImpl(new AttributeDriver([]));
-        } else {
-            $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
-        }
-
-        $this->em = $this->getBasicEntityManager($config);
-    }
-
     public function testGetMetadataFactoryCacheFromDoctrineForSluggable(): void
     {
-        $metadataFactory = $this->em->getMetadataFactory();
-        $getCache = \Closure::bind(static fn (AbstractClassMetadataFactory $metadataFactory): ?CacheItemPoolInterface => $metadataFactory->getCache(), null, \get_class($metadataFactory));
-
-        $cache = $getCache($metadataFactory);
+        $cache = $this->getMetadataCacheFromMetadataFactory();
 
         $cacheKey = ExtensionMetadataFactory::getCacheId(Sluggable::class, 'Gedmo\Sluggable');
 
         static::assertFalse($cache->hasItem($cacheKey));
 
-        $subscriber = new SluggableListener();
-        $classMetadata = $this->em->getClassMetadata(Sluggable::class);
-        $subscriber->getExtensionMetadataFactory($this->em)->getExtensionMetadata($classMetadata);
+        (new SluggableListener())->getExtensionMetadataFactory($this->em)->getExtensionMetadata($this->em->getClassMetadata(Sluggable::class));
 
         static::assertTrue($cache->hasItem($cacheKey));
     }
 
     public function testGetMetadataFactoryCacheFromDoctrineForSuperClassExtension(): void
     {
-        $metadataFactory = $this->em->getMetadataFactory();
-        $getCache = \Closure::bind(static fn (AbstractClassMetadataFactory $metadataFactory): ?CacheItemPoolInterface => $metadataFactory->getCache(), null, \get_class($metadataFactory));
-
-        /** @var CacheItemPoolInterface $cache */
-        $cache = $getCache($metadataFactory);
+        $cache = $this->getMetadataCacheFromMetadataFactory();
 
         $cacheKey = ExtensionMetadataFactory::getCacheId(SuperClassExtension::class, 'Gedmo\Tests\Mapping\Mock\Extension\Encoder');
 
         static::assertFalse($cache->hasItem($cacheKey));
 
-        $subscriber = new EncoderListener();
-        $classMetadata = $this->em->getClassMetadata(SuperClassExtension::class);
+        $config = (new EncoderListener())->getExtensionMetadataFactory($this->em)->getExtensionMetadata($this->em->getClassMetadata(SuperClassExtension::class));
 
-        $config = $subscriber->getExtensionMetadataFactory($this->em)->getExtensionMetadata($classMetadata);
-
-        static::assertSame([
-            'content' => [
-                'type' => 'md5',
-                'secret' => null,
-            ],
-        ], $config['encode']);
-
-        // Create new configuration to use new array cache
-        $config = $this->getBasicConfiguration();
-
-        if (PHP_VERSION_ID >= 80000) {
-            $config->setMetadataDriverImpl(new AttributeDriver([]));
-        } else {
-            $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
-        }
-
-        $this->em = $this->getBasicEntityManager($config);
-
-        $config = $subscriber->getExtensionMetadataFactory($this->em)->getExtensionMetadata($classMetadata);
+        static::assertTrue($cache->hasItem($cacheKey));
 
         static::assertSame([
             'content' => [
@@ -103,5 +52,39 @@ final class MappingEventSubscriberTest extends ORMMappingTestCase
                 'secret' => null,
             ],
         ], $config['encode']);
+
+        // Reset the environment to force a new test with a new manager and cache
+        $this->resetEnvironment();
+
+        $cache = $this->getMetadataCacheFromMetadataFactory();
+
+        static::assertFalse($cache->hasItem($cacheKey));
+
+        $config = (new EncoderListener())->getExtensionMetadataFactory($this->em)->getExtensionMetadata($this->em->getClassMetadata(SuperClassExtension::class));
+
+        static::assertTrue($cache->hasItem($cacheKey));
+
+        static::assertSame([
+            'content' => [
+                'type' => 'md5',
+                'secret' => null,
+            ],
+        ], $config['encode']);
+    }
+
+    private function getMetadataCacheFromMetadataFactory(): CacheItemPoolInterface
+    {
+        $metadataFactory = $this->em->getMetadataFactory();
+        $getCache = \Closure::bind(
+            static fn (AbstractClassMetadataFactory $metadataFactory): ?CacheItemPoolInterface => $metadataFactory->getCache(),
+            null,
+            \get_class($metadataFactory)
+        );
+
+        $cache = $getCache($metadataFactory);
+
+        static::assertInstanceOf(CacheItemPoolInterface::class, $cache, 'The metadata factory does not have a configured cache.');
+
+        return $cache;
     }
 }

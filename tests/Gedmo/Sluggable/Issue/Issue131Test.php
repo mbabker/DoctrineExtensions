@@ -12,16 +12,18 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Issue;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Issue131\Article;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for Sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class Issue131Test extends BaseTestCaseORM
+final class Issue131Test extends ORMTestCase
 {
     private const TARGET = Article::class;
 
@@ -29,10 +31,9 @@ final class Issue131Test extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->createSchemaForObjects([
+            self::TARGET,
+        ]);
     }
 
     public function testSlugGeneration(): void
@@ -65,10 +66,21 @@ final class Issue131Test extends BaseTestCaseORM
         static::assertSame('0', $article->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::TARGET,
-        ];
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

@@ -1,75 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    backupGlobals="false"
-    backupStaticAttributes="false"
     colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    processIsolation="false"
-    stopOnFailure="false"
     bootstrap="./bootstrap.php"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd"
 >
-    <coverage>
+    <coverage processUncoveredFiles="true" cacheDirectory="./.coverage-cache">
         <include>
-            <directory>../src</directory>
+            <directory suffix=".php">../src</directory>
         </include>
     </coverage>
+
     <testsuites>
         <testsuite name="Translatable Extension">
-            <directory suffix="Test.php">./Gedmo/Translatable/</directory>
+            <directory>./Gedmo/Translatable/</directory>
         </testsuite>
         <testsuite name="Sluggable Extension">
-            <directory suffix="Test.php">./Gedmo/Sluggable/</directory>
+            <directory>./Gedmo/Sluggable/</directory>
         </testsuite>
         <testsuite name="Sortable Extension">
-            <directory suffix="Test.php">./Gedmo/Sortable/</directory>
+            <directory>./Gedmo/Sortable/</directory>
         </testsuite>
         <testsuite name="Tree Extension">
-            <directory suffix="Test.php">./Gedmo/Tree/</directory>
+            <directory>./Gedmo/Tree/</directory>
         </testsuite>
         <testsuite name="Timestampable Extension">
-            <directory suffix="Test.php">./Gedmo/Timestampable/</directory>
+            <directory>./Gedmo/Timestampable/</directory>
         </testsuite>
         <testsuite name="Blameable Extension">
-            <directory suffix="Test.php">./Gedmo/Blameable/</directory>
+            <directory>./Gedmo/Blameable/</directory>
         </testsuite>
         <testsuite name="IpTraceable Extension">
-            <directory suffix="Test.php">./Gedmo/IpTraceable/</directory>
+            <directory>./Gedmo/IpTraceable/</directory>
         </testsuite>
         <testsuite name="Mapping Extension">
-            <directory suffix="Test.php">./Gedmo/Mapping/</directory>
+            <directory>./Gedmo/Mapping/</directory>
         </testsuite>
         <testsuite name="Loggable Extension">
-            <directory suffix="Test.php">./Gedmo/Loggable/</directory>
+            <directory>./Gedmo/Loggable/</directory>
         </testsuite>
         <testsuite name="Sortable Extension">
-            <directory suffix="Test.php">./Gedmo/Sortable/</directory>
+            <directory>./Gedmo/Sortable/</directory>
         </testsuite>
         <testsuite name="Object wrappers">
-            <directory suffix="Test.php">./Gedmo/Wrapper/</directory>
+            <directory>./Gedmo/Wrapper/</directory>
         </testsuite>
         <testsuite name="Translator extension">
-            <directory suffix="Test.php">./Gedmo/Translator/</directory>
+            <directory>./Gedmo/Translator/</directory>
         </testsuite>
         <testsuite name="SoftDeleteable Extension">
-            <directory suffix="Test.php">./Gedmo/SoftDeleteable/</directory>
+            <directory>./Gedmo/SoftDeleteable/</directory>
         </testsuite>
         <testsuite name="Uploadable Extension">
-            <directory suffix="Test.php">./Gedmo/Uploadable/</directory>
+            <directory>./Gedmo/Uploadable/</directory>
         </testsuite>
         <testsuite name="ReferenceIntegrity Extension">
-            <directory suffix="Test.php">./Gedmo/ReferenceIntegrity/</directory>
+            <directory>./Gedmo/ReferenceIntegrity/</directory>
         </testsuite>
         <testsuite name="References Extension">
-            <directory suffix="Test.php">./Gedmo/References/</directory>
+            <directory>./Gedmo/References/</directory>
         </testsuite>
     </testsuites>
+
     <php>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
         <env name="MONGODB_SERVER" value="mongodb://mongodb:27017"/>
     </php>
+
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
     </listeners>

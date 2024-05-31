@@ -22,8 +22,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Article
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -31,7 +29,7 @@ class Article
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="title", length=64)
@@ -48,15 +46,13 @@ class Article
     private ?Category $category = null;
 
     /**
-     * @var string|null
-     *
      * @Gedmo\Slug(updatable=true, unique=true, unique_base="category", fields={"title"})
      *
      * @ORM\Column(length=64, nullable=true)
      */
     #[Gedmo\Slug(updatable: true, unique: true, unique_base: 'category', fields: ['title'])]
     #[ORM\Column(length: 64, nullable: true)]
-    private $slug;
+    private ?string $slug = null;
 
     public function getId(): ?int
     {

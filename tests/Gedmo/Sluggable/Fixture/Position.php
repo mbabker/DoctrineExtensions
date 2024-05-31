@@ -22,8 +22,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Position
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -31,48 +29,38 @@ class Position
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Column(length=16)
      */
     #[ORM\Column(length: 16)]
-    private $prop;
+    private ?string $prop = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Column(length=64)
      */
     #[ORM\Column(length: 64)]
-    private $title;
+    private ?string $title = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Column(length=16)
      */
     #[ORM\Column(length: 16)]
-    private $code;
+    private ?string $code = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Column(length=16)
      */
     #[ORM\Column(length: 16)]
-    private $other;
+    private ?string $other = null;
 
     /**
-     * @var string|null
-     *
      * @Gedmo\Slug(fields={"code", "other", "title", "prop"})
      *
      * @ORM\Column(length=64, unique=true)
      */
     #[Gedmo\Slug(fields: ['code', 'other', 'title', 'prop'])]
     #[ORM\Column(length: 64, unique: true)]
-    private $slug;
+    private ?string $slug = null;
 }

@@ -23,8 +23,14 @@ use Doctrine\ORM\Mapping as ORM;
 class Type
 {
     /**
-     * @var int|null
+     * @var Collection<int, Article>
      *
+     * @ORM\OneToMany(targetEntity="Article", mappedBy="type")
+     */
+    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'type')]
+    public Collection $articles;
+
+    /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -32,25 +38,19 @@ class Type
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="title", type="string", length=128)
      */
     #[ORM\Column(name: 'title', type: Types::STRING, length: 128)]
-    private ?string $title = null;
+    private string $title;
 
-    /**
-     * @var Collection<int, Article>
-     *
-     * @ORM\OneToMany(targetEntity="Article", mappedBy="type")
-     */
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'type')]
-    private Collection $articles;
-
-    public function __construct()
+    public function __construct(string $title)
     {
         $this->articles = new ArrayCollection();
+
+        $this->setTitle($title);
     }
 
     public function getId(): ?int
@@ -58,13 +58,20 @@ class Type
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
+        $this->title = $title;
     }
 }

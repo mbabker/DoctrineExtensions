@@ -12,11 +12,14 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Issue;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
 use Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Issue449\Article;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for Sluggable behavior
@@ -25,7 +28,7 @@ use Gedmo\Tests\Tool\BaseTestCaseORM;
  *
  * @see http://marvelley.com
  */
-final class Issue449Test extends BaseTestCaseORM
+final class Issue449Test extends ORMTestCase
 {
     private const TARGET = Article::class;
     private const SOFT_DELETEABLE_FILTER_NAME = 'soft-deleteable';
@@ -36,18 +39,9 @@ final class Issue449Test extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $sluggableListener = new SluggableListener();
-        $sluggableListener->addManagedFilter(self::SOFT_DELETEABLE_FILTER_NAME, true);
-        $evm->addEventSubscriber($sluggableListener);
-
-        $this->softDeleteableListener = new SoftDeleteableListener();
-        $evm->addEventSubscriber($this->softDeleteableListener);
-
-        $config = $this->getDefaultConfiguration();
-        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
-
-        $this->em = $this->getDefaultMockSqliteEntityManager($evm, $config);
+        $this->createSchemaForObjects([
+            self::TARGET,
+        ]);
 
         $this->em->getFilters()->enable(self::SOFT_DELETEABLE_FILTER_NAME);
     }
@@ -77,10 +71,30 @@ final class Issue449Test extends BaseTestCaseORM
         static::assertNotSame($slug, $article->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyConfiguration(Configuration $config): void
     {
-        return [
-            self::TARGET,
-        ];
+        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SluggableListener();
+        $listener->addManagedFilter(self::SOFT_DELETEABLE_FILTER_NAME, true);
+
+        $evm->addEventSubscriber($listener);
+        $evm->addEventSubscriber(new SoftDeleteableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

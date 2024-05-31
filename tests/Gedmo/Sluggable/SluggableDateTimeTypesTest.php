@@ -12,22 +12,23 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
-use Gedmo\Sluggable\Sluggable;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDate;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDateImmutable;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDateTime;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDateTimeImmutable;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDateTimeTz;
 use Gedmo\Tests\Sluggable\Fixture\DateTimeTypes\ArticleDateTimeTzImmutable;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class SluggableDateTimeTypesTest extends BaseTestCaseORM
+final class SluggableDateTimeTypesTest extends ORMTestCase
 {
     private const ARTICLE_DATE = ArticleDate::class;
     private const ARTICLE_DATE_IMMUTABLE = ArticleDateImmutable::class;
@@ -40,78 +41,64 @@ final class SluggableDateTimeTypesTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
-    }
-
-    public function testShouldBuildSlugWithAllDateTimeTypes(): void
-    {
-        $articleDate = new ArticleDate();
-        $articleDate->setTitle('the title');
-        $articleDate->setCreatedAt(new \DateTime('2022-04-01'));
-
-        $this->em->persist($articleDate);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDate->getSlug(), 'with date');
-
-        $articleDateImmutable = new ArticleDateImmutable();
-        $articleDateImmutable->setTitle('the title');
-        $articleDateImmutable->setCreatedAt(new \DateTimeImmutable('2022-04-01'));
-
-        $this->em->persist($articleDateImmutable);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDateImmutable->getSlug(), 'with date_immutable');
-
-        $articleDateTime = new ArticleDateTime();
-        $articleDateTime->setTitle('the title');
-        $articleDateTime->setCreatedAt(new \DateTime('2022-04-01'));
-
-        $this->em->persist($articleDateTime);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDateTime->getSlug(), 'with datetime');
-
-        $articleDateTimeImmutable = new ArticleDateTimeImmutable();
-        $articleDateTimeImmutable->setTitle('the title');
-        $articleDateTimeImmutable->setCreatedAt(new \DateTimeImmutable('2022-04-01'));
-
-        $this->em->persist($articleDateTimeImmutable);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDateTimeImmutable->getSlug(), 'with datetime_immutable');
-
-        $articleDateTimeTz = new ArticleDateTimeTz();
-        $articleDateTimeTz->setTitle('the title');
-        $articleDateTimeTz->setCreatedAt(new \DateTime('2022-04-01'));
-
-        $this->em->persist($articleDateTimeTz);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDateTimeTz->getSlug(), 'with datetimetz');
-
-        $articleDateTimeTzImmutable = new ArticleDateTimeTzImmutable();
-        $articleDateTimeTzImmutable->setTitle('the title');
-        $articleDateTimeTzImmutable->setCreatedAt(new \DateTimeImmutable('2022-04-01'));
-
-        $this->em->persist($articleDateTimeTzImmutable);
-        $this->em->flush();
-        $this->em->clear();
-        static::assertSame('the-title-2022-04-01', $articleDateTimeTzImmutable->getSlug(), 'with datetimetz_immutable');
-    }
-
-    protected function getUsedEntityFixtures(): array
-    {
-        return [
+        $this->createSchemaForObjects([
             self::ARTICLE_DATE,
             self::ARTICLE_DATE_IMMUTABLE,
             self::ARTICLE_DATETIME,
             self::ARTICLE_DATETIME_IMMUTABLE,
             self::ARTICLE_DATETIME_TZ,
             self::ARTICLE_DATETIME_TZ_IMMUTABLE,
-        ];
+        ]);
+    }
+
+    public static function dataMutableDateTimeTypes(): \Generator
+    {
+        yield 'Entity with date field' => [self::ARTICLE_DATE, true];
+        yield 'Entity with datetime field' => [self::ARTICLE_DATETIME, true];
+        yield 'Entity with datetimetz field' => [self::ARTICLE_DATETIME_TZ, true];
+    }
+
+    public static function dataImmutableDateTimeTypes(): \Generator
+    {
+        yield 'Entity with date_immutable field' => [self::ARTICLE_DATE_IMMUTABLE, false];
+        yield 'Entity with datetime_immutable field' => [self::ARTICLE_DATETIME_IMMUTABLE, false];
+        yield 'Entity with datetimetz_immutable field' => [self::ARTICLE_DATETIME_TZ_IMMUTABLE, false];
+    }
+
+    /**
+     * @dataProvider dataMutableDateTimeTypes
+     * @dataProvider dataImmutableDateTimeTypes
+     */
+    public function testShouldBuildSlugWithAllDateTimeTypes(string $entityClass, bool $isMutable): void
+    {
+        $entity = new $entityClass();
+        $entity->setTitle('the title');
+        $entity->setCreatedAt($isMutable ? new \DateTime('2022-04-01') : new \DateTimeImmutable('2022-04-01'));
+
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->clear();
+
+        static::assertSame('the-title-2022-04-01', $entity->getSlug(), 'with date');
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SluggableListener();
+
+        $evm->addEventSubscriber($listener);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

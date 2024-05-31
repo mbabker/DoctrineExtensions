@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -27,21 +27,8 @@ use Gedmo\Tests\Mapping\Fixture\Yaml\Category;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class SluggableMappingTest extends ORMMappingTestCase
+final class SluggableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $listener = new SluggableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
-    }
-
     /**
      * @return \Generator<string, array{class-string}>
      */
@@ -68,7 +55,7 @@ final class SluggableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Sluggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('slugs', $config);
         static::assertArrayHasKey('slug', $config['slugs']);
@@ -122,7 +109,7 @@ final class SluggableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Sluggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('slugs', $config);
         static::assertArrayHasKey('slug', $config['slugs']);
@@ -161,5 +148,13 @@ final class SluggableMappingTest extends ORMMappingTestCase
         static::assertSame('parent', $second['relationField']);
         static::assertSame('slug', $second['relationSlugField']);
         static::assertSame('/', $second['separator']);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SluggableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

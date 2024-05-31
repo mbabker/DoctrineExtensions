@@ -22,6 +22,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * These are tests for the ReferenceIntegrity extension
  *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
+ *
+ * @requires extension mongodb
  */
 final class ReferenceIntegrityDocumentTest extends BaseTestCaseMongoODM
 {

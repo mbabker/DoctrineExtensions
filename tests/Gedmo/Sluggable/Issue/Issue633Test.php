@@ -12,7 +12,10 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Issue;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\YamlDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Issue633\Article;
 use Gedmo\Tests\Tool\BaseTestCaseORM;
 
@@ -21,7 +24,7 @@ use Gedmo\Tests\Tool\BaseTestCaseORM;
  *
  * @author Derek Clapham <derek.clapham@gmail.com>
  */
-final class Issue633Test extends BaseTestCaseORM
+final class Issue633Test extends ORMTestCase
 {
     private const TARGET = Article::class;
 
@@ -29,10 +32,9 @@ final class Issue633Test extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->createSchemaForObjects([
+            self::TARGET,
+        ]);
     }
 
     public function testShouldHandleUniqueBasedSlug(): void
@@ -91,10 +93,21 @@ final class Issue633Test extends BaseTestCaseORM
         static::assertSame('unique-to-code-1', $test3->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::TARGET,
-        ];
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $nestedDriver = $this->createAttributeDriver();
+        } elseif (class_exists(YamlDriver::class)) {
+            $nestedDriver = $this->createYamlDriver(__DIR__.'/../Fixture/Issue116/Mapping');
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with YAML support.');
+        }
+
+        $driver->addDriver($nestedDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

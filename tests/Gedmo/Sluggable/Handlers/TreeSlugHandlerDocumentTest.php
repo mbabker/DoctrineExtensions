@@ -20,6 +20,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * These are tests for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class TreeSlugHandlerDocumentTest extends BaseTestCaseMongoODM
 {

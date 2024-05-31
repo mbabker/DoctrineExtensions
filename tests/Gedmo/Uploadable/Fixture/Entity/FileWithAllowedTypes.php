@@ -14,6 +14,7 @@ namespace Gedmo\Tests\Uploadable\Fixture\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Uploadable\Uploadable;
 
 /**
  * @ORM\Entity
@@ -22,11 +23,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[ORM\Entity]
 #[Gedmo\Uploadable(allowedTypes: 'text/plain,text/html')]
-class FileWithAllowedTypes
+class FileWithAllowedTypes implements Uploadable
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
@@ -34,7 +33,7 @@ class FileWithAllowedTypes
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="title", type="string", nullable=true)

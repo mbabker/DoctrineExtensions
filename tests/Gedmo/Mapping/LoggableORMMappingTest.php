@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Loggable\Entity\LogEntry;
@@ -35,21 +35,8 @@ use Gedmo\Tests\Mapping\Fixture\Yaml\LoggableWithEmbedded as YamlLoggableWithEmb
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class LoggableORMMappingTest extends ORMMappingTestCase
+final class LoggableORMMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $listener = new LoggableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
-    }
-
     /**
      * @return \Generator<string, array{class-string}>
      *
@@ -80,7 +67,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('logEntryClass', $config);
         static::assertSame(LogEntry::class, $config['logEntryClass']);
@@ -99,7 +86,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('logEntryClass', $config);
         static::assertSame(LogEntry::class, $config['logEntryClass']);
@@ -145,7 +132,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         static::assertCount(2, $meta->identifier);
 
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('loggable', $config);
         static::assertTrue($config['loggable']);
@@ -190,7 +177,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         static::assertCount(2, $meta->identifier);
 
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('loggable', $config);
         static::assertTrue($config['loggable']);
@@ -231,7 +218,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('logEntryClass', $config);
         static::assertSame(LogEntry::class, $config['logEntryClass']);
@@ -250,7 +237,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('logEntryClass', $config);
         static::assertSame(LogEntry::class, $config['logEntryClass']);
@@ -275,7 +262,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('logEntryClass', $config);
         static::assertSame(LogEntry::class, $config['logEntryClass']);
@@ -286,5 +273,13 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
         static::assertCount(2, $config['versioned']);
         static::assertContains('title', $config['versioned']);
         static::assertContains('embedded.subtitle', $config['versioned']);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new LoggableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

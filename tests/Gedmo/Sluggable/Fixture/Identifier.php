@@ -21,8 +21,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Identifier
 {
     /**
-     * @var string|null
-     *
      * @ORM\Id
      *
      * @Gedmo\Slug(separator="_", updatable=false, fields={"title"})
@@ -32,7 +30,7 @@ class Identifier
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true)]
     #[Gedmo\Slug(separator: '_', updatable: false, fields: ['title'])]
-    private $id;
+    private ?string $id = null;
 
     /**
      * @ORM\Column(length=32)

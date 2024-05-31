@@ -11,35 +11,44 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Blameable\Fixture\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDBType;
+use Gedmo\Blameable\Blameable;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ODM\Document(collection="articles")
  */
 #[ODM\Document(collection: 'articles')]
-class Article
+class Article implements Blameable
 {
     /**
+     * @ODM\ReferenceOne(targetDocument="Type", inversedBy="articles")
+     */
+    #[ODM\ReferenceOne(targetDocument: Type::class, inversedBy: 'articles')]
+    public ?Type $type = null;
+
+    /**
      * @ODM\Id
-     *
-     * @var string|null
      */
     #[ODM\Id]
-    private $id;
+    private ?string $id = null;
 
     /**
      * @ODM\Field(type="string")
      */
     #[ODM\Field(type: MongoDBType::STRING)]
-    private ?string $title = null;
+    private string $title;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Gedmo\Tests\Blameable\Fixture\Document\Type")
+     * @var Collection<int, Comment>
+     *
+     * @ODM\ReferenceMany(targetDocument="Comment", mappedBy="article")
      */
-    #[ODM\ReferenceOne(targetDocument: Type::class)]
-    private ?Type $type = null;
+    #[ODM\ReferenceMany(targetDocument: Comment::class, mappedBy: 'article')]
+    private Collection $comments;
 
     /**
      * @ODM\Field(type="string")
@@ -60,36 +69,57 @@ class Article
     private ?string $updated = null;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Gedmo\Tests\Blameable\Fixture\Document\User")
-     *
-     * @Gedmo\Blameable(on="create")
-     */
-    #[ODM\ReferenceOne(targetDocument: User::class)]
-    #[Gedmo\Blameable(on: 'create')]
-    private ?User $creator = null;
-
-    /**
-     * @ODM\Field(type="string")
+     * @ODM\Field(type="string", nullable=true)
      *
      * @Gedmo\Blameable(on="change", field="type.title", value="Published")
      */
+    #[ODM\Field(type: MongoDBType::STRING, nullable: true)]
     #[Gedmo\Blameable(on: 'change', field: 'type.title', value: 'Published')]
-    #[ODM\Field(type: MongoDBType::STRING)]
     private ?string $published = null;
+
+    public function __construct(string $title)
+    {
+        $this->comments = new ArrayCollection();
+
+        $this->setTitle($title);
+    }
 
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
+    public function getTitle(): string
     {
+        return $this->title;
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
         $this->title = $title;
     }
 
-    public function getTitle(): ?string
+    public function addComment(Comment $comment): void
     {
-        return $this->title;
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->article = $this;
+        }
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
     }
 
     public function getCreated(): ?string
@@ -97,14 +127,9 @@ class Article
         return $this->created;
     }
 
-    public function getPublished(): ?string
+    public function setCreated(?string $created): void
     {
-        return $this->published;
-    }
-
-    public function getCreator(): ?User
-    {
-        return $this->creator;
+        $this->created = $created;
     }
 
     public function getUpdated(): ?string
@@ -112,33 +137,18 @@ class Article
         return $this->updated;
     }
 
-    public function setType(Type $type): void
-    {
-        $this->type = $type;
-    }
-
-    public function getType(): ?Type
-    {
-        return $this->type;
-    }
-
-    public function setCreated(?string $created): void
-    {
-        $this->created = $created;
-    }
-
-    public function setPublished(?string $published): void
-    {
-        $this->published = $published;
-    }
-
     public function setUpdated(?string $updated): void
     {
         $this->updated = $updated;
     }
 
-    public function setCreator(?User $creator): void
+    public function getPublished(): ?string
     {
-        $this->creator = $creator;
+        return $this->published;
+    }
+
+    public function setPublished(?string $published): void
+    {
+        $this->published = $published;
     }
 }

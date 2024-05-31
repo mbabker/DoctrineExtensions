@@ -28,6 +28,8 @@ use Gedmo\Tests\Translatable\Fixture\PersonTranslation;
  * These are mapping extension tests
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class MultiManagerMappingTest extends BaseTestCaseOM
 {

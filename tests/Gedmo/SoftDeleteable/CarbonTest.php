@@ -10,44 +10,46 @@
 namespace Gedmo\Tests\SoftDeleteable;
 
 use Carbon\Carbon;
-use Carbon\Doctrine\DateTimeType;
+use Carbon\Doctrine\DateTimeType as CarbonDateTimeType;
 use Doctrine\Common\EventManager;
-use Doctrine\DBAL\Types\Type as DoctrineType;
+use Doctrine\DBAL\Types\DateTimeType as DBALDateTimeType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Article;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Comment;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
-final class CarbonTest extends BaseTestCaseORM
+final class CarbonTest extends ORMTestCase
 {
     private const ARTICLE_CLASS = Article::class;
     private const COMMENT_CLASS = Comment::class;
     private const SOFT_DELETEABLE_FILTER_NAME = 'soft-deleteable';
 
-    private SoftDeleteableListener $softDeleteableListener;
+    public static function setUpBeforeClass(): void
+    {
+        Type::overrideType(Types::DATETIME_MUTABLE, CarbonDateTimeType::class);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        Type::overrideType(Types::DATETIME_MUTABLE, DBALDateTimeType::class);
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $this->softDeleteableListener = new SoftDeleteableListener();
-        $evm->addEventSubscriber($this->softDeleteableListener);
-        $config = $this->getDefaultConfiguration();
-        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
-        $this->em = $this->getDefaultMockSqliteEntityManager($evm, $config);
+        $this->createSchemaForObjects([
+            self::ARTICLE_CLASS,
+            self::COMMENT_CLASS,
+        ]);
+
         $this->em->getFilters()->enable(self::SOFT_DELETEABLE_FILTER_NAME);
-
-        DoctrineType::overrideType(Types::DATETIME_MUTABLE, DateTimeType::class);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        DoctrineType::overrideType(Types::DATETIME_MUTABLE, \Doctrine\DBAL\Types\DateTimeType::class);
     }
 
     public function testSoftDeleteable(): void
@@ -94,11 +96,26 @@ final class CarbonTest extends BaseTestCaseORM
         static::assertInstanceOf(Carbon::class, $comment->getDeletedAt());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyConfiguration(Configuration $config): void
     {
-        return [
-            self::ARTICLE_CLASS,
-            self::COMMENT_CLASS,
-        ];
+        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $evm->addEventSubscriber(new SoftDeleteableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\SoftDeleteable\Fixture\Entity');
     }
 }

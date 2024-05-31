@@ -33,6 +33,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  * ORM object manager
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 abstract class BaseTestCaseMongoODM extends TestCase
 {
@@ -40,13 +42,6 @@ abstract class BaseTestCaseMongoODM extends TestCase
      * @var DocumentManager|null
      */
     protected $dm;
-
-    protected function setUp(): void
-    {
-        if (!extension_loaded('mongodb')) {
-            static::markTestSkipped('Missing Mongo extension.');
-        }
-    }
 
     protected function tearDown(): void
     {

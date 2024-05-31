@@ -12,22 +12,27 @@ declare(strict_types=1);
 namespace Gedmo\Tests\SoftDeleteable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Address;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Person;
 use Gedmo\Tests\Tool\BaseTestCaseORM;
 
-final class HardRelationTest extends BaseTestCaseORM
+final class HardRelationTest extends ORMTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SoftDeleteableListener());
-        $this->getDefaultMockSqliteEntityManager($evm);
-        $this->em->getConfiguration()->addFilter('softdelete', SoftDeleteableFilter::class);
+        $this->createSchemaForObjects([
+            Person::class,
+            Address::class,
+        ]);
+
         $this->em->getFilters()->enable('softdelete');
     }
 
@@ -102,11 +107,26 @@ final class HardRelationTest extends BaseTestCaseORM
         static::assertNull($person, 'Should be softdeleted');
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyConfiguration(Configuration $config): void
     {
-        return [
-            Person::class,
-            Address::class,
-        ];
+        $config->addFilter('softdelete', SoftDeleteableFilter::class);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $evm->addEventSubscriber(new SoftDeleteableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\SoftDeleteable\Fixture\Entity');
     }
 }

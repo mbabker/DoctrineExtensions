@@ -11,8 +11,12 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Loggable;
 
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Loggable\Entity\LogEntry;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use Gedmo\Loggable\LoggableListener;
 use Gedmo\Tests\Loggable\Fixture\Entity\Address;
 use Gedmo\Tests\Loggable\Fixture\Entity\Article;
 use Gedmo\Tests\Loggable\Fixture\Entity\Comment;
@@ -20,22 +24,42 @@ use Gedmo\Tests\Loggable\Fixture\Entity\Composite;
 use Gedmo\Tests\Loggable\Fixture\Entity\CompositeRelation;
 use Gedmo\Tests\Loggable\Fixture\Entity\Geo;
 use Gedmo\Tests\Loggable\Fixture\Entity\GeoLocation;
+use Gedmo\Tests\Loggable\Fixture\Entity\Log\Comment as LogComment;
 use Gedmo\Tests\Loggable\Fixture\Entity\RelatedArticle;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
+use Gedmo\Tests\ORMTestCase;
 
 /**
- * These are tests for loggable behavior
+ * Functional tests for the loggable extension
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-abstract class LoggableEntityTest extends BaseTestCaseORM
+final class LoggableEntityTest extends ORMTestCase
 {
+    private const ADDRESS = Address::class;
     private const ARTICLE = Article::class;
     private const COMMENT = Comment::class;
+    private const COMMENT_LOG = LogComment::class;
     private const COMPOSITE = Composite::class;
     private const COMPOSITE_RELATION = CompositeRelation::class;
+    private const GEO = Geo::class;
     private const RELATED_ARTICLE = RelatedArticle::class;
-    private const COMMENT_LOG = Fixture\Entity\Log\Comment::class;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createSchemaForObjects([
+            LogEntry::class,
+            self::ADDRESS,
+            self::ARTICLE,
+            self::COMMENT,
+            self::COMMENT_LOG,
+            self::COMPOSITE,
+            self::COMPOSITE_RELATION,
+            self::GEO,
+            self::RELATED_ARTICLE,
+        ]);
+    }
 
     public function testShouldHandleClonedEntity(): void
     {
@@ -251,19 +275,26 @@ abstract class LoggableEntityTest extends BaseTestCaseORM
         static::assertNull($log->getData());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::ARTICLE,
-            self::COMMENT,
-            self::COMMENT_LOG,
-            self::RELATED_ARTICLE,
-            self::COMPOSITE,
-            self::COMPOSITE_RELATION,
-            LogEntry::class,
-            Address::class,
-            Geo::class,
-        ];
+        $listener = new LoggableListener();
+        $listener->setUsername('jules');
+
+        $evm->addEventSubscriber($listener);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Loggable\Entity');
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Loggable\Fixture\Entity');
     }
 
     private function populateEmbedded(): Address

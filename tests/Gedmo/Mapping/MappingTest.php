@@ -12,64 +12,35 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Mapping;
 
 use Doctrine\Common\EventManager;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Tree\Fixture\BehavioralCategory;
 use Gedmo\Timestampable\TimestampableListener;
 use Gedmo\Translatable\Entity\Translation;
 use Gedmo\Translatable\TranslatableListener;
 use Gedmo\Tree\TreeListener;
-use PHPUnit\Framework\TestCase;
 
 /**
  * These are mapping extension tests
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class MappingTest extends TestCase
+final class MappingTest extends ORMTestCase
 {
     private const TEST_ENTITY_CATEGORY = BehavioralCategory::class;
     private const TEST_ENTITY_TRANSLATION = Translation::class;
 
-    private EntityManager $em;
-
-    private TimestampableListener $timestampable;
+    private TimestampableListener $timestampableListener;
 
     protected function setUp(): void
     {
-        $config = new Configuration();
-        $config->setProxyDir(TESTS_TEMP_DIR);
-        $config->setProxyNamespace('Gedmo\Mapping\Proxy');
+        parent::setUp();
 
-        if (PHP_VERSION_ID >= 80000) {
-            $config->setMetadataDriverImpl(new AttributeDriver([]));
-        } else {
-            $config->setMetadataDriverImpl(new AnnotationDriver($_ENV['annotation_reader']));
-        }
-
-        $conn = [
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ];
-
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new TranslatableListener());
-        $this->timestampable = new TimestampableListener();
-        $evm->addEventSubscriber($this->timestampable);
-        $evm->addEventSubscriber(new SluggableListener());
-        $evm->addEventSubscriber(new TreeListener());
-        $this->em = new EntityManager(DriverManager::getConnection($conn, $config), $config, $evm);
-
-        $schemaTool = new SchemaTool($this->em);
-        $schemaTool->dropSchema([]);
-        $schemaTool->createSchema([
-            $this->em->getClassMetadata(self::TEST_ENTITY_CATEGORY),
-            $this->em->getClassMetadata(self::TEST_ENTITY_TRANSLATION),
+        $this->createSchemaForObjects([
+            self::TEST_ENTITY_CATEGORY,
+            self::TEST_ENTITY_TRANSLATION,
         ]);
     }
 
@@ -77,13 +48,37 @@ final class MappingTest extends TestCase
     {
         $food = new BehavioralCategory();
         $food->setTitle('Food');
+
         $this->em->persist($food);
         $this->em->flush();
-        // assertion checks if configuration is read correctly without cache driver
-        $conf = $this->timestampable->getConfiguration(
-            $this->em,
-            self::TEST_ENTITY_CATEGORY
-        );
+
+        // assertion checks if configuration is read correctly without a cache driver
+        $conf = $this->timestampableListener->getConfiguration($this->em, self::TEST_ENTITY_CATEGORY);
+
         static::assertCount(0, $conf);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $this->timestampableListener = new TimestampableListener();
+
+        $evm->addEventSubscriber(new TranslatableListener());
+        $evm->addEventSubscriber($this->timestampableListener);
+        $evm->addEventSubscriber(new SluggableListener());
+        $evm->addEventSubscriber(new TreeListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Tree\Fixture');
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Translatable\Entity');
     }
 }

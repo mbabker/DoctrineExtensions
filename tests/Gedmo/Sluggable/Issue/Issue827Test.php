@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Issue;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\YamlDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Issue827\Article;
 use Gedmo\Tests\Sluggable\Fixture\Issue827\Category;
 use Gedmo\Tests\Sluggable\Fixture\Issue827\Comment;
 use Gedmo\Tests\Sluggable\Fixture\Issue827\Post;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for Sluggable behavior
@@ -26,7 +28,7 @@ use Gedmo\Tests\Tool\BaseTestCaseORM;
  *
  * @see http://www.aloof.no
  */
-final class Issue827Test extends BaseTestCaseORM
+final class Issue827Test extends ORMTestCase
 {
     private const ARTICLE = Article::class;
     private const CATEGORY = Category::class;
@@ -37,10 +39,12 @@ final class Issue827Test extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->createSchemaForObjects([
+            self::ARTICLE,
+            self::CATEGORY,
+            self::COMMENT,
+            self::POST,
+        ]);
     }
 
     /**
@@ -273,13 +277,21 @@ final class Issue827Test extends BaseTestCaseORM
         static::assertSame('unique-to-post-2-1', $test5->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::ARTICLE,
-            self::CATEGORY,
-            self::COMMENT,
-            self::POST,
-        ];
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $nestedDriver = $this->createAttributeDriver();
+        } elseif (class_exists(YamlDriver::class)) {
+            $nestedDriver = $this->createYamlDriver(__DIR__.'/../Fixture/Issue116/Mapping');
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with YAML support.');
+        }
+
+        $driver->addDriver($nestedDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 }

@@ -22,6 +22,8 @@ use Gedmo\Tests\Tree\Fixture\Mock\TreeListenerMock;
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class MaterializedPathODMMongoDBTreeLockingTest extends BaseTestCaseMongoODM
 {

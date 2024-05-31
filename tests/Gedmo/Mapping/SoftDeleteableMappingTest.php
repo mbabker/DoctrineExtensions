@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -26,21 +26,8 @@ use Gedmo\Tests\Mapping\Fixture\Yaml\SoftDeleteable as YamlSoftDeleteable;
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class SoftDeleteableMappingTest extends ORMMappingTestCase
+final class SoftDeleteableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $listener = new SoftDeleteableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
-    }
-
     /**
      * @return \Generator<string, array{class-string}>
      */
@@ -71,7 +58,7 @@ final class SoftDeleteableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\SoftDeleteable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('softDeleteable', $config);
         static::assertTrue($config['softDeleteable']);
@@ -79,5 +66,13 @@ final class SoftDeleteableMappingTest extends ORMMappingTestCase
         static::assertFalse($config['timeAware']);
         static::assertArrayHasKey('fieldName', $config);
         static::assertSame('deletedAt', $config['fieldName']);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SoftDeleteableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

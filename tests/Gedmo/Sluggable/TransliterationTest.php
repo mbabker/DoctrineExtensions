@@ -12,16 +12,18 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Article;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TransliterationTest extends BaseTestCaseORM
+final class TransliterationTest extends ORMTestCase
 {
     private const ARTICLE = Article::class;
 
@@ -29,10 +31,10 @@ final class TransliterationTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
+        $this->createSchemaForObjects([
+            Article::class,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
         $this->populate();
     }
 
@@ -53,11 +55,22 @@ final class TransliterationTest extends BaseTestCaseORM
         static::assertSame('fuhren-aktivitaten-haglofs-de', $german->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::ARTICLE,
-        ];
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 
     private function populate(): void

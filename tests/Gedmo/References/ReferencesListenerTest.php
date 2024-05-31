@@ -21,6 +21,9 @@ use Gedmo\Tests\References\Fixture\ORM\Category;
 use Gedmo\Tests\References\Fixture\ORM\StockItem;
 use Gedmo\Tests\Tool\BaseTestCaseOM;
 
+/**
+ * @requires extension mongodb
+ */
 final class ReferencesListenerTest extends BaseTestCaseOM
 {
     private EntityManager $em;
@@ -30,10 +33,6 @@ final class ReferencesListenerTest extends BaseTestCaseOM
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (!extension_loaded('mongodb')) {
-            static::markTestSkipped('Missing Mongo extension.');
-        }
 
         $this->dm = $this->getMockDocumentManager(
             'test',

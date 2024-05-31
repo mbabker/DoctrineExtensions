@@ -12,7 +12,10 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Handlers;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Handler\TreeSlug;
 use Gedmo\Tests\Tool\BaseTestCaseORM;
 use Gedmo\Tree\TreeListener;
@@ -22,7 +25,7 @@ use Gedmo\Tree\TreeListener;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class TreeSlugHandlerTest extends BaseTestCaseORM
+final class TreeSlugHandlerTest extends ORMTestCase
 {
     private const TARGET = TreeSlug::class;
 
@@ -30,16 +33,15 @@ final class TreeSlugHandlerTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
-        $evm->addEventSubscriber(new TreeListener());
+        $this->createSchemaForObjects([
+            self::TARGET,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
+        $this->populate();
     }
 
     public function testSlugGeneration(): void
     {
-        $this->populate();
         $repo = $this->em->getRepository(self::TARGET);
 
         $food = $repo->findOneBy(['title' => 'Food']);
@@ -66,7 +68,6 @@ final class TreeSlugHandlerTest extends BaseTestCaseORM
 
     public function testSlugUpdates(): void
     {
-        $this->populate();
         $repo = $this->em->getRepository(self::TARGET);
 
         $fruits = $repo->findOneBy(['title' => 'Fruits']);
@@ -96,7 +97,6 @@ final class TreeSlugHandlerTest extends BaseTestCaseORM
 
     public function testMoreSlugUpdates(): void
     {
-        $this->populate();
         $repo = $this->em->getRepository(self::TARGET);
 
         $fruits = $repo->findOneBy(['title' => 'Fruits']);
@@ -130,11 +130,23 @@ final class TreeSlugHandlerTest extends BaseTestCaseORM
         static::assertSame('foodissimo/fructis/citrons', $citrons->getSlug());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyEventManager(EventManager $evm): void
     {
-        return [
-            self::TARGET,
-        ];
+        $evm->addEventSubscriber(new TreeListener());
+        $evm->addEventSubscriber(new SluggableListener());
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 
     private function populate(): void

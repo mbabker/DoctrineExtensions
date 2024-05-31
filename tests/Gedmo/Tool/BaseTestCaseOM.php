@@ -102,10 +102,6 @@ abstract class BaseTestCaseOM extends TestCase
      */
     protected function getMockDocumentManager(string $dbName, ?MappingDriver $mappingDriver = null): DocumentManager
     {
-        if (!extension_loaded('mongodb')) {
-            static::markTestSkipped('Missing Mongo extension.');
-        }
-
         $client = new Client($_ENV['MONGODB_SERVER'], [], ['typeMap' => DocumentManager::CLIENT_TYPEMAP]);
         $config = $this->getMockODMMongoDBConfig($dbName, $mappingDriver);
 

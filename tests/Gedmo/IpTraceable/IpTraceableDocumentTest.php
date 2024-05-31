@@ -21,6 +21,8 @@ use Gedmo\Tests\Tool\BaseTestCaseMongoODM;
  * These are tests for IpTraceable behavior ODM implementation
  *
  * @author Pierre-Charles Bertineau <pc.bertineau@alterphp.com>
+ *
+ * @requires extension mongodb
  */
 final class IpTraceableDocumentTest extends BaseTestCaseMongoODM
 {

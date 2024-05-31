@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -27,22 +27,16 @@ use Gedmo\Uploadable\UploadableListener;
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class UploadableMappingTest extends ORMMappingTestCase
+final class UploadableMappingTest extends MappingORMTestCase
 {
-    private EntityManager $em;
-
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
-
-        // TODO - This should be reset to default (true) after each test case
         Validator::$enableMimeTypesConfigException = false;
+    }
 
-        $listener = new UploadableListener();
-        $listener->setCacheItemPool($this->cache);
-
-        $this->em = $this->getBasicEntityManager();
-        $this->em->getEventManager()->addEventSubscriber($listener);
+    public static function tearDownAfterClass(): void
+    {
+        Validator::$enableMimeTypesConfigException = true;
     }
 
     /**
@@ -75,7 +69,7 @@ final class UploadableMappingTest extends ORMMappingTestCase
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Uploadable');
-        $config = $this->cache->getItem($cacheId)->get();
+        $config = $this->metadataCache->getItem($cacheId)->get();
 
         static::assertTrue($config['uploadable']);
         static::assertTrue($config['allowOverwrite']);
@@ -92,5 +86,13 @@ final class UploadableMappingTest extends ORMMappingTestCase
         static::assertContains('text/css', $config['allowedTypes']);
         static::assertContains('video/jpeg', $config['disallowedTypes']);
         static::assertContains('text/html', $config['disallowedTypes']);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new UploadableListener();
+        $listener->setCacheItemPool($this->metadataCache);
+
+        $evm->addEventSubscriber($listener);
     }
 }

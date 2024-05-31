@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Uploadable\Mapping\Validator;
+use Gedmo\Uploadable\Uploadable;
 
 /**
  * @ORM\Entity
@@ -23,11 +24,9 @@ use Gedmo\Uploadable\Mapping\Validator;
  */
 #[ORM\Entity]
 #[Gedmo\Uploadable(pathMethod: 'getPath', filenameGenerator: Validator::FILENAME_GENERATOR_ALPHANUMERIC, appendNumber: true)]
-class FileWithAlphanumericName
+class FileWithAlphanumericName implements Uploadable
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
@@ -35,7 +34,7 @@ class FileWithAlphanumericName
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="path", type="string", nullable=true)

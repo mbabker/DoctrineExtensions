@@ -12,12 +12,16 @@ declare(strict_types=1);
 namespace Gedmo\Tests\SoftDeleteable;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter;
 use Gedmo\SoftDeleteable\Query\TreeWalker\SoftDeleteableWalker;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 use Gedmo\Tests\Clock;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Article;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Child;
 use Gedmo\Tests\SoftDeleteable\Fixture\Entity\Comment;
@@ -31,7 +35,6 @@ use Gedmo\Tests\SoftDeleteable\Fixture\Entity\UserNoHardDelete;
 use Gedmo\Tests\SoftDeleteable\Fixture\Listener\WithLifecycleEventArgsFromORMTypeListener;
 use Gedmo\Tests\SoftDeleteable\Fixture\Listener\WithoutTypeListener;
 use Gedmo\Tests\SoftDeleteable\Fixture\Listener\WithPreAndPostSoftDeleteEventArgsTypeListener;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -41,7 +44,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Patrik Votoček <patrik@votocek.cz>
  */
-final class SoftDeleteableEntityTest extends BaseTestCaseORM
+final class SoftDeleteableEntityTest extends ORMTestCase
 {
     private const ARTICLE_CLASS = Article::class;
     private const COMMENT_CLASS = Comment::class;
@@ -55,19 +58,23 @@ final class SoftDeleteableEntityTest extends BaseTestCaseORM
     private const SOFT_DELETEABLE_FILTER_NAME = 'soft-deleteable';
     private const USER_NO_HARD_DELETE_CLASS = UserNoHardDelete::class;
 
-    private SoftDeleteableListener $softDeleteableListener;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $this->softDeleteableListener = new SoftDeleteableListener();
-        $this->softDeleteableListener->setClock(new Clock());
-        $evm->addEventSubscriber($this->softDeleteableListener);
-        $config = $this->getDefaultConfiguration();
-        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
-        $this->em = $this->getDefaultMockSqliteEntityManager($evm, $config);
+        $this->createSchemaForObjects([
+            self::ARTICLE_CLASS,
+            self::PAGE_CLASS,
+            self::MEGA_PAGE_CLASS,
+            self::MODULE_CLASS,
+            self::COMMENT_CLASS,
+            self::USER_CLASS,
+            self::OTHER_ARTICLE_CLASS,
+            self::OTHER_COMMENT_CLASS,
+            self::MAPPED_SUPERCLASS_CHILD_CLASS,
+            self::USER_NO_HARD_DELETE_CLASS,
+        ]);
+
         $this->em->getFilters()->enable(self::SOFT_DELETEABLE_FILTER_NAME);
     }
 
@@ -584,20 +591,30 @@ final class SoftDeleteableEntityTest extends BaseTestCaseORM
         static::assertNotNull($user, 'User is still available, hard delete done');
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function modifyConfiguration(Configuration $config): void
     {
-        return [
-            self::ARTICLE_CLASS,
-            self::PAGE_CLASS,
-            self::MEGA_PAGE_CLASS,
-            self::MODULE_CLASS,
-            self::COMMENT_CLASS,
-            self::USER_CLASS,
-            self::OTHER_ARTICLE_CLASS,
-            self::OTHER_COMMENT_CLASS,
-            self::MAPPED_SUPERCLASS_CHILD_CLASS,
-            self::USER_NO_HARD_DELETE_CLASS,
-        ];
+        $config->addFilter(self::SOFT_DELETEABLE_FILTER_NAME, SoftDeleteableFilter::class);
+    }
+
+    protected function modifyEventManager(EventManager $evm): void
+    {
+        $listener = new SoftDeleteableListener();
+        $listener->setClock(new Clock());
+
+        $evm->addEventSubscriber($listener);
+    }
+
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\SoftDeleteable\Fixture\Entity');
     }
 
     private function doTestPostSoftDeleteEventIsDispatched(): void

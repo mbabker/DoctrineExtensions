@@ -24,6 +24,8 @@ use Gedmo\Tests\Tool\BaseTestCaseOM;
  *
  * @author Jonathan Eskew <jonathan@jeskew.net>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class ReferenceIntegrityMappingTest extends BaseTestCaseOM
 {
@@ -31,10 +33,13 @@ final class ReferenceIntegrityMappingTest extends BaseTestCaseOM
 
     private ReferenceIntegrityListener $referenceIntegrity;
 
+    public static function setUpBeforeClass(): void
+    {
+        static::markTestSkipped('Doctrine MongoDB ODM 2.0 removed the YAML mapping driver; skipping test until it can be rewritten using a supported mapping driver.');
+    }
+
     protected function setUp(): void
     {
-        static::markTestSkipped('Intentionally skipping test. Doctrine MongoDB ODM 2.0 removed the YAML mapping driver; skipping test until it can be rewritten using a supported mapper.');
-
         parent::setUp();
 
         $yamlDriver = new YamlDriver(__DIR__.'/Driver/Yaml');

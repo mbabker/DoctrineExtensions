@@ -13,23 +13,18 @@ namespace Gedmo\Tests\Blameable\Fixture\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Blameable;
 use Gedmo\Blameable\Traits\BlameableEntity;
 
 /**
  * @ORM\Entity
  */
 #[ORM\Entity]
-class UsingTrait
+class UsingTrait implements Blameable
 {
-    /*
-     * Hook Blameable behavior
-     * updates createdAt, updatedAt fields
-     */
     use BlameableEntity;
 
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -37,26 +32,38 @@ class UsingTrait
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(length=128)
      */
     #[ORM\Column(length: 128)]
-    private ?string $title = null;
+    private string $title;
+
+    public function __construct(string $title)
+    {
+        $this->setTitle($title);
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
+        $this->title = $title;
     }
 }

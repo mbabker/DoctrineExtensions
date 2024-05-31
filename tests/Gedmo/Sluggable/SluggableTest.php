@@ -12,20 +12,19 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable;
 
 use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
-use Gedmo\Exception\InvalidMappingException;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Sluggable\Sluggable;
 use Gedmo\Sluggable\SluggableListener;
+use Gedmo\Tests\ORMTestCase;
 use Gedmo\Tests\Sluggable\Fixture\Article;
-use Gedmo\Tests\Sluggable\Fixture\ArticleWithoutFields;
-use Gedmo\Tests\Tool\BaseTestCaseORM;
 
 /**
  * These are tests for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
-final class SluggableTest extends BaseTestCaseORM
+final class SluggableTest extends ORMTestCase
 {
     private ?int $articleId = null;
 
@@ -33,10 +32,10 @@ final class SluggableTest extends BaseTestCaseORM
     {
         parent::setUp();
 
-        $evm = new EventManager();
-        $evm->addEventSubscriber(new SluggableListener());
+        $this->createSchemaForObjects([
+            Article::class,
+        ]);
 
-        $this->getDefaultMockSqliteEntityManager($evm);
         $this->populate();
     }
 
@@ -228,30 +227,22 @@ final class SluggableTest extends BaseTestCaseORM
         static::assertSame('the-title-my-code-1', $same->getSlug());
     }
 
-    public function testRequiredFields(): void
+    protected function modifyEventManager(EventManager $evm): void
     {
-        $eventManager = new EventManager();
-        $eventManager->addEventSubscriber(new SluggableListener());
-
-        $em = EntityManager::create([
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ], $this->getDefaultConfiguration(), $eventManager);
-
-        $this->expectException(InvalidMappingException::class);
-        $this->expectExceptionMessage(\sprintf(
-            'Slug must contain at least one field for slug generation in class - %s',
-            ArticleWithoutFields::class
-        ));
-
-        $em->getClassMetadata(ArticleWithoutFields::class);
+        $evm->addEventSubscriber(new SluggableListener());
     }
 
-    protected function getUsedEntityFixtures(): array
+    protected function addMetadataDriversToChain(MappingDriverChain $driver): void
     {
-        return [
-            Article::class,
-        ];
+        if (PHP_VERSION_ID >= 80000) {
+            $annotationOrAttributeDriver = $this->createAttributeDriver();
+        } elseif (class_exists(AnnotationDriver::class)) {
+            $annotationOrAttributeDriver = $this->createAnnotationDriver();
+        } else {
+            static::markTestSkipped('Test requires PHP 8 or doctrine/orm with annotations support.');
+        }
+
+        $driver->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Sluggable\Fixture');
     }
 
     private function populate(): void

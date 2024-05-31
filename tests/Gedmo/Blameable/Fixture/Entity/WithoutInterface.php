@@ -22,8 +22,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class WithoutInterface
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -31,49 +29,57 @@ class WithoutInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=128)
      */
     #[ORM\Column(type: Types::STRING, length: 128)]
-    private ?string $title = null;
+    private string $title;
 
     /**
-     * @var string|null
+     * @ORM\Column(type="string")
      *
      * @Gedmo\Blameable(on="create")
-     *
-     * @ORM\Column(type="string")
      */
     #[ORM\Column(type: Types::STRING)]
     #[Gedmo\Blameable(on: 'create')]
-    private $created;
+    private ?string $created = null;
 
     /**
-     * @var string|null
-     *
      * @ORM\Column(type="string")
      *
      * @Gedmo\Blameable(on="update")
      */
     #[ORM\Column(type: Types::STRING)]
     #[Gedmo\Blameable(on: 'update')]
-    private $updated;
+    private ?string $updated = null;
+
+    public function __construct(string $title)
+    {
+        $this->setTitle($title);
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
+    {
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
+
+        $this->title = $title;
     }
 
     public function getCreated(): ?string

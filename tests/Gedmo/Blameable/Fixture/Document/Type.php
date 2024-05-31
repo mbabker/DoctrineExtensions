@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Blameable\Fixture\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDBType;
 
@@ -21,47 +23,51 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDBType;
 class Type
 {
     /**
-     * @ODM\Id
+     * @var Collection<int, Article>
      *
-     * @var string|null
+     * @ODM\ReferenceMany(targetDocument="Article", mappedBy="type")
+     */
+    #[ODM\ReferenceMany(targetDocument: Article::class, mappedBy: 'type')]
+    public Collection $articles;
+
+    /**
+     * @ODM\Id
      */
     #[ODM\Id]
-    private $id;
+    private ?string $id = null;
 
     /**
      * @ODM\Field(type="string")
      */
     #[ODM\Field(type: MongoDBType::STRING)]
-    private ?string $title = null;
+    private string $title;
 
-    /**
-     * @ODM\Field(type="string")
-     */
-    #[ODM\Field(type: MongoDBType::STRING)]
-    private ?string $identifier = null;
+    public function __construct(string $title)
+    {
+        $this->articles = new ArrayCollection();
+
+        $this->setTitle($title);
+    }
 
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function getIdentifier(): ?string
+    /**
+     * @throws \InvalidArgumentException if the title is empty
+     */
+    public function setTitle(string $title): void
     {
-        return $this->identifier;
-    }
+        if ('' === trim($title)) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
 
-    public function setIdentifier(?string $identifier): void
-    {
-        $this->identifier = $identifier;
+        $this->title = $title;
     }
 }

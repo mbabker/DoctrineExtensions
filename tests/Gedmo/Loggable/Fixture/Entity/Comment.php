@@ -27,8 +27,6 @@ use Gedmo\Tests\Loggable\Fixture\Entity\Log\Comment as CommentLog;
 class Comment implements Loggable
 {
     /**
-     * @var int|null
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -36,7 +34,7 @@ class Comment implements Loggable
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @Gedmo\Versioned

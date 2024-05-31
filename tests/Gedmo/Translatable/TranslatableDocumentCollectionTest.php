@@ -22,6 +22,8 @@ use Gedmo\Translatable\TranslatableListener;
  * These are tests for translatable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires extension mongodb
  */
 final class TranslatableDocumentCollectionTest extends BaseTestCaseMongoODM
 {
