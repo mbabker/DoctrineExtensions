@@ -18,9 +18,12 @@ use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\Mapping\ExtensionMetadataFactory;
-use Gedmo\Tests\Mapping\Fixture\Yaml\Category;
-use Gedmo\Tests\Mapping\Fixture\Yaml\ClosureCategory;
-use Gedmo\Tests\Mapping\Fixture\Yaml\MaterializedPathCategory;
+use Gedmo\Tests\Mapping\Fixture\Category;
+use Gedmo\Tests\Mapping\Fixture\ClosureCategory;
+use Gedmo\Tests\Mapping\Fixture\MaterializedPathCategory;
+use Gedmo\Tests\Mapping\Fixture\Yaml\Category as YamlCategory;
+use Gedmo\Tests\Mapping\Fixture\Yaml\ClosureCategory as YamlClosureCategory;
+use Gedmo\Tests\Mapping\Fixture\Yaml\MaterializedPathCategory as YamlMaterializedPathCategory;
 use Gedmo\Tests\Tree\Fixture\Closure\CategoryClosureWithoutMapping;
 use Gedmo\Tree\TreeListener;
 
@@ -31,10 +34,6 @@ use Gedmo\Tree\TreeListener;
  */
 final class TreeMappingTest extends ORMMappingTestCase
 {
-    private const TEST_YAML_ENTITY_CLASS = Category::class;
-    private const YAML_CLOSURE_CATEGORY = ClosureCategory::class;
-    private const YAML_MATERIALIZED_PATH_CATEGORY = MaterializedPathCategory::class;
-
     private EntityManager $em;
 
     private TreeListener $listener;
@@ -47,8 +46,9 @@ final class TreeMappingTest extends ORMMappingTestCase
 
         $chain = new MappingDriverChain();
 
-        // TODO - The ORM's YAML mapping is deprecated and removed in 3.0
-        $chain->addDriver(new YamlDriver(__DIR__.'/Driver/Yaml'), 'Gedmo\Tests\Mapping\Fixture\Yaml');
+        if (class_exists(YamlDriver::class)) {
+            $chain->addDriver(new YamlDriver(__DIR__.'/Driver/Yaml'), 'Gedmo\Tests\Mapping\Fixture\Yaml');
+        }
 
         if (PHP_VERSION_ID >= 80000) {
             $annotationOrAttributeDriver = new AttributeDriver([]);
@@ -56,6 +56,7 @@ final class TreeMappingTest extends ORMMappingTestCase
             $annotationOrAttributeDriver = new AnnotationDriver(new AnnotationReader());
         }
 
+        $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Mapping\Fixture');
         $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Tree\Fixture');
         $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tree');
 
@@ -69,32 +70,33 @@ final class TreeMappingTest extends ORMMappingTestCase
     }
 
     /**
-     * @group legacy
-     *
-     * @see https://github.com/doctrine/persistence/pull/144
-     * @see \Doctrine\Persistence\Mapping\AbstractClassMetadataFactory::getCacheKey()
+     * @return \Generator<string, array{class-string}>
      */
-    public function testApcCached(): void
+    public static function dataNestedMappingObject(): \Generator
     {
-        $this->em->getClassMetadata(self::YAML_CLOSURE_CATEGORY);
-        $this->em->getClassMetadata(CategoryClosureWithoutMapping::class);
+        if (PHP_VERSION_ID >= 80000) {
+            yield 'Model with attributes' => [Category::class];
+        } elseif (class_exists(AnnotationDriver::class)) {
+            yield 'Model with annotations' => [Category::class];
+        }
 
-        $meta = $this->em->getConfiguration()->getMetadataCache()->getItem(
-            'Gedmo__Tests__Tree__Fixture__Closure__CategoryClosureWithoutMapping__CLASSMETADATA__'
-        )->get();
-        static::assertNotFalse($meta);
-        static::assertTrue($meta->hasAssociation('ancestor'));
-        static::assertTrue($meta->hasAssociation('descendant'));
+        if (class_exists(YamlDriver::class)) {
+            yield 'Model with YAML mapping' => [YamlCategory::class];
+        }
     }
 
-    public function testYamlNestedMapping(): void
+    /**
+     * @param class-string $className
+     *
+     * @dataProvider dataNestedMappingObject
+     */
+    public function testNestedMapping(string $className): void
     {
-        $this->em->getClassMetadata(self::TEST_YAML_ENTITY_CLASS);
-        $cacheId = ExtensionMetadataFactory::getCacheId(
-            self::TEST_YAML_ENTITY_CLASS,
-            'Gedmo\Tree'
-        );
+        // Force metadata class loading.
+        $this->em->getClassMetadata($className);
+        $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Tree');
         $config = $this->cache->getItem($cacheId)->get();
+
         static::assertArrayHasKey('left', $config);
         static::assertSame('left', $config['left']);
         static::assertArrayHasKey('right', $config);
@@ -110,13 +112,31 @@ final class TreeMappingTest extends ORMMappingTestCase
     }
 
     /**
-     * @group legacy
+     * @return \Generator<string, array{class-string}>
      */
-    public function testYamlClosureMapping(): void
+    public static function dataClosureMappingObject(): \Generator
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            yield 'Model with attributes' => [ClosureCategory::class];
+        } elseif (class_exists(AnnotationDriver::class)) {
+            yield 'Model with annotations' => [ClosureCategory::class];
+        }
+
+        if (class_exists(YamlDriver::class)) {
+            yield 'Model with YAML mapping' => [YamlClosureCategory::class];
+        }
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @dataProvider dataClosureMappingObject
+     */
+    public function testClosureMapping(string $className): void
     {
         // Force metadata class loading.
-        $this->em->getClassMetadata(self::YAML_CLOSURE_CATEGORY);
-        $cacheId = ExtensionMetadataFactory::getCacheId(self::YAML_CLOSURE_CATEGORY, 'Gedmo\Tree');
+        $this->em->getClassMetadata($className);
+        $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Tree');
         $config = $this->cache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('parent', $config);
@@ -127,10 +147,32 @@ final class TreeMappingTest extends ORMMappingTestCase
         static::assertSame(CategoryClosureWithoutMapping::class, $config['closure']);
     }
 
-    public function testYamlMaterializedPathMapping(): void
+    /**
+     * @return \Generator<string, array{class-string}>
+     */
+    public static function dataMaterializedPathMappingObject(): \Generator
     {
-        $meta = $this->em->getClassMetadata(self::YAML_MATERIALIZED_PATH_CATEGORY);
-        $config = $this->listener->getConfiguration($this->em, $meta->getName());
+        if (PHP_VERSION_ID >= 80000) {
+            yield 'Model with attributes' => [MaterializedPathCategory::class];
+        } elseif (class_exists(AnnotationDriver::class)) {
+            yield 'Model with annotations' => [MaterializedPathCategory::class];
+        }
+
+        if (class_exists(YamlDriver::class)) {
+            yield 'Model with YAML mapping' => [YamlMaterializedPathCategory::class];
+        }
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @dataProvider dataMaterializedPathMappingObject
+     */
+    public function testMaterializedPathMapping(string $className): void
+    {
+        $this->em->getClassMetadata($className);
+        $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Tree');
+        $config = $this->cache->getItem($cacheId)->get();
 
         static::assertArrayHasKey('strategy', $config);
         static::assertSame('materializedPath', $config['strategy']);
