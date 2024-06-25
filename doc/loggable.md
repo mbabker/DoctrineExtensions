@@ -1,5 +1,8 @@
 # Loggable behavioral extension for Doctrine
 
+> [!IMPORTANT]
+> The Loggable extension is **NOT** compatible with `doctrine/dbal` >=4.0. If your project needs this extension, you will need to use the latest `doctrine/dbal` 3.x release.
+
 **Loggable** behavior tracks your record changes and is able to
 manage versions.
 
