@@ -9,23 +9,15 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * Slug annotation for Sluggable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Slug implements GedmoAnnotation
+final class Slug implements Annotation
 {
     use ForwardCompatibilityTrait;
 

@@ -9,26 +9,18 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 use Gedmo\Uploadable\FilenameGenerator\FilenameGeneratorInterface;
 use Gedmo\Uploadable\Mapping\Validator;
 
 /**
  * Uploadable annotation for Uploadable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
- *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Uploadable implements GedmoAnnotation
+final class Uploadable implements Annotation
 {
     use ForwardCompatibilityTrait;
 

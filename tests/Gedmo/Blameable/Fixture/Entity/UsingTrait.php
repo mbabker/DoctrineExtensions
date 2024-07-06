@@ -15,33 +15,19 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Blameable\Traits\BlameableEntity;
 
-/**
- * @ORM\Entity
- */
 #[ORM\Entity]
 class UsingTrait
 {
-    /*
-     * Hook Blameable behavior
-     * updates createdAt, updatedAt fields
-     */
     use BlameableEntity;
 
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
-    /**
-     * @ORM\Column(length=128)
-     */
     #[ORM\Column(length: 128)]
     private ?string $title = null;
 

@@ -9,19 +9,12 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
-
 /**
  * TreePath annotation for Tree behavioral extension
- *
- * @Annotation
- *
- * @Target("PROPERTY")
  *
  * @author <rocco@roccosportal.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class TreePathHash implements GedmoAnnotation
+final class TreePathHash implements Annotation
 {
 }

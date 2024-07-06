@@ -9,25 +9,17 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * TreePath annotation for Tree behavioral extension
- *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author <rocco@roccosportal.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class TreePath implements GedmoAnnotation
+final class TreePath implements Annotation
 {
     use ForwardCompatibilityTrait;
 

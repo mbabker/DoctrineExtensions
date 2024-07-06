@@ -9,23 +9,15 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * Group annotation for SoftDeleteable extension
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
- *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class SoftDeleteable implements GedmoAnnotation
+final class SoftDeleteable implements Annotation
 {
     use ForwardCompatibilityTrait;
 

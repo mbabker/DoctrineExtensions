@@ -22,8 +22,6 @@ class Timestampable
 
     /**
      * @var \DateTime
-     *
-     * @Tmsp(on="create")
      */
     #[Tmsp(on: 'create')]
     private $created;

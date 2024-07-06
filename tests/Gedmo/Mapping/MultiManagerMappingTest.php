@@ -11,10 +11,8 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -41,37 +39,27 @@ final class MultiManagerMappingTest extends BaseTestCaseOM
     {
         parent::setUp();
 
-        // EM with standard annotation/attribute mapping
+        // EM with standard attribute mapping
         $this->em1 = $this->getDefaultMockSqliteEntityManager([
             ArticleEntity::class,
         ]);
 
-        // EM with XML and annotation/attribute mapping
-        if (PHP_VERSION_ID >= 80000) {
-            $annotationDriver = new AttributeDriver([]);
-
-            $annotationDriver2 = new AttributeDriver([]);
-        } else {
-            $reader = new AnnotationReader();
-            $annotationDriver = new AnnotationDriver($reader);
-
-            $reader = new AnnotationReader();
-            $annotationDriver2 = new AnnotationDriver($reader);
-        }
-
+        // EM with XML and attribute mapping
+        $attributeDriver = new AttributeDriver([]);
+        $attributeDriver2 = new AttributeDriver([]);
         $xmlDriver = new XmlDriver(__DIR__.'/Driver/Xml', XmlDriver::DEFAULT_FILE_EXTENSION, false);
 
         $chain = new MappingDriverChain();
-        $chain->addDriver($annotationDriver, 'Gedmo\Tests\Translatable\Fixture');
+        $chain->addDriver($attributeDriver, 'Gedmo\Tests\Translatable\Fixture');
         $chain->addDriver($xmlDriver, 'Gedmo\Tests\Mapping\Fixture\Xml');
-        $chain->addDriver($annotationDriver2, 'Gedmo\Translatable');
+        $chain->addDriver($attributeDriver2, 'Gedmo\Translatable');
 
         $this->em2 = $this->getDefaultMockSqliteEntityManager([
             PersonTranslation::class,
             User::class,
         ], $chain);
 
-        // DM with standard annotation/attribute mapping
+        // DM with standard attribute mapping
         $this->dm1 = $this->getMockDocumentManager('gedmo_extensions_test');
     }
 

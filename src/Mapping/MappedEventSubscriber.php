@@ -9,12 +9,8 @@
 
 namespace Gedmo\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\PsrCachedReader;
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\Deprecations\Deprecation;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as DocumentClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
@@ -80,17 +76,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
      */
     private array $adapters = [];
 
-    /**
-     * Custom annotation reader
-     *
-     * @var Reader|AttributeReader|object|false|null
-     */
-    private $annotationReader = false;
-
-    /**
-     * @var Reader|AttributeReader|false|null
-     */
-    private static $defaultAnnotationReader = false;
+    private ?AttributeReader $attributeReader = null;
 
     /**
      * @var CacheItemPoolInterface|null
@@ -174,61 +160,23 @@ abstract class MappedEventSubscriber implements EventSubscriber
     public function getExtensionMetadataFactory(ObjectManager $objectManager)
     {
         $oid = spl_object_id($objectManager);
-        if (!isset($this->extensionMetadataFactory[$oid])) {
-            if (false === $this->annotationReader) {
-                // create default annotation/attribute reader for extensions
-                $this->annotationReader = $this->getDefaultAnnotationReader();
-            }
-            $this->extensionMetadataFactory[$oid] = new ExtensionMetadataFactory(
-                $objectManager,
-                $this->getNamespace(),
-                $this->annotationReader,
-                $this->getCacheItemPool($objectManager)
-            );
-        }
 
-        return $this->extensionMetadataFactory[$oid];
+        return $this->extensionMetadataFactory[$oid] ??= new ExtensionMetadataFactory(
+            $objectManager,
+            $this->getNamespace(),
+            $this->attributeReader ?? new AttributeReader(),
+            $this->getCacheItemPool($objectManager)
+        );
     }
 
     /**
-     * Set the annotation reader instance
-     *
-     * When originally implemented, `Doctrine\Common\Annotations\Reader` was not available,
-     * therefore this method may accept any object implementing these methods from the interface:
-     *
-     *     getClassAnnotations([reflectionClass])
-     *     getClassAnnotation([reflectionClass], [name])
-     *     getPropertyAnnotations([reflectionProperty])
-     *     getPropertyAnnotation([reflectionProperty], [name])
-     *
-     * @param Reader|AttributeReader|object $reader
+     * Set the attribute reader instance
      *
      * @return void
-     *
-     * @note Providing any object is deprecated, as of 4.0 an {@see AttributeReader} will be required
      */
-    public function setAnnotationReader($reader)
+    public function setAnnotationReader(AttributeReader $reader)
     {
-        if ($reader instanceof Reader) {
-            Deprecation::trigger(
-                'gedmo/doctrine-extensions',
-                'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2772',
-                'Annotations support is deprecated, migrate your application to use attributes and pass an instance of %s to the %s() method instead.',
-                AttributeReader::class,
-                __METHOD__
-            );
-        } elseif (!$reader instanceof AttributeReader) {
-            Deprecation::trigger(
-                'gedmo/doctrine-extensions',
-                'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2558',
-                'Providing an annotation reader which does not implement %s or is not an instance of %s to %s() is deprecated.',
-                Reader::class,
-                AttributeReader::class,
-                __METHOD__
-            );
-        }
-
-        $this->annotationReader = $reader;
+        $this->attributeReader = $reader;
     }
 
     final public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool): void
@@ -242,7 +190,7 @@ abstract class MappedEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Scans the objects for extended annotations
+     * Scans the objects for extended metadata
      * event subscribers must subscribe to loadClassMetadata event
      *
      * @param ClassMetadata $metadata
@@ -325,29 +273,6 @@ abstract class MappedEventSubscriber implements EventSubscriber
         $meta->getReflectionProperty($field)->setValue($object, $newValue);
         $uow->propertyChanged($object, $field, $oldValue, $newValue);
         $adapter->recomputeSingleObjectChangeSet($uow, $meta, $object);
-    }
-
-    /**
-     * Get the default annotation or attribute reader for extensions, creating it if necessary.
-     *
-     * If a reader cannot be created due to missing requirements, no default will be set as the reader is only required for annotation or attribute metadata,
-     * and the {@see ExtensionMetadataFactory} can handle raising an error if it tries to create a mapping driver that requires this reader.
-     *
-     * @return Reader|AttributeReader|null
-     */
-    private function getDefaultAnnotationReader()
-    {
-        if (false === self::$defaultAnnotationReader) {
-            if (class_exists(PsrCachedReader::class)) {
-                self::$defaultAnnotationReader = new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
-            } elseif (\PHP_VERSION_ID >= 80000) {
-                self::$defaultAnnotationReader = new AttributeReader();
-            } else {
-                self::$defaultAnnotationReader = null;
-            }
-        }
-
-        return self::$defaultAnnotationReader;
     }
 
     private function getCacheItemPool(ObjectManager $objectManager): CacheItemPoolInterface

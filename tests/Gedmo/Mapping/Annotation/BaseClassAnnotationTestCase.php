@@ -11,33 +11,19 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Gedmo\Mapping\Annotation\Annotation;
 use PHPUnit\Framework\TestCase;
 
 abstract class BaseClassAnnotationTestCase extends TestCase
 {
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getValidParameters
      *
      * @param mixed $expectedReturn
      */
     public function testLoadFromAttribute(string $annotationProperty, $expectedReturn): void
     {
-        $annotation = $this->getClassAnnotation(true);
-        static::assertSame($annotation->$annotationProperty, $expectedReturn);
-    }
-
-    /**
-     * @dataProvider getValidParameters
-     *
-     * @param mixed $expectedReturn
-     */
-    public function testLoadFromDoctrineAnnotation(string $annotationProperty, $expectedReturn): void
-    {
-        $annotation = $this->getClassAnnotation(false);
+        $annotation = $this->getClassAnnotation();
         static::assertSame($annotation->$annotationProperty, $expectedReturn);
     }
 
@@ -50,21 +36,14 @@ abstract class BaseClassAnnotationTestCase extends TestCase
 
     abstract protected function getAttributeModelClass(): string;
 
-    abstract protected function getAnnotationModelClass(): string;
-
-    private function getClassAnnotation(bool $attributes): Annotation
+    private function getClassAnnotation(): Annotation
     {
-        $class = $attributes ? $this->getAttributeModelClass() : $this->getAnnotationModelClass();
+        $class = $this->getAttributeModelClass();
         $reflection = new \ReflectionClass($class);
         $annotationClass = $this->getAnnotationClass();
 
-        if ($attributes) {
-            $attributes = $reflection->getAttributes($annotationClass);
-            $annotation = $attributes[0]->newInstance();
-        } else {
-            $reader = new AnnotationReader();
-            $annotation = $reader->getClassAnnotation($reflection, $annotationClass);
-        }
+        $attributes = $reflection->getAttributes($annotationClass);
+        $annotation = $attributes[0]->newInstance();
 
         if (!is_a($annotation, $annotationClass)) {
             throw new \LogicException('Can\'t parse annotation.');

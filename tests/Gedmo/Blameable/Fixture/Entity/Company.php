@@ -18,18 +18,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV6;
 
-/**
- * @ORM\Entity
- */
 #[ORM\Entity]
 class Company implements Blameable
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,18 +31,12 @@ class Company implements Blameable
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="name", type="string", length=128)
      */
     #[ORM\Column(name: 'name', type: Types::STRING, length: 128)]
     private $name;
 
     /**
      * @var UuidV6|null
-     *
-     * @Gedmo\Blameable(on="create")
-     *
-     * @ORM\Column(name="created", type="uuid")
      */
     #[ORM\Column(name: 'created', type: 'uuid')]
     #[Gedmo\Blameable(on: 'create')]

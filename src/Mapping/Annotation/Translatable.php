@@ -9,23 +9,15 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * Translatable annotation for Translatable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Translatable implements GedmoAnnotation
+final class Translatable implements Annotation
 {
     use ForwardCompatibilityTrait;
 

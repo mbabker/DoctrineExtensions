@@ -9,26 +9,18 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
 use Gedmo\Loggable\LogEntryInterface;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * Loggable annotation for Loggable behavioral extension
  *
  * @phpstan-template T of LogEntryInterface
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Loggable implements GedmoAnnotation
+final class Loggable implements Annotation
 {
     use ForwardCompatibilityTrait;
 

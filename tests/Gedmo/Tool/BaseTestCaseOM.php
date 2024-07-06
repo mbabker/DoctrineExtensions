@@ -15,7 +15,6 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver as AnnotationDriverODM;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -23,7 +22,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\DefaultNamingStrategy;
 use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver as AnnotationDriverORM;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver as AttributeDriverORM;
 use Doctrine\ORM\Repository\DefaultRepositoryFactory as DefaultRepositoryFactoryORM;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -77,11 +75,7 @@ abstract class BaseTestCaseOM extends TestCase
      */
     protected function getMongoDBDriver(array $paths = []): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
-            return new AttributeDriver($paths);
-        }
-
-        return new AnnotationDriverODM($_ENV['annotation_reader'], $paths);
+        return new AttributeDriver($paths);
     }
 
     /**
@@ -89,16 +83,12 @@ abstract class BaseTestCaseOM extends TestCase
      */
     protected function getORMDriver(array $paths = []): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000) {
-            return new AttributeDriverORM($paths);
-        }
-
-        return new AnnotationDriverORM($_ENV['annotation_reader'], $paths);
+        return new AttributeDriverORM($paths);
     }
 
     /**
      * DocumentManager mock object together with
-     * annotation mapping driver and database
+     * attribute mapping driver and database
      */
     protected function getMockDocumentManager(string $dbName, ?MappingDriver $mappingDriver = null): DocumentManager
     {
@@ -114,7 +104,7 @@ abstract class BaseTestCaseOM extends TestCase
 
     /**
      * EntityManager mock object together with
-     * annotation mapping driver and pdo_sqlite
+     * attribute mapping driver and pdo_sqlite
      * database in memory
      *
      * @param string[] $fixtures
@@ -163,7 +153,7 @@ abstract class BaseTestCaseOM extends TestCase
     }
 
     /**
-     * Get annotation mapping configuration
+     * Get attribute mapping configuration
      */
     private function getMockODMMongoDBConfig(string $dbName, ?MappingDriver $mappingDriver = null): Configuration
     {
@@ -186,7 +176,7 @@ abstract class BaseTestCaseOM extends TestCase
     }
 
     /**
-     * Get annotation mapping configuration for ORM
+     * Get attribute mapping configuration for ORM
      */
     private function getMockORMConfig(?MappingDriver $mappingDriver = null): \Doctrine\ORM\Configuration
     {

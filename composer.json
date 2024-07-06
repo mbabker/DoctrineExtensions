@@ -52,7 +52,6 @@
         "symfony/cache": "^5.4 || ^6.0 || ^7.0"
     },
     "require-dev": {
-        "doctrine/annotations": "^1.13 || ^2.0",
         "doctrine/cache": "^1.11 || ^2.0",
         "doctrine/dbal": "^3.2",
         "doctrine/doctrine-bundle": "^2.3",
@@ -72,7 +71,6 @@
         "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
     },
     "conflict": {
-        "doctrine/annotations": "<1.13 || >=3.0",
         "doctrine/dbal": "<3.2 || >=4.0",
         "doctrine/mongodb-odm": "<2.3 || >=3.0",
         "doctrine/orm": "<2.14.0 || 2.16.0 || 2.16.1 || >=4.0"

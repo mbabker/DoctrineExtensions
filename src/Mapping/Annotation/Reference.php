@@ -9,19 +9,15 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 
 /**
  * Reference annotation for ORM -> ODM references extension
  * to be user like "@ReferenceMany(type="entity", class="MyEntity", identifier="entity_id")"
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- *
- * @Annotation
  */
-abstract class Reference implements GedmoAnnotation
+abstract class Reference implements Annotation
 {
     use ForwardCompatibilityTrait;
 

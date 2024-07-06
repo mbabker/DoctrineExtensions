@@ -9,22 +9,16 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 use Gedmo\Sluggable\Handler\SlugHandlerInterface;
 
 /**
  * SlugHandler annotation for Sluggable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
-final class SlugHandler implements GedmoAnnotation
+final class SlugHandler implements Annotation
 {
     use ForwardCompatibilityTrait;
 

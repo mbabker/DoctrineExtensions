@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Mapping;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Gedmo\Loggable\Entity\LogEntry;
 use Gedmo\Loggable\LoggableListener;
@@ -59,8 +58,6 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
     {
         if (PHP_VERSION_ID >= 80000) {
             yield 'Model with attributes' => [AnnotatedLoggable::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggable::class];
         }
 
         if (class_exists(YamlDriver::class)) {
@@ -119,8 +116,6 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
 
         if (PHP_VERSION_ID >= 80000) {
             yield 'Model with attributes' => [AnnotatedLoggableComposite::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableComposite::class];
         }
 
         if (class_exists(YamlDriver::class)) {
@@ -162,8 +157,6 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
 
         if (PHP_VERSION_ID >= 80000) {
             yield 'Model with attributes' => [AnnotatedLoggableCompositeRelation::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableCompositeRelation::class];
         }
 
         if (class_exists(YamlDriver::class)) {
@@ -201,25 +194,10 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
      * these will be run as separate cases checking each driver's config appropriately.
      */
 
-    /**
-     * @return \Generator<string, array{class-string}>
-     */
-    public static function dataLoggableObjectWithEmbedded(): \Generator
+    public function testLoggableAttributeWithEmbedded(): void
     {
-        if (PHP_VERSION_ID >= 80000) {
-            yield 'Model with attributes' => [AnnotatedLoggableWithEmbedded::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableWithEmbedded::class];
-        }
-    }
+        $className = AnnotatedLoggableWithEmbedded::class;
 
-    /**
-     * @param class-string $className
-     *
-     * @dataProvider dataLoggableObjectWithEmbedded
-     */
-    public function testLoggableAnnotatedWithEmbedded(string $className): void
-    {
         // Force metadata class loading.
         $this->em->getClassMetadata($className);
         $cacheId = ExtensionMetadataFactory::getCacheId($className, 'Gedmo\Loggable');

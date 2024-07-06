@@ -11,15 +11,10 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping\Mock\Extension\Encoder\Mapping;
 
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
+use Gedmo\Mapping\Annotation\Annotation;
 
-/**
- * @Annotation
- *
- * @NamedArgumentConstructor
- */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Encode implements GedmoAnnotation
+final class Encode implements Annotation
 {
     /**
      * @var string

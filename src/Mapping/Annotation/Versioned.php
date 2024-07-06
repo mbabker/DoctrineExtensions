@@ -9,21 +9,12 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
-
 /**
  * Versioned annotation for Loggable behavioral extension
- *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Versioned implements GedmoAnnotation
+final class Versioned implements Annotation
 {
 }

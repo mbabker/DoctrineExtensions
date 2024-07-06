@@ -14,7 +14,6 @@ namespace Gedmo\Tests\Tool;
 use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Gedmo\Loggable\LoggableListener;
@@ -62,13 +61,13 @@ abstract class BaseTestCaseMongoODM extends TestCase
     }
 
     /**
-     * DocumentManager mock object together with annotation mapping driver and database.
+     * DocumentManager mock object together with attribute mapping driver and database.
      */
     protected function getMockDocumentManager(?EventManager $evm = null, ?Configuration $config = null): DocumentManager
     {
         $client = new Client($_ENV['MONGODB_SERVER'], [], ['typeMap' => DocumentManager::CLIENT_TYPEMAP]);
 
-        $config ??= $this->getMockAnnotatedConfig();
+        $config ??= $this->getMockAttributeMappingConfig();
         $evm ??= $this->getEventManager();
 
         return $this->dm = DocumentManager::create($client, $config, $evm);
@@ -81,13 +80,13 @@ abstract class BaseTestCaseMongoODM extends TestCase
 
     /**
      * DocumentManager mock object with
-     * annotation mapping driver
+     * attribute mapping driver
      */
     protected function getMockMappedDocumentManager(?EventManager $evm = null, ?Configuration $config = null): DocumentManager
     {
         $conn = $this->createStub(Client::class);
 
-        $config ??= $this->getMockAnnotatedConfig();
+        $config ??= $this->getMockAttributeMappingConfig();
 
         $this->dm = DocumentManager::create($conn, $config, $evm ?? $this->getEventManager());
 
@@ -99,17 +98,13 @@ abstract class BaseTestCaseMongoODM extends TestCase
      */
     protected function getMetadataDriverImplementation(): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000) {
-            return new AttributeDriver();
-        }
-
-        return new AnnotationDriver($_ENV['annotation_reader']);
+        return new AttributeDriver();
     }
 
     /**
-     * Get annotation mapping configuration
+     * Get attribute mapping configuration
      */
-    protected function getMockAnnotatedConfig(): Configuration
+    protected function getMockAttributeMappingConfig(): Configuration
     {
         $config = new Configuration();
         $config->addFilter('softdeleteable', SoftDeleteableFilter::class);
@@ -145,11 +140,7 @@ abstract class BaseTestCaseMongoODM extends TestCase
 
     private function getMetadataDefaultDriverImplementation(): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
-            return new AttributeDriver([]);
-        }
-
-        return new AnnotationDriver($_ENV['annotation_reader']);
+        return new AttributeDriver([]);
     }
 
     /**

@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -32,12 +30,7 @@ final class MappingEventSubscriberTest extends ORMMappingTestCase
         parent::setUp();
 
         $config = $this->getBasicConfiguration();
-
-        if (PHP_VERSION_ID >= 80000) {
-            $config->setMetadataDriverImpl(new AttributeDriver([]));
-        } else {
-            $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
-        }
+        $config->setMetadataDriverImpl(new AttributeDriver([]));
 
         $this->em = $this->getBasicEntityManager($config);
     }
@@ -86,12 +79,7 @@ final class MappingEventSubscriberTest extends ORMMappingTestCase
 
         // Create new configuration to use new array cache
         $config = $this->getBasicConfiguration();
-
-        if (PHP_VERSION_ID >= 80000) {
-            $config->setMetadataDriverImpl(new AttributeDriver([]));
-        } else {
-            $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
-        }
+        $config->setMetadataDriverImpl(new AttributeDriver([]));
 
         $this->em = $this->getBasicEntityManager($config);
 

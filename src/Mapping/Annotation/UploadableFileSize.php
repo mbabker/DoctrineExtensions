@@ -9,20 +9,13 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
-
 /**
  * UploadableFileSize Annotation for Uploadable behavioral extension
- *
- * @Annotation
- *
- * @Target("PROPERTY")
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class UploadableFileSize implements GedmoAnnotation
+final class UploadableFileSize implements Annotation
 {
 }

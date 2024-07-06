@@ -9,24 +9,16 @@
 
 namespace Gedmo\Mapping\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Deprecations\Deprecation;
-use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 use Gedmo\Tree\Entity\MappedSuperclass\AbstractClosure;
 
 /**
  * TreeClosure annotation for Tree behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class TreeClosure implements GedmoAnnotation
+final class TreeClosure implements Annotation
 {
     use ForwardCompatibilityTrait;
 
