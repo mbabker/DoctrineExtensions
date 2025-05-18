@@ -130,8 +130,8 @@ abstract class File implements Driver
 
         // if no mapping found try to load mapping file again
         if (null === $mapping) {
-            $yaml = $this->_loadMappingFile($this->locator->findMappingFile($className));
-            $mapping = $yaml[$className];
+            $mappingData = $this->_loadMappingFile($this->locator->findMappingFile($className));
+            $mapping = $mappingData[$className];
         }
 
         return $mapping;

@@ -68,8 +68,7 @@
         "symfony/console": "^5.4 || ^6.0 || ^7.0",
         "symfony/doctrine-bridge": "^5.4 || ^6.0 || ^7.0",
         "symfony/phpunit-bridge": "^6.0 || ^7.0",
-        "symfony/uid": "^5.4 || ^6.0 || ^7.0",
-        "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
+        "symfony/uid": "^5.4 || ^6.0 || ^7.0"
     },
     "conflict": {
         "doctrine/annotations": "<1.13 || >=3.0",

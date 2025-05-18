@@ -9,7 +9,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gedmo\Tests\Mapping\Fixture\Yaml;
+namespace Gedmo\Tests\Mapping\Fixture\Xml;
 
 class BaseCategory
 {

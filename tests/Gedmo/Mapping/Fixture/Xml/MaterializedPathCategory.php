@@ -9,28 +9,29 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gedmo\Tests\Mapping\Fixture\Yaml;
+namespace Gedmo\Tests\Mapping\Fixture\Xml;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class ClosureCategory
+class MaterializedPathCategory
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id = null;
 
     private ?string $title = null;
 
-    /**
-     * @var Collection<int, ClosureCategory>
-     */
-    private $children;
-
-    private ?ClosureCategory $parent = null;
+    private ?string $path = null;
 
     private ?int $level = null;
+
+    /**
+     * @var Collection<int, Category>
+     */
+    private Collection $children;
+
+    private ?MaterializedPathCategory $parent = null;
+
+    private ?\DateTime $lockTime = null;
 
     public function __construct()
     {
@@ -52,13 +53,13 @@ class ClosureCategory
         return $this->title;
     }
 
-    public function addChildren(self $children): void
+    public function addChildren(Category $children): void
     {
         $this->children[] = $children;
     }
 
     /**
-     * @return Collection<int, self>
+     * @return Collection<int, Category>
      */
     public function getChildren(): Collection
     {
@@ -75,13 +76,33 @@ class ClosureCategory
         return $this->parent;
     }
 
-    public function setLevel(int $level): void
+    public function setLevel(?int $level): void
     {
         $this->level = $level;
     }
 
-    public function getLevel(): int
+    public function getLevel(): ?int
     {
         return $this->level;
+    }
+
+    public function setPath(?string $path): void
+    {
+        $this->path = $path;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function setLockTime(?\DateTime $lockTime): void
+    {
+        $this->lockTime = $lockTime;
+    }
+
+    public function getLockTime(): ?\DateTime
+    {
+        return $this->lockTime;
     }
 }

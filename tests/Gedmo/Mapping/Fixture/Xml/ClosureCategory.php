@@ -9,42 +9,31 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gedmo\Tests\Mapping\Fixture\Yaml;
+namespace Gedmo\Tests\Mapping\Fixture\Xml;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class Category extends BaseCategory
+class ClosureCategory
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id = null;
 
     private ?string $title = null;
 
-    private ?string $slug = null;
-
     /**
-     * @var Collection<int, self>
+     * @var Collection<int, ClosureCategory>
      */
-    private $children;
+    private Collection $children;
 
-    private ?Category $parent = null;
+    private ?ClosureCategory $parent = null;
 
-    /**
-     * @var \DateTime
-     */
-    private $changed;
+    private ?int $level = null;
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * @return int $id
-     */
     public function getId(): int
     {
         return $this->id;
@@ -60,28 +49,15 @@ class Category extends BaseCategory
         return $this->title;
     }
 
-    public function setSlug(string $slug): void
-    {
-        $this->slug = $slug;
-    }
-
-    /**
-     * @return string $slug
-     */
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
     public function addChildren(self $children): void
     {
         $this->children[] = $children;
     }
 
     /**
-     * @return Collection<int, self> $children
+     * @return Collection<int, self>
      */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -91,11 +67,18 @@ class Category extends BaseCategory
         $this->parent = $parent;
     }
 
-    /**
-     * @return self $parent
-     */
     public function getParent(): self
     {
         return $this->parent;
+    }
+
+    public function setLevel(int $level): void
+    {
+        $this->level = $level;
+    }
+
+    public function getLevel(): int
+    {
+        return $this->level;
     }
 }

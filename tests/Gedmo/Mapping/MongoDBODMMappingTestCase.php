@@ -13,63 +13,67 @@ namespace Gedmo\Tests\Mapping;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Mapping\Driver\XmlDriver;
+use Doctrine\ODM\MongoDB\Configuration;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use MongoDB\Client;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-abstract class ORMMappingTestCase extends TestCase
+abstract class MongoDBODMMappingTestCase extends TestCase
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
-    protected $cache;
+    protected CacheItemPoolInterface $cache;
+
+    protected DocumentManager $dm;
 
     protected function setUp(): void
     {
         $this->cache = new ArrayAdapter();
+        $this->dm = $this->getBasicDocumentManager();
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->dm->getDocumentDatabases() as $documentDatabase) {
+            $documentDatabase->drop();
+        }
     }
 
     final protected function getBasicConfiguration(): Configuration
     {
         $config = new Configuration();
-        $config->setMetadataCache(new ArrayAdapter());
-        $config->setQueryCache(new ArrayAdapter());
         $config->setProxyDir(TESTS_TEMP_DIR);
-        $config->setProxyNamespace('Gedmo\Mapping\Proxy');
+        $config->setHydratorDir(TESTS_TEMP_DIR);
+        $config->setProxyNamespace('Proxy');
+        $config->setHydratorNamespace('Hydrator');
+        $config->setDefaultDB('gedmo_extensions_test');
+        $config->setAutoGenerateProxyClasses(Configuration::AUTOGENERATE_EVAL);
+        $config->setAutoGenerateHydratorClasses(Configuration::AUTOGENERATE_EVAL);
+        $config->setMetadataCache(new ArrayAdapter());
 
         return $config;
     }
 
-    final protected function getBasicEntityManager(?Configuration $config = null, ?Connection $connection = null, ?EventManager $evm = null): EntityManager
+    final protected function getBasicDocumentManager(?Configuration $config = null, ?Client $client = null, ?EventManager $evm = null): DocumentManager
     {
         if (null === $config) {
             $config = $this->getBasicConfiguration();
             $config->setMetadataDriverImpl($this->createChainedMappingDriver());
         }
 
-        $connection ??= DriverManager::getConnection([
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ], $config);
+        $client = new Client($_ENV['MONGODB_SERVER'], [], ['typeMap' => DocumentManager::CLIENT_TYPEMAP]);
 
-        return new EntityManager($connection, $config, $evm);
+        return DocumentManager::create($client, $config, $evm);
     }
 
     final protected function createChainedMappingDriver(): MappingDriverChain
     {
         $chain = new MappingDriverChain();
 
-        $chain->addDriver(new XmlDriver(__DIR__.'/Driver/Xml', XmlDriver::DEFAULT_FILE_EXTENSION, false), 'Gedmo\Tests\Mapping\Fixture\Xml');
-
-        if (PHP_VERSION_ID >= 80000) {
+        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
             $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');
         } elseif (class_exists(AnnotationDriver::class) && class_exists(AnnotationReader::class)) {
             $chain->addDriver(new AnnotationDriver(new AnnotationReader()), 'Gedmo\Tests\Mapping\Fixture');

@@ -9,39 +9,34 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gedmo\Tests\Mapping\Fixture\Yaml;
+namespace Gedmo\Tests\Mapping\Fixture\Xml;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class MaterializedPathCategory
+class Category extends BaseCategory
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id = null;
 
     private ?string $title = null;
 
-    private ?string $path = null;
-
-    private ?int $level = null;
+    private ?string $slug = null;
 
     /**
-     * @var Collection<int, Category>
+     * @var Collection<int, self>
      */
-    private $children;
+    private Collection $children;
 
-    private ?MaterializedPathCategory $parent = null;
+    private ?Category $parent = null;
 
-    private ?\DateTime $lockTime = null;
+    private ?\DateTime $changed = null;
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -56,13 +51,23 @@ class MaterializedPathCategory
         return $this->title;
     }
 
-    public function addChildren(Category $children): void
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function addChildren(self $children): void
     {
         $this->children[] = $children;
     }
 
     /**
-     * @return Collection<int, Category>
+     * @return Collection<int, self>
      */
     public function getChildren(): Collection
     {
@@ -77,35 +82,5 @@ class MaterializedPathCategory
     public function getParent(): self
     {
         return $this->parent;
-    }
-
-    public function setLevel(?int $level): void
-    {
-        $this->level = $level;
-    }
-
-    public function getLevel(): ?int
-    {
-        return $this->level;
-    }
-
-    public function setPath(?string $path): void
-    {
-        $this->path = $path;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    public function setLockTime(?\DateTime $lockTime): void
-    {
-        $this->lockTime = $lockTime;
-    }
-
-    public function getLockTime(): ?\DateTime
-    {
-        return $this->lockTime;
     }
 }
