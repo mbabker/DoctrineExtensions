@@ -16,12 +16,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 /**
  * Slug annotation for Sluggable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -45,19 +39,11 @@ final class Slug implements GedmoAnnotation
     public string $prefix = '';
     public string $suffix = '';
 
-    /**
-     * @var SlugHandler[]
-     *
-     * @deprecated since gedmo/doctrine-extensions 3.18
-     */
-    public $handlers = [];
-
     public string $dateFormat = 'Y-m-d-H:i';
 
     /**
      * @param array<string, mixed> $data
      * @param string[]             $fields
-     * @param SlugHandler[]        $handlers @deprecated since since gedmo/doctrine-extensions 3.18
      */
     public function __construct(
         array $data = [],
@@ -69,7 +55,6 @@ final class Slug implements GedmoAnnotation
         string $separator = '-',
         string $prefix = '',
         string $suffix = '',
-        array $handlers = [],
         string $dateFormat = 'Y-m-d-H:i',
         bool $uniqueOverTranslations = false
     ) {
@@ -91,7 +76,6 @@ final class Slug implements GedmoAnnotation
             $this->separator = $this->getAttributeValue($data, 'separator', $args, 6, $separator);
             $this->prefix = $this->getAttributeValue($data, 'prefix', $args, 7, $prefix);
             $this->suffix = $this->getAttributeValue($data, 'suffix', $args, 8, $suffix);
-            $this->handlers = $this->getAttributeValue($data, 'handlers', $args, 9, $handlers);
             $this->dateFormat = $this->getAttributeValue($data, 'dateFormat', $args, 10, $dateFormat);
             $this->uniqueOverTranslations = $this->getAttributeValue($data, 'uniqueOverTranslations', $args, 11, $uniqueOverTranslations);
 
@@ -107,7 +91,6 @@ final class Slug implements GedmoAnnotation
         $this->separator = $separator;
         $this->prefix = $prefix;
         $this->suffix = $suffix;
-        $this->handlers = $handlers;
         $this->dateFormat = $dateFormat;
     }
 }

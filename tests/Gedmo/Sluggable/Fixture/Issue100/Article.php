@@ -17,46 +17,27 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Sluggable\Sluggable;
 use Gedmo\Translatable\Translatable;
 
-/**
- * @ORM\Entity
- */
 #[ORM\Entity]
 class Article implements Sluggable, Translatable
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
-    /**
-     * @Gedmo\Translatable
-     *
-     * @ORM\Column(name="title", type="string", length=64)
-     */
     #[ORM\Column(name: 'title', type: Types::STRING, length: 64)]
     #[Gedmo\Translatable]
     private ?string $title = null;
 
-    /**
-     * @Gedmo\Translatable
-     * @Gedmo\Slug(separator="-", updatable=true, fields={"title"}, unique=true, uniqueOverTranslations=true)
-     *
-     * @ORM\Column(name="slug", type="string", length=64, unique=true)
-     */
     #[Gedmo\Translatable]
     #[Gedmo\Slug(fields: ['title'], updatable: true, unique: true, uniqueOverTranslations: true, separator: '-')]
     #[ORM\Column(name: 'slug', type: Types::STRING, length: 64, unique: true)]
     private ?string $slug = null;
 
     /**
-     * @Gedmo\Locale
      * Used locale to override Translation listener`s locale
      * this is not a mapped field of entity metadata, just a simple property
      */

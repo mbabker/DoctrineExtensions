@@ -16,10 +16,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
  * Position annotation for Sortable extension
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
- *
- * @Annotation
- *
- * @Target("PROPERTY")
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class SortablePosition implements GedmoAnnotation

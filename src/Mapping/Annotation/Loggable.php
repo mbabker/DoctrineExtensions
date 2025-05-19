@@ -19,12 +19,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
  *
  * @phpstan-template T of LogEntryInterface
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

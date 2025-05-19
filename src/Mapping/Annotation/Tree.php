@@ -16,12 +16,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 /**
  * Tree annotation for Tree behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

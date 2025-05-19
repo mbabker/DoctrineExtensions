@@ -16,12 +16,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 /**
  * ReferenceIntegrity annotation for ReferenceIntegrity behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
- *
  * @author Evert Harmeling <evert.harmeling@freshheads.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]

@@ -18,8 +18,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
  * to be user like "@ReferenceMany(type="entity", class="MyEntity", identifier="entity_id")"
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- *
- * @Annotation
  */
 abstract class Reference implements GedmoAnnotation
 {

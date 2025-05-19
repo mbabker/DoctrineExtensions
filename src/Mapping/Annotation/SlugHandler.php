@@ -17,10 +17,6 @@ use Gedmo\Sluggable\Handler\SlugHandlerInterface;
 /**
  * SlugHandler annotation for Sluggable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
@@ -34,7 +30,7 @@ final class SlugHandler implements GedmoAnnotation
     public string $class = '';
 
     /**
-     * @var array<SlugHandlerOption>|array<string, mixed>
+     * @var array<string, mixed>
      */
     public array $options = [];
 
@@ -42,7 +38,7 @@ final class SlugHandler implements GedmoAnnotation
      * @param array<string, mixed> $data
      *
      * @phpstan-param string|class-string<SlugHandlerInterface>     $class
-     * @phpstan-param array<SlugHandlerOption>|array<string, mixed> $options
+     * @phpstan-param array<string, mixed> $options
      */
     public function __construct(
         array $data = [],

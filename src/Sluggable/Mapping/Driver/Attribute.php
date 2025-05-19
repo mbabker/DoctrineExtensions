@@ -13,7 +13,6 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Exception\InvalidMappingException;
 use Gedmo\Mapping\Annotation\Slug;
 use Gedmo\Mapping\Annotation\SlugHandler;
-use Gedmo\Mapping\Annotation\SlugHandlerOption;
 use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
 use Gedmo\Sluggable\Handler\SlugHandlerInterface;
 
@@ -35,13 +34,6 @@ class Attribute extends AbstractAnnotationDriver
      * Mapping object configuring a slug handler for a sluggable field.
      */
     public const HANDLER = SlugHandler::class;
-
-    /**
-     * Mapping object configuring an option for a slug handler.
-     *
-     * @deprecated since gedmo/doctrine-extensions 3.18, will be removed in version 4.0.
-     */
-    public const HANDLER_OPTION = SlugHandlerOption::class;
 
     /**
      * List of types which are valid for slug and sluggable fields

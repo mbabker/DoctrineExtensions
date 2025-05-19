@@ -12,37 +12,24 @@ namespace Gedmo\Tests\Tree\Fixture\Issue2616;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="page")
- */
 #[ORM\Entity, ORM\Table(name: 'page')]
 class Page
 {
     /**
      * @var Category|null
-     *
-     * @ORM\OneToOne(targetEntity="Category", inversedBy="page")
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="category_id", nullable=false)
      */
     #[ORM\JoinColumn(name: 'entity_id', referencedColumnName: 'category_id', nullable: false)]
     #[ORM\OneToOne(targetEntity: Category::class, inversedBy: 'page')]
     protected $category;
+
     /**
      * @var int|null
-     *
-     * @ORM\Column(name="page_id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
      */
     #[ORM\Column(name: 'page_id', type: Types::INTEGER)]
     #[ORM\GeneratedValue]
     #[ORM\Id]
     private $id;
 
-    /**
-     * @ORM\Column(name="title", type="string", length=64)
-     */
     #[ORM\Column(name: 'title', type: Types::STRING, length: 64)]
     private ?string $title = null;
 

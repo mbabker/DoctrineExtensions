@@ -11,13 +11,11 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -68,12 +66,7 @@ abstract class ORMMappingTestCase extends TestCase
         $chain = new MappingDriverChain();
 
         $chain->addDriver(new XmlDriver(__DIR__.'/Driver/Xml', XmlDriver::DEFAULT_FILE_EXTENSION, false), 'Gedmo\Tests\Mapping\Fixture\Xml');
-
-        if (PHP_VERSION_ID >= 80000) {
-            $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');
-        } elseif (class_exists(AnnotationDriver::class) && class_exists(AnnotationReader::class)) {
-            $chain->addDriver(new AnnotationDriver(new AnnotationReader()), 'Gedmo\Tests\Mapping\Fixture');
-        }
+        $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');
 
         return $chain;
     }

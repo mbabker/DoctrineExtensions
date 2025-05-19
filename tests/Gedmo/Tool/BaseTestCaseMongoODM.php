@@ -14,7 +14,6 @@ namespace Gedmo\Tests\Tool;
 use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Gedmo\Loggable\LoggableListener;
@@ -33,6 +32,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  * ORM object manager
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
+ *
+ * @requires ext-mongodb
  */
 abstract class BaseTestCaseMongoODM extends TestCase
 {
@@ -99,11 +100,7 @@ abstract class BaseTestCaseMongoODM extends TestCase
      */
     protected function getMetadataDriverImplementation(): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000) {
-            return new AttributeDriver();
-        }
-
-        return new AnnotationDriver($_ENV['annotation_reader']);
+        return new AttributeDriver();
     }
 
     /**
@@ -145,11 +142,7 @@ abstract class BaseTestCaseMongoODM extends TestCase
 
     private function getMetadataDefaultDriverImplementation(): MappingDriver
     {
-        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
-            return new AttributeDriver([]);
-        }
-
-        return new AnnotationDriver($_ENV['annotation_reader']);
+        return new AttributeDriver([]);
     }
 
     /**

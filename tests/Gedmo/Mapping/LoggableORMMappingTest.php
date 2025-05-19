@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Mapping;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Gedmo\Loggable\Entity\LogEntry;
 use Gedmo\Loggable\LoggableListener;
 use Gedmo\Mapping\ExtensionMetadataFactory;
@@ -52,11 +51,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
      */
     public static function dataLoggableObject(): \Generator
     {
-        if (PHP_VERSION_ID >= 80000) {
-            yield 'Model with attributes' => [AnnotatedLoggable::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggable::class];
-        }
+        yield 'Model with attributes' => [AnnotatedLoggable::class];
     }
 
     /**
@@ -108,11 +103,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
     {
         yield 'Model with XML mapping' => [XmlLoggableComposite::class];
 
-        if (PHP_VERSION_ID >= 80000) {
-            yield 'Model with attributes' => [AnnotatedLoggableComposite::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableComposite::class];
-        }
+        yield 'Model with attributes' => [AnnotatedLoggableComposite::class];
     }
 
     /**
@@ -147,11 +138,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
     {
         yield 'Model with XML mapping' => [XmlLoggableCompositeRelation::class];
 
-        if (PHP_VERSION_ID >= 80000) {
-            yield 'Model with attributes' => [AnnotatedLoggableCompositeRelation::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableCompositeRelation::class];
-        }
+        yield 'Model with attributes' => [AnnotatedLoggableCompositeRelation::class];
     }
 
     /**
@@ -189,11 +176,7 @@ final class LoggableORMMappingTest extends ORMMappingTestCase
      */
     public static function dataLoggableObjectWithEmbedded(): \Generator
     {
-        if (PHP_VERSION_ID >= 80000) {
-            yield 'Model with attributes' => [AnnotatedLoggableWithEmbedded::class];
-        } elseif (class_exists(AnnotationDriver::class)) {
-            yield 'Model with annotations' => [AnnotatedLoggableWithEmbedded::class];
-        }
+        yield 'Model with attributes' => [AnnotatedLoggableWithEmbedded::class];
     }
 
     /**

@@ -15,8 +15,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
- *
  * @author Anatoly Marinescu <tolean@zingan.com>
  */
 #[ORM\Entity]
@@ -24,26 +22,15 @@ class News
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
      */
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
-    /**
-     * @ORM\Column(name="title", type="string", length=64)
-     */
     #[ORM\Column(name: 'title', type: Types::STRING, length: 64)]
     private string $title;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Gedmo\Tests\Tree\Fixture\Closure\Category", cascade={"persist"})
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
-     */
     #[ORM\OneToOne(targetEntity: Category::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
     private Category $category;

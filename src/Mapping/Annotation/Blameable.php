@@ -16,12 +16,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
 /**
  * Blameable annotation for Blameable behavioral extension
  *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("PROPERTY")
- *
  * @author David Buchmann <mail@davidbu.ch>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]

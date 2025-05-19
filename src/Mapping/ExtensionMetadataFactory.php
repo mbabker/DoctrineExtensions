@@ -10,8 +10,6 @@
 namespace Gedmo\Mapping;
 
 use Doctrine\Bundle\DoctrineBundle\Mapping\MappingDriver as DoctrineBundleMappingDriver;
-use Doctrine\Common\Annotations\Reader;
-use Doctrine\Deprecations\Deprecation;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as DocumentClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as EntityClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo as LegacyEntityClassMetadata;
@@ -22,8 +20,6 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
 use Doctrine\Persistence\ObjectManager;
 use Gedmo\Exception\RuntimeException;
-use Gedmo\Mapping\Driver\AnnotationDriverInterface;
-use Gedmo\Mapping\Driver\AttributeAnnotationReader;
 use Gedmo\Mapping\Driver\AttributeDriverInterface;
 use Gedmo\Mapping\Driver\AttributeReader;
 use Gedmo\Mapping\Driver\Chain;
@@ -62,42 +58,16 @@ class ExtensionMetadataFactory
     protected $extensionNamespace;
 
     /**
-     * Metadata annotation reader
+     * Metadata attribute reader
      *
-     * @var Reader|AttributeReader|object|null
+     * @var AttributeReader|null
      */
     protected $annotationReader;
 
-    private ?CacheItemPoolInterface $cacheItemPool = null;
+    private ?CacheItemPoolInterface $cacheItemPool;
 
-    /**
-     * @param Reader|AttributeReader|object|null $annotationReader
-     *
-     * @note Providing any object as the third argument is deprecated, as of 4.0 an {@see AttributeReader} will be required
-     */
-    public function __construct(ObjectManager $objectManager, string $extensionNamespace, ?object $annotationReader = null, ?CacheItemPoolInterface $cacheItemPool = null)
+    public function __construct(ObjectManager $objectManager, string $extensionNamespace, ?AttributeReader $annotationReader = null, ?CacheItemPoolInterface $cacheItemPool = null)
     {
-        if (null !== $annotationReader) {
-            if ($annotationReader instanceof Reader) {
-                Deprecation::trigger(
-                    'gedmo/doctrine-extensions',
-                    'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2772',
-                    'Annotations support is deprecated, migrate your application to use attributes and pass an instance of %s to the %s constructor instead.',
-                    AttributeReader::class,
-                    static::class
-                );
-            } elseif (!$annotationReader instanceof AttributeReader) {
-                Deprecation::trigger(
-                    'gedmo/doctrine-extensions',
-                    'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2258',
-                    'Providing an annotation reader which does not implement %s or is not an instance of %s to %s is deprecated.',
-                    Reader::class,
-                    AttributeReader::class,
-                    static::class
-                );
-            }
-        }
-
         $this->objectManager = $objectManager;
         $this->annotationReader = $annotationReader;
         $this->extensionNamespace = $extensionNamespace;
@@ -224,16 +194,12 @@ class ExtensionMetadataFactory
             if (!class_exists($driverClassName)) {
                 $originalDriverClassName = $driverClassName;
 
-                // try to fall back to either an annotation or attribute driver depending on the available dependencies
-                if (interface_exists(Reader::class)) {
-                    $driverClassName = $this->extensionNamespace.'\Mapping\Driver\Annotation';
-                } elseif (\PHP_VERSION_ID >= 80000) {
-                    $driverClassName = $this->extensionNamespace.'\Mapping\Driver\Attribute';
-                }
+                // try to fall back to an attribute driver
+                $driverClassName = $this->extensionNamespace.'\Mapping\Driver\Attribute';
 
                 if (!class_exists($driverClassName)) {
                     if ($originalDriverClassName !== $driverClassName) {
-                        throw new RuntimeException("Failed to create mapping driver: ({$originalDriverClassName}), the extension driver nor a fallback annotation or attribute driver could be found.");
+                        throw new RuntimeException("Failed to create mapping driver: ({$originalDriverClassName}), the extension driver nor a fallback attribute driver could be found.");
                     }
 
                     throw new RuntimeException("Failed to fallback to annotation driver: ({$driverClassName}), extension driver was not found.");
@@ -254,18 +220,10 @@ class ExtensionMetadataFactory
 
             if ($driver instanceof AttributeDriverInterface) {
                 if (null === $this->annotationReader) {
-                    throw new RuntimeException("Cannot use metadata driver ({$driverClassName}), an annotation or attribute reader was not provided.");
+                    throw new RuntimeException("Cannot use metadata driver ({$driverClassName}), an attribute reader was not provided.");
                 }
 
-                if ($driver instanceof AnnotationDriverInterface) {
-                    $driver->setAnnotationReader($this->annotationReader);
-                } else {
-                    if ($this->annotationReader instanceof AttributeReader) {
-                        $driver->setAnnotationReader($this->annotationReader);
-                    } else {
-                        $driver->setAnnotationReader(new AttributeAnnotationReader(new AttributeReader(), $this->annotationReader));
-                    }
-                }
+                $driver->setAnnotationReader($this->annotationReader);
             }
         }
 

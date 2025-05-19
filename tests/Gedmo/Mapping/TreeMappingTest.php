@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -45,14 +43,10 @@ final class TreeMappingTest extends ORMMappingTestCase
 
         $chain->addDriver(new XmlDriver(__DIR__.'/Driver/Xml', XmlDriver::DEFAULT_FILE_EXTENSION, false), 'Gedmo\Tests\Mapping\Fixture\Xml');
 
-        if (PHP_VERSION_ID >= 80000) {
-            $annotationOrAttributeDriver = new AttributeDriver([]);
-        } else {
-            $annotationOrAttributeDriver = new AnnotationDriver(new AnnotationReader());
-        }
+        $attributeDriver = new AttributeDriver([]);
 
-        $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tests\Tree\Fixture');
-        $chain->addDriver($annotationOrAttributeDriver, 'Gedmo\Tree');
+        $chain->addDriver($attributeDriver, 'Gedmo\Tests\Tree\Fixture');
+        $chain->addDriver($attributeDriver, 'Gedmo\Tree');
 
         $config->setMetadataDriverImpl($chain);
 

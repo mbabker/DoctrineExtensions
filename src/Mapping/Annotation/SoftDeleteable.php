@@ -17,12 +17,6 @@ use Gedmo\Mapping\Annotation\Annotation as GedmoAnnotation;
  * Group annotation for SoftDeleteable extension
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
- *
- * @Annotation
- *
- * @NamedArgumentConstructor
- *
- * @Target("CLASS")
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class SoftDeleteable implements GedmoAnnotation

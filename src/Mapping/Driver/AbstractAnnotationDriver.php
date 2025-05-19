@@ -9,8 +9,6 @@
 
 namespace Gedmo\Mapping\Driver;
 
-use Doctrine\Common\Annotations\Reader;
-use Doctrine\Deprecations\Deprecation;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 
@@ -24,12 +22,8 @@ abstract class AbstractAnnotationDriver implements AttributeDriverInterface
 {
     /**
      * Annotation reader instance
-     *
-     * @var Reader|AttributeReader|object
-     *
-     * @todo Remove the support for the `object` type in the next major release.
      */
-    protected $reader;
+    protected AttributeReader $reader;
 
     /**
      * Original driver if it is available
@@ -46,43 +40,12 @@ abstract class AbstractAnnotationDriver implements AttributeDriverInterface
     protected $validTypes = [];
 
     /**
-     * Set the annotation reader instance
-     *
-     * When originally implemented, `Doctrine\Common\Annotations\Reader` was not available,
-     * therefore this method may accept any object implementing these methods from the interface:
-     *
-     *     getClassAnnotations([reflectionClass])
-     *     getClassAnnotation([reflectionClass], [name])
-     *     getPropertyAnnotations([reflectionProperty])
-     *     getPropertyAnnotation([reflectionProperty], [name])
-     *
-     * @param Reader|AttributeReader|object $reader
+     * Set the annotation reader instance.
      *
      * @return void
-     *
-     * @note Providing any object is deprecated, as of 4.0 an {@see AttributeReader} will be required
      */
-    public function setAnnotationReader($reader)
+    public function setAnnotationReader(AttributeReader $reader)
     {
-        if ($reader instanceof Reader) {
-            Deprecation::trigger(
-                'gedmo/doctrine-extensions',
-                'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2772',
-                'Annotations support is deprecated, migrate your application to use attributes and pass an instance of %s to the %s() method instead.',
-                AttributeReader::class,
-                __METHOD__
-            );
-        } elseif (!$reader instanceof AttributeReader) {
-            Deprecation::trigger(
-                'gedmo/doctrine-extensions',
-                'https://github.com/doctrine-extensions/DoctrineExtensions/pull/2558',
-                'Providing an annotation reader which does not implement %s or is not an instance of %s to %s() is deprecated.',
-                Reader::class,
-                AttributeReader::class,
-                __METHOD__
-            );
-        }
-
         $this->reader = $reader;
     }
 

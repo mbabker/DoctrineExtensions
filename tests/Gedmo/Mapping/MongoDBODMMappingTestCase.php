@@ -11,11 +11,9 @@ declare(strict_types=1);
 
 namespace Gedmo\Tests\Mapping;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use MongoDB\Client;
@@ -72,12 +70,7 @@ abstract class MongoDBODMMappingTestCase extends TestCase
     final protected function createChainedMappingDriver(): MappingDriverChain
     {
         $chain = new MappingDriverChain();
-
-        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
-            $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');
-        } elseif (class_exists(AnnotationDriver::class) && class_exists(AnnotationReader::class)) {
-            $chain->addDriver(new AnnotationDriver(new AnnotationReader()), 'Gedmo\Tests\Mapping\Fixture');
-        }
+        $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Mapping\Fixture');
 
         return $chain;
     }

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Gedmo\Tests\Sluggable\Issue;
 
 use Doctrine\Common\EventManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -51,12 +50,7 @@ final class Issue116Test extends BaseTestCaseORM
     protected function getMetadataDriverImplementation(): MappingDriver
     {
         $chain = new MappingDriverChain();
-
-        if (PHP_VERSION_ID >= 80000) {
-            $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Sluggable\Fixture\Issue116');
-        } else {
-            $chain->addDriver(new AnnotationDriver($_ENV['annotation_reader']), 'Gedmo\Tests\Sluggable\Fixture\Issue116');
-        }
+        $chain->addDriver(new AttributeDriver([]), 'Gedmo\Tests\Sluggable\Fixture\Issue116');
 
         return $chain;
     }
